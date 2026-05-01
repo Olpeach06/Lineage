@@ -1,0 +1,332 @@
+﻿<Page x:Class="Lineage.Pages.AnimalProfilePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      mc:Ignorable="d"
+      d:DesignHeight="800" d:DesignWidth="1000"
+      Title="Профиль животного"
+      Background="#F5F0E6"
+      Loaded="Page_Loaded">
+
+    <Page.Resources>
+        <Style x:Key="BlockStyle" TargetType="Border">
+            <Setter Property="Background" Value="#FDF8F0"/>
+            <Setter Property="CornerRadius" Value="15"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="BorderBrush" Value="#B7A48B"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Верхняя панель с кнопкой назад -->
+        <Border Grid.Row="0"
+                Background="#FDF8F0"
+                BorderBrush="#D6C9B8"
+                BorderThickness="0,0,0,1"
+                Padding="15,10">
+            <StackPanel Orientation="Horizontal">
+                <Button Content="← Назад к дереву"
+                        Click="BackButton_Click"
+                        Background="Transparent"
+                        BorderBrush="#B7A48B"
+                        Foreground="#5C4E3D"
+                        Padding="15,8"
+                        BorderThickness="1"
+                        Cursor="Hand"/>
+                <TextBlock x:Name="txtPageTitle"
+                           Text="Профиль животного"
+                           FontSize="18" FontWeight="SemiBold"
+                           Foreground="#5C4E3D"
+                           VerticalAlignment="Center"
+                           Margin="20,0,0,0"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Основное содержимое -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="20">
+
+                <!-- Карточка профиля -->
+                <Border Style="{StaticResource BlockStyle}" Margin="0,0,0,20">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Фото -->
+                        <Border Grid.Column="0"
+                                Width="160" Height="160"
+                                BorderBrush="#B7A48B"
+                                BorderThickness="1"
+                                CornerRadius="10"
+                                Background="#F5F0E6"
+                                HorizontalAlignment="Left">
+                            <Grid>
+                                <Image x:Name="imgProfile" Stretch="UniformToFill" Visibility="Collapsed"/>
+                                <TextBlock x:Name="txtNoProfilePhoto"
+                                           Text="🐄" FontSize="60"
+                                           Foreground="#B7A48B"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Visibility="Visible"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Основная информация -->
+                        <StackPanel Grid.Column="1" Margin="20,0">
+                            <TextBlock x:Name="txtNickname"
+                                       Text="Кличка"
+                                       FontSize="26" FontWeight="Bold"
+                                       Foreground="#5C4E3D"/>
+                            <TextBlock x:Name="txtInventoryNumber"
+                                       Text="Инв. номер: KH-001"
+                                       Foreground="#8FAA7A"
+                                       FontSize="14"
+                                       Margin="0,5,0,5"/>
+                            <WrapPanel Margin="0,0,0,10">
+                                <TextBlock Text="📅 " Foreground="#8FAA7A" FontSize="16"/>
+                                <TextBlock x:Name="txtBirthDate" Text="15.03.2020" Foreground="#6B5E4A" FontSize="16"/>
+                                <TextBlock Text=" — " Foreground="#6B5E4A" FontSize="16"/>
+                                <TextBlock x:Name="txtDeathDate" Text="..." Foreground="#6B5E4A" FontSize="16"/>
+                            </WrapPanel>
+                            <WrapPanel Margin="0,0,0,10">
+                                <TextBlock x:Name="txtSpeciesIcon" Text="🐄" Foreground="#8FAA7A" FontSize="16" Margin="0,0,5,0"/>
+                                <TextBlock x:Name="txtSpecies" Text="КРС" Foreground="#6B5E4A" FontSize="16"/>
+                                <TextBlock Text=" | " Foreground="#6B5E4A" FontSize="16"/>
+                                <TextBlock x:Name="txtBreed" Text="Голштинская" Foreground="#6B5E4A" FontSize="16"/>
+                            </WrapPanel>
+                            <WrapPanel Margin="0,0,0,10">
+                                <TextBlock x:Name="txtGenderSymbol" Text="♀" Foreground="#8FAA7A" FontSize="16" Margin="0,0,5,0"/>
+                                <TextBlock x:Name="txtGender" Text="Самка" Foreground="#6B5E4A" FontSize="16"/>
+                                <TextBlock Text=" | " Foreground="#6B5E4A" FontSize="16"/>
+                                <TextBlock x:Name="txtPedigreeClass" Text="Класс: Элита" Foreground="#6B5E4A" FontSize="16"/>
+                            </WrapPanel>
+                            <WrapPanel>
+                                <TextBlock Text="📍 " Foreground="#8FAA7A" FontSize="16"/>
+                                <TextBlock x:Name="txtBirthPlace" Text="Место рождения: Московская обл." Foreground="#6B5E4A" FontSize="14"/>
+                            </WrapPanel>
+                        </StackPanel>
+
+                        <!-- Кнопки действий -->
+                        <StackPanel Grid.Column="2" VerticalAlignment="Top">
+                            <Button x:Name="btnEdit"
+                                    Content="✎ Редактировать"
+                                    Width="140" Height="35"
+                                    Background="#8FAA7A"
+                                    Foreground="White"
+                                    BorderThickness="0"
+                                    Margin="0,0,0,10"
+                                    Click="EditButton_Click"/>
+                            <Button x:Name="btnAddBreeding"
+                                    Content="🔗 Добавить вязку"
+                                    Width="140" Height="35"
+                                    Background="Transparent"
+                                    BorderBrush="#B7A48B"
+                                    Foreground="#5C4E3D"
+                                    BorderThickness="1"
+                                    Margin="0,0,0,10"
+                                    Click="AddBreedingButton_Click"/>
+                            <Button x:Name="btnAddExhibition"
+                                    Content="🏆 Добавить выставку"
+                                    Width="140" Height="35"
+                                    Background="Transparent"
+                                    BorderBrush="#B7A48B"
+                                    Foreground="#5C4E3D"
+                                    BorderThickness="1"
+                                    Click="AddExhibitionButton_Click"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Родословная -->
+                <Border Style="{StaticResource BlockStyle}" Margin="0,0,0,20">
+                    <StackPanel>
+                        <TextBlock Text="🌳 Родословная"
+                                   FontSize="18" FontWeight="SemiBold"
+                                   Foreground="#5C4E3D"
+                                   Margin="0,0,0,15"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Border Grid.Column="0"
+                                    Background="#F5F0E6"
+                                    CornerRadius="10"
+                                    Padding="15"
+                                    Margin="0,0,10,0">
+                                <StackPanel>
+                                    <TextBlock Text="Отец" FontWeight="Bold" Foreground="#5C4E3D" Margin="0,0,0,10"/>
+                                    <TextBlock x:Name="txtFather" Text="Буран" Foreground="#6B5E4A" Cursor="Hand"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Grid.Column="1"
+                                    Background="#F5F0E6"
+                                    CornerRadius="10"
+                                    Padding="15"
+                                    Margin="5,0">
+                                <StackPanel>
+                                    <TextBlock Text="Мать" FontWeight="Bold" Foreground="#5C4E3D" Margin="0,0,0,10"/>
+                                    <TextBlock x:Name="txtMother" Text="Зорька" Foreground="#6B5E4A" Cursor="Hand"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Grid.Column="2"
+                                    Background="#F5F0E6"
+                                    CornerRadius="10"
+                                    Padding="15"
+                                    Margin="10,0,0,0">
+                                <StackPanel>
+                                    <TextBlock Text="Потомство" FontWeight="Bold" Foreground="#5C4E3D" Margin="0,0,0,10"/>
+                                    <TextBlock x:Name="txtOffspring" Text="Рябинка" Foreground="#6B5E4A" Cursor="Hand"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Племенные характеристики и продуктивность -->
+                <Grid Margin="0,0,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Племенные характеристики -->
+                    <Border Grid.Column="0" Style="{StaticResource BlockStyle}">
+                        <StackPanel>
+                            <TextBlock Text="📊 Племенные характеристики"
+                                       FontSize="18" FontWeight="SemiBold"
+                                       Foreground="#5C4E3D"
+                                       Margin="0,0,0,15"/>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Племенной класс:" Foreground="#6B5E4A"/>
+                                <TextBlock Grid.Row="0" Grid.Column="1" x:Name="txtClass" Text="Элита" Foreground="#5C4E3D" FontWeight="SemiBold"/>
+
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Племенная ценность:" Foreground="#6B5E4A" Margin="0,5,0,0"/>
+                                <TextBlock Grid.Row="1" Grid.Column="1" x:Name="txtBreedingValue" Text="92.5" Foreground="#5C4E3D" Margin="0,5,0,0"/>
+
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Племенное животное:" Foreground="#6B5E4A" Margin="0,5,0,0"/>
+                                <TextBlock Grid.Row="2" Grid.Column="1" x:Name="txtIsBreedingStock" Text="Да" Foreground="#5C4E3D" Margin="0,5,0,0"/>
+
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Промеры:" Foreground="#6B5E4A" Margin="0,5,0,0"/>
+                                <TextBlock Grid.Row="3" Grid.Column="1" x:Name="txtMeasurements" Text="145 см / 210 см" Foreground="#5C4E3D" Margin="0,5,0,0"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Продуктивность -->
+                    <Border Grid.Column="2" Style="{StaticResource BlockStyle}">
+                        <StackPanel>
+                            <TextBlock Text="🥛 Продуктивность"
+                                       FontSize="18" FontWeight="SemiBold"
+                                       Foreground="#5C4E3D"
+                                       Margin="0,0,0,15"/>
+                            <TextBlock x:Name="txtProductivity" Text="Загрузка..." Foreground="#6B5E4A"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Вкладки (Вязки, Выставки, Оценки) -->
+                <Border Style="{StaticResource BlockStyle}">
+                    <StackPanel>
+                        <TabControl BorderThickness="0" Background="Transparent">
+                            <TabItem x:Name="tabBreedings" Header="🔗 Вязки" Background="#F5F0E6">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="250">
+                                    <ItemsControl x:Name="icBreedings" Margin="5">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="#F5F0E6" CornerRadius="8" Padding="10" Margin="0,0,0,5">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="100"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Column="0" Text="{Binding BreedingDate}" Foreground="#8FAA7A" FontWeight="Bold"/>
+                                                        <TextBlock Grid.Column="1" Text="{Binding Info}" Foreground="#6B5E4A" Margin="10,0"/>
+                                                        <Button Grid.Column="2" Content="Подробнее" Background="#8FAA7A" Foreground="White" BorderThickness="0" Padding="10,5" FontSize="11" Cursor="Hand" Click="BreedingDetails_Click" Tag="{Binding Id}"/>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                            </TabItem>
+
+                            <TabItem x:Name="tabExhibitions" Header="🏆 Выставки" Background="#F5F0E6">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="250">
+                                    <ItemsControl x:Name="icExhibitions" Margin="5">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="#F5F0E6" CornerRadius="8" Padding="10" Margin="0,0,0,5">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="100"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Column="0" Text="{Binding ExhibitionDate}" Foreground="#8FAA7A" FontWeight="Bold"/>
+                                                        <TextBlock Grid.Column="1" Text="{Binding Name}" Foreground="#6B5E4A" Margin="10,0"/>
+                                                        <Button Grid.Column="2" Content="Подробнее" Background="#8FAA7A" Foreground="White" BorderThickness="0" Padding="10,5" FontSize="11" Cursor="Hand" Click="ExhibitionDetails_Click" Tag="{Binding Id}"/>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                            </TabItem>
+
+                            <TabItem x:Name="tabAssessments" Header="⭐ Оценки" Background="#F5F0E6">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="250">
+                                    <ItemsControl x:Name="icAssessments" Margin="5">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="#F5F0E6" CornerRadius="8" Padding="10" Margin="0,0,0,5">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="100"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Column="0" Text="{Binding AssessmentDate}" Foreground="#8FAA7A" FontWeight="Bold"/>
+                                                        <TextBlock Grid.Column="1" Text="{Binding Class}" Foreground="#6B5E4A" Margin="10,0"/>
+                                                        <Button Grid.Column="2" Content="Подробнее" Background="#8FAA7A" Foreground="White" BorderThickness="0" Padding="10,5" FontSize="11" Cursor="Hand" Click="AssessmentDetails_Click" Tag="{Binding Id}"/>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                            </TabItem>
+                        </TabControl>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

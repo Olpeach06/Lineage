@@ -1,0 +1,298 @@
+﻿<Page x:Class="Lineage.Pages.UsersPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      mc:Ignorable="d"
+      d:DesignHeight="800" d:DesignWidth="1200"
+      Title="Управление пользователями"
+      Background="#F5F0E6"
+      Loaded="Page_Loaded">
+
+    <Page.Resources>
+        <DropShadowEffect x:Key="ShadowEffect"
+                          BlurRadius="10"
+                          Opacity="0.1"
+                          ShadowDepth="2"
+                          Color="#5C4E3D"/>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- ВЕРХНЕЕ МЕНЮ -->
+        <Border Grid.Row="0"
+                Background="#FDF8F0"
+                BorderBrush="#D6C9B8"
+                BorderThickness="0,0,0,1"
+                Effect="{StaticResource ShadowEffect}">
+            <Grid Margin="20,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Логотип -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="0,0,40,0">
+                    <Image Source="/Images/icon-tree.png" Width="32" Height="32" Margin="0,0,8,0"/>
+                    <TextBlock Text="Genealogy" FontSize="20" FontWeight="SemiBold"
+                               Foreground="#5C4E3D" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Навигация -->
+                <Button Grid.Column="1" Content="Главная"
+                        Click="MainPageButton_Click" Margin="5,0"
+                        Background="Transparent" Foreground="#6B5E4A"
+                        BorderThickness="0" Padding="15,8"
+                        FontSize="14" FontWeight="Medium" Cursor="Hand">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border x:Name="border" Background="{TemplateBinding Background}"
+                                                Padding="{TemplateBinding Padding}" CornerRadius="8">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="border" Property="Background" Value="#F0E9DE"/>
+                                                <Setter Property="Foreground" Value="#8FAA7A"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Button.Style>
+                </Button>
+
+                <Button Grid.Column="2" Content="Мои проекты"
+                        Click="TreesButton_Click" Margin="5,0"
+                        Background="Transparent" Foreground="#6B5E4A"
+                        BorderThickness="0" Padding="15,8"
+                        FontSize="14" FontWeight="Medium" Cursor="Hand">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border x:Name="border" Background="{TemplateBinding Background}"
+                                                Padding="{TemplateBinding Padding}" CornerRadius="8">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="border" Property="Background" Value="#F0E9DE"/>
+                                                <Setter Property="Foreground" Value="#8FAA7A"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Button.Style>
+                </Button>
+
+                <Button Grid.Column="3" Content="Отчеты"
+                        Click="ReportsButton_Click" Margin="5,0"
+                        Background="Transparent" Foreground="#6B5E4A"
+                        BorderThickness="0" Padding="15,8"
+                        FontSize="14" FontWeight="Medium" Cursor="Hand">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border x:Name="border" Background="{TemplateBinding Background}"
+                                                Padding="{TemplateBinding Padding}" CornerRadius="8">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="border" Property="Background" Value="#F0E9DE"/>
+                                                <Setter Property="Foreground" Value="#8FAA7A"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Button.Style>
+                </Button>
+
+                <Button Grid.Column="4" Content="👥 Пользователи" IsEnabled="False" Margin="5,0"
+                        Background="Transparent" Foreground="#8FAA7A"
+                        BorderThickness="0" Padding="15,8"
+                        FontSize="14" FontWeight="SemiBold" Cursor="Hand"/>
+
+                <!-- Профиль и выход -->
+                <StackPanel Grid.Column="6" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Border Background="#F5F0E6" CornerRadius="20" Padding="10,5,15,5" Margin="0,0,15,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="👤" FontSize="14" Foreground="#8FAA7A" Margin="0,0,8,0"/>
+                            <TextBlock x:Name="txtUserName" Text="Имя пользователя"
+                                       VerticalAlignment="Center" Foreground="#5C4E3D" FontWeight="Medium"/>
+                        </StackPanel>
+                    </Border>
+                    <Button Content="Выйти" Click="LogoutButton_Click"
+                            Background="Transparent" BorderBrush="#D6C9B8" BorderThickness="1"
+                            Foreground="#8B7E6B" Padding="12,5" Cursor="Hand">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="border" Background="{TemplateBinding Background}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                                    Padding="{TemplateBinding Padding}" CornerRadius="8">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="border" Property="Background" Value="#F0E9DE"/>
+                                                    <Setter Property="Foreground" Value="#8FAA7A"/>
+                                                    <Setter TargetName="border" Property="BorderBrush" Value="#8FAA7A"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ОСНОВНОЙ КОНТЕНТ -->
+        <Grid Grid.Row="1" Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Заголовок и кнопка добавления -->
+            <Grid Grid.Row="0" Margin="0,0,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0"
+                           Text="УПРАВЛЕНИЕ ПОЛЬЗОВАТЕЛЯМИ"
+                           FontSize="24" FontWeight="SemiBold"
+                           Foreground="#5C4E3D"
+                           VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <!-- Поиск -->
+                    <Border BorderBrush="#D6C9B8" BorderThickness="1" CornerRadius="8" Height="35" Background="White">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="30"/>
+                                <ColumnDefinition Width="30"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox x:Name="txtSearch" Text="Поиск..." Foreground="#8B7E6B"
+                                     Background="Transparent" BorderThickness="0" Padding="10,7"
+                                     GotFocus="txtSearch_GotFocus" LostFocus="txtSearch_LostFocus"
+                                     KeyDown="txtSearch_KeyDown" TextChanged="txtSearch_TextChanged"/>
+                            <Button Grid.Column="1" x:Name="btnClearSearch" Content="✕"
+                                    Background="Transparent" BorderThickness="0" Cursor="Hand"
+                                    Width="30" Visibility="Collapsed" Click="ClearSearch_Click"
+                                    Foreground="#8B7E6B" FontSize="14" FontWeight="Bold"/>
+                            <Button Grid.Column="2" Content="🔍" Background="Transparent"
+                                    BorderThickness="0" Cursor="Hand" Click="SearchButton_Click"/>
+                        </Grid>
+                    </Border>
+                    <Button x:Name="btnAddUser"
+                            Content="➕ Добавить"
+                            Width="100" Height="35"
+                            Background="#8FAA7A" Foreground="White"
+                            BorderThickness="0" Margin="10,0,0,0"
+                            Click="AddUserButton_Click"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Таблица пользователей -->
+            <Border Grid.Row="1"
+                    Background="#FDF8F0"
+                    CornerRadius="10"
+                    BorderBrush="#D6C9B8"
+                    BorderThickness="1"
+                    Padding="0">
+                <ListView x:Name="lvUsers"
+                          BorderThickness="0"
+                          Background="Transparent"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto"
+                          SelectionMode="Single"
+                          MouseDoubleClick="UserDoubleClick">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="ID" Width="50" DisplayMemberBinding="{Binding Id}"/>
+                            <GridViewColumn Header="Логин" Width="150" DisplayMemberBinding="{Binding Username}"/>
+                            <GridViewColumn Header="Email" Width="200" DisplayMemberBinding="{Binding Email}"/>
+                            <GridViewColumn Header="Роль" Width="120" DisplayMemberBinding="{Binding RoleName}"/>
+                            <GridViewColumn Header="Связанная персона" Width="150">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding PersonName}" Foreground="#6B5E4A" VerticalAlignment="Center"/>
+                                            <Button x:Name="btnLinkPerson" Content="🔗" Width="25" Height="25"
+                                                    Background="Transparent" BorderBrush="#D6C9B8" BorderThickness="1"
+                                                    Margin="5,0,0,0" Cursor="Hand" Click="LinkPerson_Click" Tag="{Binding Id}"
+                                                    ToolTip="Привязать к персоне" Visibility="{Binding CanEdit}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Активен" Width="80">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding IsActive}" IsEnabled="False"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Дата регистрации" Width="120" DisplayMemberBinding="{Binding CreatedDate}"/>
+                            <GridViewColumn Header="Последний вход" Width="120" DisplayMemberBinding="{Binding LastLoginDate}"/>
+                            <GridViewColumn Header="Действия" Width="80">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="✎" Width="30" Height="25"
+                                                    Background="Transparent" BorderBrush="#D6C9B8" BorderThickness="1"
+                                                    Margin="0,0,5,0" Cursor="Hand" Click="EditUser_Click" Tag="{Binding Id}"
+                                                    Visibility="{Binding CanEdit}"/>
+                                            <Button Content="🗑" Width="30" Height="25"
+                                                    Background="Transparent" BorderBrush="#FF8C00" BorderThickness="1"
+                                                    Cursor="Hand" Click="DeleteUser_Click" Tag="{Binding Id}"
+                                                    Visibility="{Binding IsAdmin}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </Border>
+
+            <!-- Информация о количестве пользователей -->
+            <TextBlock Grid.Row="2"
+                       x:Name="txtUsersCount"
+                       Text="Всего пользователей: 0"
+                       Foreground="#8B7E6B"
+                       Margin="0,10,0,0"
+                       HorizontalAlignment="Right"/>
+        </Grid>
+    </Grid>
+</Page>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="57cf5abb49604087abae6bc64c413f01" Name="Diagram1">
+        <EntityTypeShape EntityType="GenealogyUnifiedDBModel.AnimalAssessments" Width="1.5" PointX="7.5" PointY="19.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="GenealogyUnifiedDBModel.AnimalGenders" Width="1.5" PointX="3" PointY="16.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="GenealogyUnifiedDBModel.AnimalPedigree" Width="1.5" PointX="10.5" PointY="19.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="GenealogyUnifiedDBModel.Animals" Width="1.5" PointX="5.25" PointY="16.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="GenealogyUnifiedDBModel.Breedings" Width="1.5" PointX="10.5" PointY="14.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="GenealogyUnifiedDBModel.Breeds" Width="1.5" PointX="3" PointY="13.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="GenealogyUnifiedDBModel.Colors" Width="1.5" PointX="3" PointY="27.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="GenealogyUnifiedDBModel.Exhibitions" Width="1.5" PointX="7.5" PointY="14.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="GenealogyUnifiedDBModel.FamilyTrees" Width="1.5" PointX="1.5" PointY="22.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="GenealogyUnifiedDBModel.Genders" Width="1.5" PointX="1.5" PointY="39" IsExpanded="true" />
+        <EntityTypeShape EntityType="GenealogyUnifiedDBModel.MediaFiles" Width="1.5" PointX="8.25" PointY="27.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="GenealogyUnifiedDBModel.MediaLinks" Width="1.5" PointX="10.5" PointY="23.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="GenealogyUnifiedDBModel.MediaTypes" Width="1.5" PointX="6" PointY="28.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="GenealogyUnifiedDBModel.PedigreeClasses" Width="1.5" PointX="3" PointY="18.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="GenealogyUnifiedDBModel.PersonRelationships" Width="1.5" PointX="5.25" PointY="32.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="GenealogyUnifiedDBModel.Persons" Width="1.5" PointX="0.75" PointY="30.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="GenealogyUnifiedDBModel.ProjectTypes" Width="1.5" PointX="1.5" PointY="10.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="GenealogyUnifiedDBModel.Species" Width="1.5" PointX="0.75" PointY="14.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="GenealogyUnifiedDBModel.Stories" Width="1.5" PointX="8.25" PointY="31.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="GenealogyUnifiedDBModel.sysdiagrams" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="GenealogyUnifiedDBModel.UserRoles" Width="1.5" PointX="0.75" PointY="41.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="GenealogyUnifiedDBModel.Users" Width="1.5" PointX="3" PointY="32.25" IsExpanded="true" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_AnimalAssessments_Animal" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_AnimalAssessments_Class" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_AnimalAssessments_Creator" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_Animals_Gender" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_AnimalPedigree_Animal" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_AnimalPedigree_Creator" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_AnimalPedigree_Father" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_AnimalPedigree_Mother" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_Animals_Breed" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_Animals_Color" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_Animals_Creator" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_Animals_Owner" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_Animals_PedigreeClass" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_Animals_Species" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_Animals_Tree" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_Breedings_Female" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_Breedings_Male" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_Exhibitions_Animal" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_MediaLinks_Animal" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_Breedings_Creator" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_Breedings_Tree" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_Breeds_Species" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_Colors_Species" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_Exhibitions_Creator" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_Exhibitions_Tree" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_FamilyTrees_Creator" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_FamilyTrees_ProjectType" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_Persons_Tree" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_Persons_Gender" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_MediaFiles_Type" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_MediaFiles_Uploader" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_MediaLinks_File" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_MediaLinks_Person" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_MediaLinks_Story" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_PersonRelationships_Creator" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_PersonRelationships_Person1" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_PersonRelationships_Person2" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_Persons_Creator" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_Stories_Person" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_Users_Person" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_Stories_Creator" ManuallyRouted="false" />
+        <AssociationConnector Association="GenealogyUnifiedDBModel.FK_Users_Role" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

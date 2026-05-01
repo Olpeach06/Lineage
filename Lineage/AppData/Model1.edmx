@@ -1,0 +1,2395 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="Хранилище GenealogyUnifiedDBModel" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="AnimalAssessments">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AnimalId" Type="int" Nullable="false" />
+          <Property Name="AssessmentDate" Type="date" Nullable="false" />
+          <Property Name="ClassId" Type="int" Nullable="false" />
+          <Property Name="OverallScore" Type="decimal" Precision="5" Scale="2" />
+          <Property Name="ExteriorScore" Type="decimal" Precision="5" Scale="2" />
+          <Property Name="ProductivityScore" Type="decimal" Precision="5" Scale="2" />
+          <Property Name="OffspringScore" Type="decimal" Precision="5" Scale="2" />
+          <Property Name="CommissionMembers" Type="nvarchar" MaxLength="200" />
+          <Property Name="CertificateNumber" Type="nvarchar" MaxLength="50" />
+          <Property Name="ValidUntil" Type="date" />
+          <Property Name="Notes" Type="nvarchar(max)" />
+          <Property Name="CreatedByUserId" Type="int" Nullable="false" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="AnimalGenders">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="20" Nullable="false" />
+        </EntityType>
+        <EntityType Name="AnimalPedigree">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AnimalId" Type="int" Nullable="false" />
+          <Property Name="FatherId" Type="int" />
+          <Property Name="MotherId" Type="int" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+          <Property Name="CreatedByUserId" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Animals">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TreeId" Type="int" Nullable="false" />
+          <Property Name="Nickname" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="InventoryNumber" Type="nvarchar" MaxLength="50" />
+          <Property Name="SpeciesId" Type="int" Nullable="false" />
+          <Property Name="BreedId" Type="int" />
+          <Property Name="ColorId" Type="int" />
+          <Property Name="GenderId" Type="int" Nullable="false" />
+          <Property Name="IsCastrated" Type="bit" />
+          <Property Name="BirthDate" Type="date" />
+          <Property Name="BirthPlace" Type="nvarchar" MaxLength="200" />
+          <Property Name="DeathDate" Type="date" />
+          <Property Name="DeathPlace" Type="nvarchar" MaxLength="200" />
+          <Property Name="DeathReason" Type="nvarchar" MaxLength="200" />
+          <Property Name="IsAlive" Type="bit" />
+          <Property Name="PedigreeClassId" Type="int" />
+          <Property Name="BreedingValue" Type="decimal" Precision="10" Scale="2" />
+          <Property Name="IsBreedingStock" Type="bit" />
+          <Property Name="ProductivityData" Type="nvarchar(max)" />
+          <Property Name="HeightAtWithers" Type="decimal" Precision="8" Scale="2" />
+          <Property Name="ChestGirth" Type="decimal" Precision="8" Scale="2" />
+          <Property Name="BodyLength" Type="decimal" Precision="8" Scale="2" />
+          <Property Name="Weight" Type="decimal" Precision="10" Scale="2" />
+          <Property Name="ChipNumber" Type="nvarchar" MaxLength="50" />
+          <Property Name="GeneticDiseases" Type="nvarchar" MaxLength="500" />
+          <Property Name="DNATestDate" Type="date" />
+          <Property Name="DNAResults" Type="nvarchar" MaxLength="500" />
+          <Property Name="OwnerId" Type="int" />
+          <Property Name="Description" Type="nvarchar(max)" />
+          <Property Name="ProfilePhotoPath" Type="nvarchar" MaxLength="500" />
+          <Property Name="CreatedByUserId" Type="int" Nullable="false" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+          <Property Name="UpdatedAt" Type="datetime" />
+        </EntityType>
+        <EntityType Name="Breedings">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TreeId" Type="int" Nullable="false" />
+          <Property Name="MaleId" Type="int" Nullable="false" />
+          <Property Name="FemaleId" Type="int" Nullable="false" />
+          <Property Name="BreedingDate" Type="date" Nullable="false" />
+          <Property Name="ExpectedBirthDate" Type="date" />
+          <Property Name="ActualBirthDate" Type="date" />
+          <Property Name="IsSuccessful" Type="bit" />
+          <Property Name="OffspringCount" Type="int" />
+          <Property Name="AliveCount" Type="int" />
+          <Property Name="Notes" Type="nvarchar(max)" />
+          <Property Name="CreatedByUserId" Type="int" Nullable="false" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Breeds">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="SpeciesId" Type="int" />
+          <Property Name="Description" Type="nvarchar" MaxLength="500" />
+        </EntityType>
+        <EntityType Name="Colors">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="SpeciesId" Type="int" />
+        </EntityType>
+        <EntityType Name="Exhibitions">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TreeId" Type="int" Nullable="false" />
+          <Property Name="AnimalId" Type="int" Nullable="false" />
+          <Property Name="ExhibitionName" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="ExhibitionDate" Type="date" Nullable="false" />
+          <Property Name="Location" Type="nvarchar" MaxLength="200" />
+          <Property Name="Result" Type="nvarchar" MaxLength="100" />
+          <Property Name="JudgeName" Type="nvarchar" MaxLength="100" />
+          <Property Name="Rating" Type="int" />
+          <Property Name="CertificateNumber" Type="nvarchar" MaxLength="50" />
+          <Property Name="Notes" Type="nvarchar(max)" />
+          <Property Name="CreatedByUserId" Type="int" Nullable="false" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="FamilyTrees">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="Description" Type="nvarchar(max)" />
+          <Property Name="ProjectTypeId" Type="int" Nullable="false" />
+          <Property Name="CreatedByUserId" Type="int" Nullable="false" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+          <Property Name="IsPublic" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Genders">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="Symbol" Type="nvarchar" MaxLength="5" />
+        </EntityType>
+        <EntityType Name="MediaFiles">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FileName" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="FilePath" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="FileSize" Type="bigint" Nullable="false" />
+          <Property Name="MediaTypeId" Type="int" Nullable="false" />
+          <Property Name="Description" Type="nvarchar" MaxLength="500" />
+          <Property Name="UploadedByUserId" Type="int" Nullable="false" />
+          <Property Name="UploadedAt" Type="datetime" Nullable="false" />
+          <Property Name="IsProfilePhoto" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="MediaLinks">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="MediaFileId" Type="int" Nullable="false" />
+          <Property Name="PersonId" Type="int" />
+          <Property Name="AnimalId" Type="int" />
+          <Property Name="StoryId" Type="int" />
+          <Property Name="SortOrder" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="MediaTypes">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Extension" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="PedigreeClasses">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Code" Type="int" Nullable="false" />
+          <Property Name="Description" Type="nvarchar" MaxLength="255" />
+        </EntityType>
+        <EntityType Name="PersonRelationships">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Person1Id" Type="int" Nullable="false" />
+          <Property Name="Person2Id" Type="int" Nullable="false" />
+          <Property Name="RelationshipType" Type="int" Nullable="false" />
+          <Property Name="Direction" Type="int" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+          <Property Name="CreatedByUserId" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Persons">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TreeId" Type="int" Nullable="false" />
+          <Property Name="FirstName" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="LastName" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="Patronymic" Type="nvarchar" MaxLength="100" />
+          <Property Name="MaidenName" Type="nvarchar" MaxLength="100" />
+          <Property Name="GenderId" Type="int" Nullable="false" />
+          <Property Name="BirthDate" Type="date" />
+          <Property Name="BirthPlace" Type="nvarchar" MaxLength="200" />
+          <Property Name="DeathDate" Type="date" />
+          <Property Name="DeathPlace" Type="nvarchar" MaxLength="200" />
+          <Property Name="Biography" Type="nvarchar(max)" />
+          <Property Name="ProfilePhotoPath" Type="nvarchar" MaxLength="500" />
+          <Property Name="CreatedByUserId" Type="int" Nullable="false" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+          <Property Name="UpdatedAt" Type="datetime" />
+        </EntityType>
+        <EntityType Name="ProjectTypes">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Description" Type="nvarchar" MaxLength="255" />
+        </EntityType>
+        <EntityType Name="Species">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Stories">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="PersonId" Type="int" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="Content" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="EventDate" Type="date" />
+          <Property Name="EventDateText" Type="nvarchar" MaxLength="100" />
+          <Property Name="CreatedByUserId" Type="int" Nullable="false" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+          <Property Name="UpdatedAt" Type="datetime" />
+        </EntityType>
+        <EntityType Name="sysdiagrams">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="principal_id" Type="int" Nullable="false" />
+          <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="version" Type="int" />
+          <Property Name="definition" Type="varbinary(max)" />
+        </EntityType>
+        <EntityType Name="UserRoles">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Description" Type="nvarchar" MaxLength="255" />
+        </EntityType>
+        <EntityType Name="Users">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Username" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="PasswordHash" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="Email" Type="nvarchar" MaxLength="100" />
+          <Property Name="RoleId" Type="int" Nullable="false" />
+          <Property Name="PersonId" Type="int" />
+          <Property Name="IsActive" Type="bit" Nullable="false" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+          <Property Name="LastLoginAt" Type="datetime" />
+          <Property Name="LastUsedMode" Type="int" />
+        </EntityType>
+        <Association Name="FK_AnimalAssessments_Animal">
+          <End Role="Animals" Type="Self.Animals" Multiplicity="1" />
+          <End Role="AnimalAssessments" Type="Self.AnimalAssessments" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Animals">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AnimalAssessments">
+              <PropertyRef Name="AnimalId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AnimalAssessments_Class">
+          <End Role="PedigreeClasses" Type="Self.PedigreeClasses" Multiplicity="1" />
+          <End Role="AnimalAssessments" Type="Self.AnimalAssessments" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PedigreeClasses">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AnimalAssessments">
+              <PropertyRef Name="ClassId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AnimalAssessments_Creator">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="AnimalAssessments" Type="Self.AnimalAssessments" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AnimalAssessments">
+              <PropertyRef Name="CreatedByUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AnimalPedigree_Animal">
+          <End Role="Animals" Type="Self.Animals" Multiplicity="1" />
+          <End Role="AnimalPedigree" Type="Self.AnimalPedigree" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Animals">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AnimalPedigree">
+              <PropertyRef Name="AnimalId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AnimalPedigree_Creator">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="AnimalPedigree" Type="Self.AnimalPedigree" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AnimalPedigree">
+              <PropertyRef Name="CreatedByUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AnimalPedigree_Father">
+          <End Role="Animals" Type="Self.Animals" Multiplicity="0..1" />
+          <End Role="AnimalPedigree" Type="Self.AnimalPedigree" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Animals">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AnimalPedigree">
+              <PropertyRef Name="FatherId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AnimalPedigree_Mother">
+          <End Role="Animals" Type="Self.Animals" Multiplicity="0..1" />
+          <End Role="AnimalPedigree" Type="Self.AnimalPedigree" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Animals">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AnimalPedigree">
+              <PropertyRef Name="MotherId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Animals_Breed">
+          <End Role="Breeds" Type="Self.Breeds" Multiplicity="0..1" />
+          <End Role="Animals" Type="Self.Animals" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Breeds">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Animals">
+              <PropertyRef Name="BreedId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Animals_Color">
+          <End Role="Colors" Type="Self.Colors" Multiplicity="0..1" />
+          <End Role="Animals" Type="Self.Animals" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Colors">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Animals">
+              <PropertyRef Name="ColorId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Animals_Creator">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Animals" Type="Self.Animals" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Animals">
+              <PropertyRef Name="CreatedByUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Animals_Gender">
+          <End Role="AnimalGenders" Type="Self.AnimalGenders" Multiplicity="1" />
+          <End Role="Animals" Type="Self.Animals" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AnimalGenders">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Animals">
+              <PropertyRef Name="GenderId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Animals_Owner">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="Animals" Type="Self.Animals" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Animals">
+              <PropertyRef Name="OwnerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Animals_PedigreeClass">
+          <End Role="PedigreeClasses" Type="Self.PedigreeClasses" Multiplicity="0..1" />
+          <End Role="Animals" Type="Self.Animals" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PedigreeClasses">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Animals">
+              <PropertyRef Name="PedigreeClassId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Animals_Species">
+          <End Role="Species" Type="Self.Species" Multiplicity="1" />
+          <End Role="Animals" Type="Self.Animals" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Species">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Animals">
+              <PropertyRef Name="SpeciesId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Animals_Tree">
+          <End Role="FamilyTrees" Type="Self.FamilyTrees" Multiplicity="1" />
+          <End Role="Animals" Type="Self.Animals" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FamilyTrees">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Animals">
+              <PropertyRef Name="TreeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Breedings_Creator">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Breedings" Type="Self.Breedings" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Breedings">
+              <PropertyRef Name="CreatedByUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Breedings_Female">
+          <End Role="Animals" Type="Self.Animals" Multiplicity="1" />
+          <End Role="Breedings" Type="Self.Breedings" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Animals">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Breedings">
+              <PropertyRef Name="FemaleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Breedings_Male">
+          <End Role="Animals" Type="Self.Animals" Multiplicity="1" />
+          <End Role="Breedings" Type="Self.Breedings" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Animals">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Breedings">
+              <PropertyRef Name="MaleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Breedings_Tree">
+          <End Role="FamilyTrees" Type="Self.FamilyTrees" Multiplicity="1" />
+          <End Role="Breedings" Type="Self.Breedings" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FamilyTrees">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Breedings">
+              <PropertyRef Name="TreeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Breeds_Species">
+          <End Role="Species" Type="Self.Species" Multiplicity="0..1" />
+          <End Role="Breeds" Type="Self.Breeds" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Species">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Breeds">
+              <PropertyRef Name="SpeciesId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Colors_Species">
+          <End Role="Species" Type="Self.Species" Multiplicity="0..1" />
+          <End Role="Colors" Type="Self.Colors" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Species">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Colors">
+              <PropertyRef Name="SpeciesId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Exhibitions_Animal">
+          <End Role="Animals" Type="Self.Animals" Multiplicity="1" />
+          <End Role="Exhibitions" Type="Self.Exhibitions" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Animals">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Exhibitions">
+              <PropertyRef Name="AnimalId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Exhibitions_Creator">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Exhibitions" Type="Self.Exhibitions" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Exhibitions">
+              <PropertyRef Name="CreatedByUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Exhibitions_Tree">
+          <End Role="FamilyTrees" Type="Self.FamilyTrees" Multiplicity="1" />
+          <End Role="Exhibitions" Type="Self.Exhibitions" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FamilyTrees">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Exhibitions">
+              <PropertyRef Name="TreeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FamilyTrees_Creator">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="FamilyTrees" Type="Self.FamilyTrees" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="FamilyTrees">
+              <PropertyRef Name="CreatedByUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FamilyTrees_ProjectType">
+          <End Role="ProjectTypes" Type="Self.ProjectTypes" Multiplicity="1" />
+          <End Role="FamilyTrees" Type="Self.FamilyTrees" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProjectTypes">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="FamilyTrees">
+              <PropertyRef Name="ProjectTypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MediaFiles_Type">
+          <End Role="MediaTypes" Type="Self.MediaTypes" Multiplicity="1" />
+          <End Role="MediaFiles" Type="Self.MediaFiles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MediaTypes">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="MediaFiles">
+              <PropertyRef Name="MediaTypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MediaFiles_Uploader">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="MediaFiles" Type="Self.MediaFiles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="MediaFiles">
+              <PropertyRef Name="UploadedByUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MediaLinks_Animal">
+          <End Role="Animals" Type="Self.Animals" Multiplicity="0..1" />
+          <End Role="MediaLinks" Type="Self.MediaLinks" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Animals">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="MediaLinks">
+              <PropertyRef Name="AnimalId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MediaLinks_File">
+          <End Role="MediaFiles" Type="Self.MediaFiles" Multiplicity="1" />
+          <End Role="MediaLinks" Type="Self.MediaLinks" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MediaFiles">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="MediaLinks">
+              <PropertyRef Name="MediaFileId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MediaLinks_Person">
+          <End Role="Persons" Type="Self.Persons" Multiplicity="0..1" />
+          <End Role="MediaLinks" Type="Self.MediaLinks" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Persons">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="MediaLinks">
+              <PropertyRef Name="PersonId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MediaLinks_Story">
+          <End Role="Stories" Type="Self.Stories" Multiplicity="0..1" />
+          <End Role="MediaLinks" Type="Self.MediaLinks" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Stories">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="MediaLinks">
+              <PropertyRef Name="StoryId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PersonRelationships_Creator">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="PersonRelationships" Type="Self.PersonRelationships" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PersonRelationships">
+              <PropertyRef Name="CreatedByUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PersonRelationships_Person1">
+          <End Role="Persons" Type="Self.Persons" Multiplicity="1" />
+          <End Role="PersonRelationships" Type="Self.PersonRelationships" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Persons">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PersonRelationships">
+              <PropertyRef Name="Person1Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PersonRelationships_Person2">
+          <End Role="Persons" Type="Self.Persons" Multiplicity="1" />
+          <End Role="PersonRelationships" Type="Self.PersonRelationships" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Persons">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PersonRelationships">
+              <PropertyRef Name="Person2Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Persons_Creator">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Persons" Type="Self.Persons" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Persons">
+              <PropertyRef Name="CreatedByUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Persons_Gender">
+          <End Role="Genders" Type="Self.Genders" Multiplicity="1" />
+          <End Role="Persons" Type="Self.Persons" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Genders">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Persons">
+              <PropertyRef Name="GenderId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Persons_Tree">
+          <End Role="FamilyTrees" Type="Self.FamilyTrees" Multiplicity="1" />
+          <End Role="Persons" Type="Self.Persons" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FamilyTrees">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Persons">
+              <PropertyRef Name="TreeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Stories_Creator">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Stories" Type="Self.Stories" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Stories">
+              <PropertyRef Name="CreatedByUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Stories_Person">
+          <End Role="Persons" Type="Self.Persons" Multiplicity="1" />
+          <End Role="Stories" Type="Self.Stories" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Persons">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Stories">
+              <PropertyRef Name="PersonId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Users_Person">
+          <End Role="Persons" Type="Self.Persons" Multiplicity="0..1" />
+          <End Role="Users" Type="Self.Users" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Persons">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Users">
+              <PropertyRef Name="PersonId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Users_Role">
+          <End Role="UserRoles" Type="Self.UserRoles" Multiplicity="1" />
+          <End Role="Users" Type="Self.Users" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="UserRoles">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Users">
+              <PropertyRef Name="RoleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="Хранилище GenealogyUnifiedDBModelContainer">
+          <EntitySet Name="AnimalAssessments" EntityType="Self.AnimalAssessments" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="AnimalGenders" EntityType="Self.AnimalGenders" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="AnimalPedigree" EntityType="Self.AnimalPedigree" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Animals" EntityType="Self.Animals" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Breedings" EntityType="Self.Breedings" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Breeds" EntityType="Self.Breeds" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Colors" EntityType="Self.Colors" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Exhibitions" EntityType="Self.Exhibitions" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="FamilyTrees" EntityType="Self.FamilyTrees" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Genders" EntityType="Self.Genders" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="MediaFiles" EntityType="Self.MediaFiles" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="MediaLinks" EntityType="Self.MediaLinks" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="MediaTypes" EntityType="Self.MediaTypes" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PedigreeClasses" EntityType="Self.PedigreeClasses" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PersonRelationships" EntityType="Self.PersonRelationships" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Persons" EntityType="Self.Persons" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ProjectTypes" EntityType="Self.ProjectTypes" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Species" EntityType="Self.Species" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Stories" EntityType="Self.Stories" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="UserRoles" EntityType="Self.UserRoles" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Users" EntityType="Self.Users" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_AnimalAssessments_Animal" Association="Self.FK_AnimalAssessments_Animal">
+            <End Role="Animals" EntitySet="Animals" />
+            <End Role="AnimalAssessments" EntitySet="AnimalAssessments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AnimalAssessments_Class" Association="Self.FK_AnimalAssessments_Class">
+            <End Role="PedigreeClasses" EntitySet="PedigreeClasses" />
+            <End Role="AnimalAssessments" EntitySet="AnimalAssessments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AnimalAssessments_Creator" Association="Self.FK_AnimalAssessments_Creator">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="AnimalAssessments" EntitySet="AnimalAssessments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AnimalPedigree_Animal" Association="Self.FK_AnimalPedigree_Animal">
+            <End Role="Animals" EntitySet="Animals" />
+            <End Role="AnimalPedigree" EntitySet="AnimalPedigree" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AnimalPedigree_Creator" Association="Self.FK_AnimalPedigree_Creator">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="AnimalPedigree" EntitySet="AnimalPedigree" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AnimalPedigree_Father" Association="Self.FK_AnimalPedigree_Father">
+            <End Role="Animals" EntitySet="Animals" />
+            <End Role="AnimalPedigree" EntitySet="AnimalPedigree" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AnimalPedigree_Mother" Association="Self.FK_AnimalPedigree_Mother">
+            <End Role="Animals" EntitySet="Animals" />
+            <End Role="AnimalPedigree" EntitySet="AnimalPedigree" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Animals_Breed" Association="Self.FK_Animals_Breed">
+            <End Role="Breeds" EntitySet="Breeds" />
+            <End Role="Animals" EntitySet="Animals" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Animals_Color" Association="Self.FK_Animals_Color">
+            <End Role="Colors" EntitySet="Colors" />
+            <End Role="Animals" EntitySet="Animals" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Animals_Creator" Association="Self.FK_Animals_Creator">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Animals" EntitySet="Animals" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Animals_Gender" Association="Self.FK_Animals_Gender">
+            <End Role="AnimalGenders" EntitySet="AnimalGenders" />
+            <End Role="Animals" EntitySet="Animals" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Animals_Owner" Association="Self.FK_Animals_Owner">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Animals" EntitySet="Animals" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Animals_PedigreeClass" Association="Self.FK_Animals_PedigreeClass">
+            <End Role="PedigreeClasses" EntitySet="PedigreeClasses" />
+            <End Role="Animals" EntitySet="Animals" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Animals_Species" Association="Self.FK_Animals_Species">
+            <End Role="Species" EntitySet="Species" />
+            <End Role="Animals" EntitySet="Animals" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Animals_Tree" Association="Self.FK_Animals_Tree">
+            <End Role="FamilyTrees" EntitySet="FamilyTrees" />
+            <End Role="Animals" EntitySet="Animals" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Breedings_Creator" Association="Self.FK_Breedings_Creator">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Breedings" EntitySet="Breedings" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Breedings_Female" Association="Self.FK_Breedings_Female">
+            <End Role="Animals" EntitySet="Animals" />
+            <End Role="Breedings" EntitySet="Breedings" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Breedings_Male" Association="Self.FK_Breedings_Male">
+            <End Role="Animals" EntitySet="Animals" />
+            <End Role="Breedings" EntitySet="Breedings" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Breedings_Tree" Association="Self.FK_Breedings_Tree">
+            <End Role="FamilyTrees" EntitySet="FamilyTrees" />
+            <End Role="Breedings" EntitySet="Breedings" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Breeds_Species" Association="Self.FK_Breeds_Species">
+            <End Role="Species" EntitySet="Species" />
+            <End Role="Breeds" EntitySet="Breeds" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Colors_Species" Association="Self.FK_Colors_Species">
+            <End Role="Species" EntitySet="Species" />
+            <End Role="Colors" EntitySet="Colors" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Exhibitions_Animal" Association="Self.FK_Exhibitions_Animal">
+            <End Role="Animals" EntitySet="Animals" />
+            <End Role="Exhibitions" EntitySet="Exhibitions" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Exhibitions_Creator" Association="Self.FK_Exhibitions_Creator">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Exhibitions" EntitySet="Exhibitions" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Exhibitions_Tree" Association="Self.FK_Exhibitions_Tree">
+            <End Role="FamilyTrees" EntitySet="FamilyTrees" />
+            <End Role="Exhibitions" EntitySet="Exhibitions" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FamilyTrees_Creator" Association="Self.FK_FamilyTrees_Creator">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="FamilyTrees" EntitySet="FamilyTrees" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FamilyTrees_ProjectType" Association="Self.FK_FamilyTrees_ProjectType">
+            <End Role="ProjectTypes" EntitySet="ProjectTypes" />
+            <End Role="FamilyTrees" EntitySet="FamilyTrees" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MediaFiles_Type" Association="Self.FK_MediaFiles_Type">
+            <End Role="MediaTypes" EntitySet="MediaTypes" />
+            <End Role="MediaFiles" EntitySet="MediaFiles" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MediaFiles_Uploader" Association="Self.FK_MediaFiles_Uploader">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="MediaFiles" EntitySet="MediaFiles" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MediaLinks_Animal" Association="Self.FK_MediaLinks_Animal">
+            <End Role="Animals" EntitySet="Animals" />
+            <End Role="MediaLinks" EntitySet="MediaLinks" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MediaLinks_File" Association="Self.FK_MediaLinks_File">
+            <End Role="MediaFiles" EntitySet="MediaFiles" />
+            <End Role="MediaLinks" EntitySet="MediaLinks" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MediaLinks_Person" Association="Self.FK_MediaLinks_Person">
+            <End Role="Persons" EntitySet="Persons" />
+            <End Role="MediaLinks" EntitySet="MediaLinks" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MediaLinks_Story" Association="Self.FK_MediaLinks_Story">
+            <End Role="Stories" EntitySet="Stories" />
+            <End Role="MediaLinks" EntitySet="MediaLinks" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PersonRelationships_Creator" Association="Self.FK_PersonRelationships_Creator">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="PersonRelationships" EntitySet="PersonRelationships" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PersonRelationships_Person1" Association="Self.FK_PersonRelationships_Person1">
+            <End Role="Persons" EntitySet="Persons" />
+            <End Role="PersonRelationships" EntitySet="PersonRelationships" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PersonRelationships_Person2" Association="Self.FK_PersonRelationships_Person2">
+            <End Role="Persons" EntitySet="Persons" />
+            <End Role="PersonRelationships" EntitySet="PersonRelationships" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Persons_Creator" Association="Self.FK_Persons_Creator">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Persons" EntitySet="Persons" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Persons_Gender" Association="Self.FK_Persons_Gender">
+            <End Role="Genders" EntitySet="Genders" />
+            <End Role="Persons" EntitySet="Persons" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Persons_Tree" Association="Self.FK_Persons_Tree">
+            <End Role="FamilyTrees" EntitySet="FamilyTrees" />
+            <End Role="Persons" EntitySet="Persons" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Stories_Creator" Association="Self.FK_Stories_Creator">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Stories" EntitySet="Stories" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Stories_Person" Association="Self.FK_Stories_Person">
+            <End Role="Persons" EntitySet="Persons" />
+            <End Role="Stories" EntitySet="Stories" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Users_Person" Association="Self.FK_Users_Person">
+            <End Role="Persons" EntitySet="Persons" />
+            <End Role="Users" EntitySet="Users" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Users_Role" Association="Self.FK_Users_Role">
+            <End Role="UserRoles" EntitySet="UserRoles" />
+            <End Role="Users" EntitySet="Users" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="GenealogyUnifiedDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="AnimalAssessments">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AnimalId" Type="Int32" Nullable="false" />
+          <Property Name="AssessmentDate" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="ClassId" Type="Int32" Nullable="false" />
+          <Property Name="OverallScore" Type="Decimal" Precision="5" Scale="2" />
+          <Property Name="ExteriorScore" Type="Decimal" Precision="5" Scale="2" />
+          <Property Name="ProductivityScore" Type="Decimal" Precision="5" Scale="2" />
+          <Property Name="OffspringScore" Type="Decimal" Precision="5" Scale="2" />
+          <Property Name="CommissionMembers" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="CertificateNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ValidUntil" Type="DateTime" Precision="0" />
+          <Property Name="Notes" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedByUserId" Type="Int32" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Animals" Relationship="Self.FK_AnimalAssessments_Animal" FromRole="AnimalAssessments" ToRole="Animals" />
+          <NavigationProperty Name="PedigreeClasses" Relationship="Self.FK_AnimalAssessments_Class" FromRole="AnimalAssessments" ToRole="PedigreeClasses" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_AnimalAssessments_Creator" FromRole="AnimalAssessments" ToRole="Users" />
+        </EntityType>
+        <EntityType Name="AnimalGenders">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Animals" Relationship="Self.FK_Animals_Gender" FromRole="AnimalGenders" ToRole="Animals" />
+        </EntityType>
+        <EntityType Name="AnimalPedigree">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AnimalId" Type="Int32" Nullable="false" />
+          <Property Name="FatherId" Type="Int32" />
+          <Property Name="MotherId" Type="Int32" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="CreatedByUserId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Animals" Relationship="Self.FK_AnimalPedigree_Animal" FromRole="AnimalPedigree" ToRole="Animals" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_AnimalPedigree_Creator" FromRole="AnimalPedigree" ToRole="Users" />
+          <NavigationProperty Name="Animals1" Relationship="Self.FK_AnimalPedigree_Father" FromRole="AnimalPedigree" ToRole="Animals" />
+          <NavigationProperty Name="Animals2" Relationship="Self.FK_AnimalPedigree_Mother" FromRole="AnimalPedigree" ToRole="Animals" />
+        </EntityType>
+        <EntityType Name="Animals">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TreeId" Type="Int32" Nullable="false" />
+          <Property Name="Nickname" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="InventoryNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="SpeciesId" Type="Int32" Nullable="false" />
+          <Property Name="BreedId" Type="Int32" />
+          <Property Name="ColorId" Type="Int32" />
+          <Property Name="GenderId" Type="Int32" Nullable="false" />
+          <Property Name="IsCastrated" Type="Boolean" />
+          <Property Name="BirthDate" Type="DateTime" Precision="0" />
+          <Property Name="BirthPlace" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="DeathDate" Type="DateTime" Precision="0" />
+          <Property Name="DeathPlace" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="DeathReason" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="IsAlive" Type="Boolean" />
+          <Property Name="PedigreeClassId" Type="Int32" />
+          <Property Name="BreedingValue" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="IsBreedingStock" Type="Boolean" />
+          <Property Name="ProductivityData" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="HeightAtWithers" Type="Decimal" Precision="8" Scale="2" />
+          <Property Name="ChestGirth" Type="Decimal" Precision="8" Scale="2" />
+          <Property Name="BodyLength" Type="Decimal" Precision="8" Scale="2" />
+          <Property Name="Weight" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="ChipNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="GeneticDiseases" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="DNATestDate" Type="DateTime" Precision="0" />
+          <Property Name="DNAResults" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="OwnerId" Type="Int32" />
+          <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ProfilePhotoPath" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedByUserId" Type="Int32" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdatedAt" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="AnimalAssessments" Relationship="Self.FK_AnimalAssessments_Animal" FromRole="Animals" ToRole="AnimalAssessments" />
+          <NavigationProperty Name="AnimalGenders" Relationship="Self.FK_Animals_Gender" FromRole="Animals" ToRole="AnimalGenders" />
+          <NavigationProperty Name="AnimalPedigree" Relationship="Self.FK_AnimalPedigree_Animal" FromRole="Animals" ToRole="AnimalPedigree" />
+          <NavigationProperty Name="AnimalPedigree1" Relationship="Self.FK_AnimalPedigree_Father" FromRole="Animals" ToRole="AnimalPedigree" />
+          <NavigationProperty Name="AnimalPedigree2" Relationship="Self.FK_AnimalPedigree_Mother" FromRole="Animals" ToRole="AnimalPedigree" />
+          <NavigationProperty Name="Breeds" Relationship="Self.FK_Animals_Breed" FromRole="Animals" ToRole="Breeds" />
+          <NavigationProperty Name="Colors" Relationship="Self.FK_Animals_Color" FromRole="Animals" ToRole="Colors" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_Animals_Creator" FromRole="Animals" ToRole="Users" />
+          <NavigationProperty Name="Users1" Relationship="Self.FK_Animals_Owner" FromRole="Animals" ToRole="Users" />
+          <NavigationProperty Name="PedigreeClasses" Relationship="Self.FK_Animals_PedigreeClass" FromRole="Animals" ToRole="PedigreeClasses" />
+          <NavigationProperty Name="Species" Relationship="Self.FK_Animals_Species" FromRole="Animals" ToRole="Species" />
+          <NavigationProperty Name="FamilyTrees" Relationship="Self.FK_Animals_Tree" FromRole="Animals" ToRole="FamilyTrees" />
+          <NavigationProperty Name="Breedings" Relationship="Self.FK_Breedings_Female" FromRole="Animals" ToRole="Breedings" />
+          <NavigationProperty Name="Breedings1" Relationship="Self.FK_Breedings_Male" FromRole="Animals" ToRole="Breedings" />
+          <NavigationProperty Name="Exhibitions" Relationship="Self.FK_Exhibitions_Animal" FromRole="Animals" ToRole="Exhibitions" />
+          <NavigationProperty Name="MediaLinks" Relationship="Self.FK_MediaLinks_Animal" FromRole="Animals" ToRole="MediaLinks" />
+        </EntityType>
+        <EntityType Name="Breedings">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TreeId" Type="Int32" Nullable="false" />
+          <Property Name="MaleId" Type="Int32" Nullable="false" />
+          <Property Name="FemaleId" Type="Int32" Nullable="false" />
+          <Property Name="BreedingDate" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="ExpectedBirthDate" Type="DateTime" Precision="0" />
+          <Property Name="ActualBirthDate" Type="DateTime" Precision="0" />
+          <Property Name="IsSuccessful" Type="Boolean" />
+          <Property Name="OffspringCount" Type="Int32" />
+          <Property Name="AliveCount" Type="Int32" />
+          <Property Name="Notes" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedByUserId" Type="Int32" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Animals" Relationship="Self.FK_Breedings_Female" FromRole="Breedings" ToRole="Animals" />
+          <NavigationProperty Name="Animals1" Relationship="Self.FK_Breedings_Male" FromRole="Breedings" ToRole="Animals" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_Breedings_Creator" FromRole="Breedings" ToRole="Users" />
+          <NavigationProperty Name="FamilyTrees" Relationship="Self.FK_Breedings_Tree" FromRole="Breedings" ToRole="FamilyTrees" />
+        </EntityType>
+        <EntityType Name="Breeds">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="SpeciesId" Type="Int32" />
+          <Property Name="Description" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Animals" Relationship="Self.FK_Animals_Breed" FromRole="Breeds" ToRole="Animals" />
+          <NavigationProperty Name="Species" Relationship="Self.FK_Breeds_Species" FromRole="Breeds" ToRole="Species" />
+        </EntityType>
+        <EntityType Name="Colors">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="SpeciesId" Type="Int32" />
+          <NavigationProperty Name="Animals" Relationship="Self.FK_Animals_Color" FromRole="Colors" ToRole="Animals" />
+          <NavigationProperty Name="Species" Relationship="Self.FK_Colors_Species" FromRole="Colors" ToRole="Species" />
+        </EntityType>
+        <EntityType Name="Exhibitions">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TreeId" Type="Int32" Nullable="false" />
+          <Property Name="AnimalId" Type="Int32" Nullable="false" />
+          <Property Name="ExhibitionName" Type="String" MaxLength="200" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="ExhibitionDate" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="Location" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="Result" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="JudgeName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Rating" Type="Int32" />
+          <Property Name="CertificateNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Notes" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedByUserId" Type="Int32" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Animals" Relationship="Self.FK_Exhibitions_Animal" FromRole="Exhibitions" ToRole="Animals" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_Exhibitions_Creator" FromRole="Exhibitions" ToRole="Users" />
+          <NavigationProperty Name="FamilyTrees" Relationship="Self.FK_Exhibitions_Tree" FromRole="Exhibitions" ToRole="FamilyTrees" />
+        </EntityType>
+        <EntityType Name="FamilyTrees">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="200" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ProjectTypeId" Type="Int32" Nullable="false" />
+          <Property Name="CreatedByUserId" Type="Int32" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="IsPublic" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Animals" Relationship="Self.FK_Animals_Tree" FromRole="FamilyTrees" ToRole="Animals" />
+          <NavigationProperty Name="Breedings" Relationship="Self.FK_Breedings_Tree" FromRole="FamilyTrees" ToRole="Breedings" />
+          <NavigationProperty Name="Exhibitions" Relationship="Self.FK_Exhibitions_Tree" FromRole="FamilyTrees" ToRole="Exhibitions" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_FamilyTrees_Creator" FromRole="FamilyTrees" ToRole="Users" />
+          <NavigationProperty Name="ProjectTypes" Relationship="Self.FK_FamilyTrees_ProjectType" FromRole="FamilyTrees" ToRole="ProjectTypes" />
+          <NavigationProperty Name="Persons" Relationship="Self.FK_Persons_Tree" FromRole="FamilyTrees" ToRole="Persons" />
+        </EntityType>
+        <EntityType Name="Genders">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Symbol" Type="String" MaxLength="5" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Persons" Relationship="Self.FK_Persons_Gender" FromRole="Genders" ToRole="Persons" />
+        </EntityType>
+        <EntityType Name="MediaFiles">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FileName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="FilePath" Type="String" MaxLength="500" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="FileSize" Type="Int64" Nullable="false" />
+          <Property Name="MediaTypeId" Type="Int32" Nullable="false" />
+          <Property Name="Description" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="UploadedByUserId" Type="Int32" Nullable="false" />
+          <Property Name="UploadedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="IsProfilePhoto" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="MediaTypes" Relationship="Self.FK_MediaFiles_Type" FromRole="MediaFiles" ToRole="MediaTypes" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_MediaFiles_Uploader" FromRole="MediaFiles" ToRole="Users" />
+          <NavigationProperty Name="MediaLinks" Relationship="Self.FK_MediaLinks_File" FromRole="MediaFiles" ToRole="MediaLinks" />
+        </EntityType>
+        <EntityType Name="MediaLinks">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="MediaFileId" Type="Int32" Nullable="false" />
+          <Property Name="PersonId" Type="Int32" />
+          <Property Name="AnimalId" Type="Int32" />
+          <Property Name="StoryId" Type="Int32" />
+          <Property Name="SortOrder" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Animals" Relationship="Self.FK_MediaLinks_Animal" FromRole="MediaLinks" ToRole="Animals" />
+          <NavigationProperty Name="MediaFiles" Relationship="Self.FK_MediaLinks_File" FromRole="MediaLinks" ToRole="MediaFiles" />
+          <NavigationProperty Name="Persons" Relationship="Self.FK_MediaLinks_Person" FromRole="MediaLinks" ToRole="Persons" />
+          <NavigationProperty Name="Stories" Relationship="Self.FK_MediaLinks_Story" FromRole="MediaLinks" ToRole="Stories" />
+        </EntityType>
+        <EntityType Name="MediaTypes">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Extension" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="MediaFiles" Relationship="Self.FK_MediaFiles_Type" FromRole="MediaTypes" ToRole="MediaFiles" />
+        </EntityType>
+        <EntityType Name="PedigreeClasses">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Code" Type="Int32" Nullable="false" />
+          <Property Name="Description" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="AnimalAssessments" Relationship="Self.FK_AnimalAssessments_Class" FromRole="PedigreeClasses" ToRole="AnimalAssessments" />
+          <NavigationProperty Name="Animals" Relationship="Self.FK_Animals_PedigreeClass" FromRole="PedigreeClasses" ToRole="Animals" />
+        </EntityType>
+        <EntityType Name="PersonRelationships">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Person1Id" Type="Int32" Nullable="false" />
+          <Property Name="Person2Id" Type="Int32" Nullable="false" />
+          <Property Name="RelationshipType" Type="Int32" Nullable="false" />
+          <Property Name="Direction" Type="Int32" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="CreatedByUserId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_PersonRelationships_Creator" FromRole="PersonRelationships" ToRole="Users" />
+          <NavigationProperty Name="Persons" Relationship="Self.FK_PersonRelationships_Person1" FromRole="PersonRelationships" ToRole="Persons" />
+          <NavigationProperty Name="Persons1" Relationship="Self.FK_PersonRelationships_Person2" FromRole="PersonRelationships" ToRole="Persons" />
+        </EntityType>
+        <EntityType Name="Persons">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TreeId" Type="Int32" Nullable="false" />
+          <Property Name="FirstName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="LastName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Patronymic" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="MaidenName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="GenderId" Type="Int32" Nullable="false" />
+          <Property Name="BirthDate" Type="DateTime" Precision="0" />
+          <Property Name="BirthPlace" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="DeathDate" Type="DateTime" Precision="0" />
+          <Property Name="DeathPlace" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="Biography" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ProfilePhotoPath" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedByUserId" Type="Int32" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdatedAt" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="FamilyTrees" Relationship="Self.FK_Persons_Tree" FromRole="Persons" ToRole="FamilyTrees" />
+          <NavigationProperty Name="Genders" Relationship="Self.FK_Persons_Gender" FromRole="Persons" ToRole="Genders" />
+          <NavigationProperty Name="MediaLinks" Relationship="Self.FK_MediaLinks_Person" FromRole="Persons" ToRole="MediaLinks" />
+          <NavigationProperty Name="PersonRelationships" Relationship="Self.FK_PersonRelationships_Person1" FromRole="Persons" ToRole="PersonRelationships" />
+          <NavigationProperty Name="PersonRelationships1" Relationship="Self.FK_PersonRelationships_Person2" FromRole="Persons" ToRole="PersonRelationships" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_Persons_Creator" FromRole="Persons" ToRole="Users" />
+          <NavigationProperty Name="Stories" Relationship="Self.FK_Stories_Person" FromRole="Persons" ToRole="Stories" />
+          <NavigationProperty Name="Users1" Relationship="Self.FK_Users_Person" FromRole="Persons" ToRole="Users" />
+        </EntityType>
+        <EntityType Name="ProjectTypes">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Description" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="FamilyTrees" Relationship="Self.FK_FamilyTrees_ProjectType" FromRole="ProjectTypes" ToRole="FamilyTrees" />
+        </EntityType>
+        <EntityType Name="Species">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Animals" Relationship="Self.FK_Animals_Species" FromRole="Species" ToRole="Animals" />
+          <NavigationProperty Name="Breeds" Relationship="Self.FK_Breeds_Species" FromRole="Species" ToRole="Breeds" />
+          <NavigationProperty Name="Colors" Relationship="Self.FK_Colors_Species" FromRole="Species" ToRole="Colors" />
+        </EntityType>
+        <EntityType Name="Stories">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PersonId" Type="Int32" Nullable="false" />
+          <Property Name="Title" Type="String" MaxLength="200" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Content" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="EventDate" Type="DateTime" Precision="0" />
+          <Property Name="EventDateText" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedByUserId" Type="Int32" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdatedAt" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="MediaLinks" Relationship="Self.FK_MediaLinks_Story" FromRole="Stories" ToRole="MediaLinks" />
+          <NavigationProperty Name="Persons" Relationship="Self.FK_Stories_Person" FromRole="Stories" ToRole="Persons" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_Stories_Creator" FromRole="Stories" ToRole="Users" />
+        </EntityType>
+        <EntityType Name="sysdiagrams">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="principal_id" Type="Int32" Nullable="false" />
+          <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="version" Type="Int32" />
+          <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="UserRoles">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Description" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_Users_Role" FromRole="UserRoles" ToRole="Users" />
+        </EntityType>
+        <EntityType Name="Users">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Username" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="PasswordHash" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Email" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="RoleId" Type="Int32" Nullable="false" />
+          <Property Name="PersonId" Type="Int32" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="LastLoginAt" Type="DateTime" Precision="3" />
+          <Property Name="LastUsedMode" Type="Int32" />
+          <NavigationProperty Name="AnimalAssessments" Relationship="Self.FK_AnimalAssessments_Creator" FromRole="Users" ToRole="AnimalAssessments" />
+          <NavigationProperty Name="AnimalPedigree" Relationship="Self.FK_AnimalPedigree_Creator" FromRole="Users" ToRole="AnimalPedigree" />
+          <NavigationProperty Name="Animals" Relationship="Self.FK_Animals_Creator" FromRole="Users" ToRole="Animals" />
+          <NavigationProperty Name="Animals1" Relationship="Self.FK_Animals_Owner" FromRole="Users" ToRole="Animals" />
+          <NavigationProperty Name="Breedings" Relationship="Self.FK_Breedings_Creator" FromRole="Users" ToRole="Breedings" />
+          <NavigationProperty Name="Exhibitions" Relationship="Self.FK_Exhibitions_Creator" FromRole="Users" ToRole="Exhibitions" />
+          <NavigationProperty Name="FamilyTrees" Relationship="Self.FK_FamilyTrees_Creator" FromRole="Users" ToRole="FamilyTrees" />
+          <NavigationProperty Name="MediaFiles" Relationship="Self.FK_MediaFiles_Uploader" FromRole="Users" ToRole="MediaFiles" />
+          <NavigationProperty Name="PersonRelationships" Relationship="Self.FK_PersonRelationships_Creator" FromRole="Users" ToRole="PersonRelationships" />
+          <NavigationProperty Name="Persons" Relationship="Self.FK_Persons_Creator" FromRole="Users" ToRole="Persons" />
+          <NavigationProperty Name="Persons1" Relationship="Self.FK_Users_Person" FromRole="Users" ToRole="Persons" />
+          <NavigationProperty Name="Stories" Relationship="Self.FK_Stories_Creator" FromRole="Users" ToRole="Stories" />
+          <NavigationProperty Name="UserRoles" Relationship="Self.FK_Users_Role" FromRole="Users" ToRole="UserRoles" />
+        </EntityType>
+        <Association Name="FK_AnimalAssessments_Animal">
+          <End Role="Animals" Type="Self.Animals" Multiplicity="1" />
+          <End Role="AnimalAssessments" Type="Self.AnimalAssessments" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Animals">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AnimalAssessments">
+              <PropertyRef Name="AnimalId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AnimalAssessments_Class">
+          <End Role="PedigreeClasses" Type="Self.PedigreeClasses" Multiplicity="1" />
+          <End Role="AnimalAssessments" Type="Self.AnimalAssessments" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PedigreeClasses">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AnimalAssessments">
+              <PropertyRef Name="ClassId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AnimalAssessments_Creator">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="AnimalAssessments" Type="Self.AnimalAssessments" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AnimalAssessments">
+              <PropertyRef Name="CreatedByUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Animals_Gender">
+          <End Role="AnimalGenders" Type="Self.AnimalGenders" Multiplicity="1" />
+          <End Role="Animals" Type="Self.Animals" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AnimalGenders">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Animals">
+              <PropertyRef Name="GenderId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AnimalPedigree_Animal">
+          <End Role="Animals" Type="Self.Animals" Multiplicity="1" />
+          <End Role="AnimalPedigree" Type="Self.AnimalPedigree" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Animals">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AnimalPedigree">
+              <PropertyRef Name="AnimalId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AnimalPedigree_Creator">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="AnimalPedigree" Type="Self.AnimalPedigree" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AnimalPedigree">
+              <PropertyRef Name="CreatedByUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AnimalPedigree_Father">
+          <End Role="Animals" Type="Self.Animals" Multiplicity="0..1" />
+          <End Role="AnimalPedigree" Type="Self.AnimalPedigree" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Animals">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AnimalPedigree">
+              <PropertyRef Name="FatherId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AnimalPedigree_Mother">
+          <End Role="Animals" Type="Self.Animals" Multiplicity="0..1" />
+          <End Role="AnimalPedigree" Type="Self.AnimalPedigree" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Animals">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AnimalPedigree">
+              <PropertyRef Name="MotherId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Animals_Breed">
+          <End Role="Breeds" Type="Self.Breeds" Multiplicity="0..1" />
+          <End Role="Animals" Type="Self.Animals" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Breeds">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Animals">
+              <PropertyRef Name="BreedId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Animals_Color">
+          <End Role="Colors" Type="Self.Colors" Multiplicity="0..1" />
+          <End Role="Animals" Type="Self.Animals" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Colors">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Animals">
+              <PropertyRef Name="ColorId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Animals_Creator">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Animals" Type="Self.Animals" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Animals">
+              <PropertyRef Name="CreatedByUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Animals_Owner">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="Animals" Type="Self.Animals" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Animals">
+              <PropertyRef Name="OwnerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Animals_PedigreeClass">
+          <End Role="PedigreeClasses" Type="Self.PedigreeClasses" Multiplicity="0..1" />
+          <End Role="Animals" Type="Self.Animals" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PedigreeClasses">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Animals">
+              <PropertyRef Name="PedigreeClassId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Animals_Species">
+          <End Role="Species" Type="Self.Species" Multiplicity="1" />
+          <End Role="Animals" Type="Self.Animals" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Species">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Animals">
+              <PropertyRef Name="SpeciesId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Animals_Tree">
+          <End Role="FamilyTrees" Type="Self.FamilyTrees" Multiplicity="1" />
+          <End Role="Animals" Type="Self.Animals" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FamilyTrees">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Animals">
+              <PropertyRef Name="TreeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Breedings_Female">
+          <End Role="Animals" Type="Self.Animals" Multiplicity="1" />
+          <End Role="Breedings" Type="Self.Breedings" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Animals">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Breedings">
+              <PropertyRef Name="FemaleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Breedings_Male">
+          <End Role="Animals" Type="Self.Animals" Multiplicity="1" />
+          <End Role="Breedings" Type="Self.Breedings" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Animals">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Breedings">
+              <PropertyRef Name="MaleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Exhibitions_Animal">
+          <End Role="Animals" Type="Self.Animals" Multiplicity="1" />
+          <End Role="Exhibitions" Type="Self.Exhibitions" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Animals">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Exhibitions">
+              <PropertyRef Name="AnimalId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MediaLinks_Animal">
+          <End Role="Animals" Type="Self.Animals" Multiplicity="0..1" />
+          <End Role="MediaLinks" Type="Self.MediaLinks" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Animals">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="MediaLinks">
+              <PropertyRef Name="AnimalId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Breedings_Creator">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Breedings" Type="Self.Breedings" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Breedings">
+              <PropertyRef Name="CreatedByUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Breedings_Tree">
+          <End Role="FamilyTrees" Type="Self.FamilyTrees" Multiplicity="1" />
+          <End Role="Breedings" Type="Self.Breedings" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FamilyTrees">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Breedings">
+              <PropertyRef Name="TreeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Breeds_Species">
+          <End Role="Species" Type="Self.Species" Multiplicity="0..1" />
+          <End Role="Breeds" Type="Self.Breeds" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Species">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Breeds">
+              <PropertyRef Name="SpeciesId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Colors_Species">
+          <End Role="Species" Type="Self.Species" Multiplicity="0..1" />
+          <End Role="Colors" Type="Self.Colors" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Species">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Colors">
+              <PropertyRef Name="SpeciesId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Exhibitions_Creator">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Exhibitions" Type="Self.Exhibitions" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Exhibitions">
+              <PropertyRef Name="CreatedByUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Exhibitions_Tree">
+          <End Role="FamilyTrees" Type="Self.FamilyTrees" Multiplicity="1" />
+          <End Role="Exhibitions" Type="Self.Exhibitions" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FamilyTrees">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Exhibitions">
+              <PropertyRef Name="TreeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FamilyTrees_Creator">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="FamilyTrees" Type="Self.FamilyTrees" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="FamilyTrees">
+              <PropertyRef Name="CreatedByUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FamilyTrees_ProjectType">
+          <End Role="ProjectTypes" Type="Self.ProjectTypes" Multiplicity="1" />
+          <End Role="FamilyTrees" Type="Self.FamilyTrees" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProjectTypes">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="FamilyTrees">
+              <PropertyRef Name="ProjectTypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Persons_Tree">
+          <End Role="FamilyTrees" Type="Self.FamilyTrees" Multiplicity="1" />
+          <End Role="Persons" Type="Self.Persons" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FamilyTrees">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Persons">
+              <PropertyRef Name="TreeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Persons_Gender">
+          <End Role="Genders" Type="Self.Genders" Multiplicity="1" />
+          <End Role="Persons" Type="Self.Persons" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Genders">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Persons">
+              <PropertyRef Name="GenderId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MediaFiles_Type">
+          <End Role="MediaTypes" Type="Self.MediaTypes" Multiplicity="1" />
+          <End Role="MediaFiles" Type="Self.MediaFiles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MediaTypes">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="MediaFiles">
+              <PropertyRef Name="MediaTypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MediaFiles_Uploader">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="MediaFiles" Type="Self.MediaFiles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="MediaFiles">
+              <PropertyRef Name="UploadedByUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MediaLinks_File">
+          <End Role="MediaFiles" Type="Self.MediaFiles" Multiplicity="1" />
+          <End Role="MediaLinks" Type="Self.MediaLinks" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MediaFiles">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="MediaLinks">
+              <PropertyRef Name="MediaFileId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MediaLinks_Person">
+          <End Role="Persons" Type="Self.Persons" Multiplicity="0..1" />
+          <End Role="MediaLinks" Type="Self.MediaLinks" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Persons">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="MediaLinks">
+              <PropertyRef Name="PersonId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MediaLinks_Story">
+          <End Role="Stories" Type="Self.Stories" Multiplicity="0..1" />
+          <End Role="MediaLinks" Type="Self.MediaLinks" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Stories">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="MediaLinks">
+              <PropertyRef Name="StoryId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PersonRelationships_Creator">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="PersonRelationships" Type="Self.PersonRelationships" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PersonRelationships">
+              <PropertyRef Name="CreatedByUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PersonRelationships_Person1">
+          <End Role="Persons" Type="Self.Persons" Multiplicity="1" />
+          <End Role="PersonRelationships" Type="Self.PersonRelationships" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Persons">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PersonRelationships">
+              <PropertyRef Name="Person1Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PersonRelationships_Person2">
+          <End Role="Persons" Type="Self.Persons" Multiplicity="1" />
+          <End Role="PersonRelationships" Type="Self.PersonRelationships" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Persons">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PersonRelationships">
+              <PropertyRef Name="Person2Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Persons_Creator">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Persons" Type="Self.Persons" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Persons">
+              <PropertyRef Name="CreatedByUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Stories_Person">
+          <End Role="Persons" Type="Self.Persons" Multiplicity="1" />
+          <End Role="Stories" Type="Self.Stories" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Persons">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Stories">
+              <PropertyRef Name="PersonId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Users_Person">
+          <End Role="Persons" Type="Self.Persons" Multiplicity="0..1" />
+          <End Role="Users" Type="Self.Users" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Persons">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Users">
+              <PropertyRef Name="PersonId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Stories_Creator">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Stories" Type="Self.Stories" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Stories">
+              <PropertyRef Name="CreatedByUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Users_Role">
+          <End Role="UserRoles" Type="Self.UserRoles" Multiplicity="1" />
+          <End Role="Users" Type="Self.Users" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="UserRoles">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Users">
+              <PropertyRef Name="RoleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="GenealogyUnifiedDBEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="AnimalAssessments" EntityType="Self.AnimalAssessments" />
+          <EntitySet Name="AnimalGenders" EntityType="Self.AnimalGenders" />
+          <EntitySet Name="AnimalPedigree" EntityType="Self.AnimalPedigree" />
+          <EntitySet Name="Animals" EntityType="Self.Animals" />
+          <EntitySet Name="Breedings" EntityType="Self.Breedings" />
+          <EntitySet Name="Breeds" EntityType="Self.Breeds" />
+          <EntitySet Name="Colors" EntityType="Self.Colors" />
+          <EntitySet Name="Exhibitions" EntityType="Self.Exhibitions" />
+          <EntitySet Name="FamilyTrees" EntityType="Self.FamilyTrees" />
+          <EntitySet Name="Genders" EntityType="Self.Genders" />
+          <EntitySet Name="MediaFiles" EntityType="Self.MediaFiles" />
+          <EntitySet Name="MediaLinks" EntityType="Self.MediaLinks" />
+          <EntitySet Name="MediaTypes" EntityType="Self.MediaTypes" />
+          <EntitySet Name="PedigreeClasses" EntityType="Self.PedigreeClasses" />
+          <EntitySet Name="PersonRelationships" EntityType="Self.PersonRelationships" />
+          <EntitySet Name="Persons" EntityType="Self.Persons" />
+          <EntitySet Name="ProjectTypes" EntityType="Self.ProjectTypes" />
+          <EntitySet Name="Species" EntityType="Self.Species" />
+          <EntitySet Name="Stories" EntityType="Self.Stories" />
+          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" />
+          <EntitySet Name="UserRoles" EntityType="Self.UserRoles" />
+          <EntitySet Name="Users" EntityType="Self.Users" />
+          <AssociationSet Name="FK_AnimalAssessments_Animal" Association="Self.FK_AnimalAssessments_Animal">
+            <End Role="Animals" EntitySet="Animals" />
+            <End Role="AnimalAssessments" EntitySet="AnimalAssessments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AnimalAssessments_Class" Association="Self.FK_AnimalAssessments_Class">
+            <End Role="PedigreeClasses" EntitySet="PedigreeClasses" />
+            <End Role="AnimalAssessments" EntitySet="AnimalAssessments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AnimalAssessments_Creator" Association="Self.FK_AnimalAssessments_Creator">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="AnimalAssessments" EntitySet="AnimalAssessments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Animals_Gender" Association="Self.FK_Animals_Gender">
+            <End Role="AnimalGenders" EntitySet="AnimalGenders" />
+            <End Role="Animals" EntitySet="Animals" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AnimalPedigree_Animal" Association="Self.FK_AnimalPedigree_Animal">
+            <End Role="Animals" EntitySet="Animals" />
+            <End Role="AnimalPedigree" EntitySet="AnimalPedigree" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AnimalPedigree_Creator" Association="Self.FK_AnimalPedigree_Creator">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="AnimalPedigree" EntitySet="AnimalPedigree" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AnimalPedigree_Father" Association="Self.FK_AnimalPedigree_Father">
+            <End Role="Animals" EntitySet="Animals" />
+            <End Role="AnimalPedigree" EntitySet="AnimalPedigree" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AnimalPedigree_Mother" Association="Self.FK_AnimalPedigree_Mother">
+            <End Role="Animals" EntitySet="Animals" />
+            <End Role="AnimalPedigree" EntitySet="AnimalPedigree" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Animals_Breed" Association="Self.FK_Animals_Breed">
+            <End Role="Breeds" EntitySet="Breeds" />
+            <End Role="Animals" EntitySet="Animals" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Animals_Color" Association="Self.FK_Animals_Color">
+            <End Role="Colors" EntitySet="Colors" />
+            <End Role="Animals" EntitySet="Animals" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Animals_Creator" Association="Self.FK_Animals_Creator">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Animals" EntitySet="Animals" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Animals_Owner" Association="Self.FK_Animals_Owner">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Animals" EntitySet="Animals" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Animals_PedigreeClass" Association="Self.FK_Animals_PedigreeClass">
+            <End Role="PedigreeClasses" EntitySet="PedigreeClasses" />
+            <End Role="Animals" EntitySet="Animals" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Animals_Species" Association="Self.FK_Animals_Species">
+            <End Role="Species" EntitySet="Species" />
+            <End Role="Animals" EntitySet="Animals" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Animals_Tree" Association="Self.FK_Animals_Tree">
+            <End Role="FamilyTrees" EntitySet="FamilyTrees" />
+            <End Role="Animals" EntitySet="Animals" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Breedings_Female" Association="Self.FK_Breedings_Female">
+            <End Role="Animals" EntitySet="Animals" />
+            <End Role="Breedings" EntitySet="Breedings" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Breedings_Male" Association="Self.FK_Breedings_Male">
+            <End Role="Animals" EntitySet="Animals" />
+            <End Role="Breedings" EntitySet="Breedings" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Exhibitions_Animal" Association="Self.FK_Exhibitions_Animal">
+            <End Role="Animals" EntitySet="Animals" />
+            <End Role="Exhibitions" EntitySet="Exhibitions" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MediaLinks_Animal" Association="Self.FK_MediaLinks_Animal">
+            <End Role="Animals" EntitySet="Animals" />
+            <End Role="MediaLinks" EntitySet="MediaLinks" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Breedings_Creator" Association="Self.FK_Breedings_Creator">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Breedings" EntitySet="Breedings" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Breedings_Tree" Association="Self.FK_Breedings_Tree">
+            <End Role="FamilyTrees" EntitySet="FamilyTrees" />
+            <End Role="Breedings" EntitySet="Breedings" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Breeds_Species" Association="Self.FK_Breeds_Species">
+            <End Role="Species" EntitySet="Species" />
+            <End Role="Breeds" EntitySet="Breeds" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Colors_Species" Association="Self.FK_Colors_Species">
+            <End Role="Species" EntitySet="Species" />
+            <End Role="Colors" EntitySet="Colors" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Exhibitions_Creator" Association="Self.FK_Exhibitions_Creator">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Exhibitions" EntitySet="Exhibitions" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Exhibitions_Tree" Association="Self.FK_Exhibitions_Tree">
+            <End Role="FamilyTrees" EntitySet="FamilyTrees" />
+            <End Role="Exhibitions" EntitySet="Exhibitions" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FamilyTrees_Creator" Association="Self.FK_FamilyTrees_Creator">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="FamilyTrees" EntitySet="FamilyTrees" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FamilyTrees_ProjectType" Association="Self.FK_FamilyTrees_ProjectType">
+            <End Role="ProjectTypes" EntitySet="ProjectTypes" />
+            <End Role="FamilyTrees" EntitySet="FamilyTrees" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Persons_Tree" Association="Self.FK_Persons_Tree">
+            <End Role="FamilyTrees" EntitySet="FamilyTrees" />
+            <End Role="Persons" EntitySet="Persons" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Persons_Gender" Association="Self.FK_Persons_Gender">
+            <End Role="Genders" EntitySet="Genders" />
+            <End Role="Persons" EntitySet="Persons" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MediaFiles_Type" Association="Self.FK_MediaFiles_Type">
+            <End Role="MediaTypes" EntitySet="MediaTypes" />
+            <End Role="MediaFiles" EntitySet="MediaFiles" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MediaFiles_Uploader" Association="Self.FK_MediaFiles_Uploader">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="MediaFiles" EntitySet="MediaFiles" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MediaLinks_File" Association="Self.FK_MediaLinks_File">
+            <End Role="MediaFiles" EntitySet="MediaFiles" />
+            <End Role="MediaLinks" EntitySet="MediaLinks" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MediaLinks_Person" Association="Self.FK_MediaLinks_Person">
+            <End Role="Persons" EntitySet="Persons" />
+            <End Role="MediaLinks" EntitySet="MediaLinks" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MediaLinks_Story" Association="Self.FK_MediaLinks_Story">
+            <End Role="Stories" EntitySet="Stories" />
+            <End Role="MediaLinks" EntitySet="MediaLinks" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PersonRelationships_Creator" Association="Self.FK_PersonRelationships_Creator">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="PersonRelationships" EntitySet="PersonRelationships" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PersonRelationships_Person1" Association="Self.FK_PersonRelationships_Person1">
+            <End Role="Persons" EntitySet="Persons" />
+            <End Role="PersonRelationships" EntitySet="PersonRelationships" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PersonRelationships_Person2" Association="Self.FK_PersonRelationships_Person2">
+            <End Role="Persons" EntitySet="Persons" />
+            <End Role="PersonRelationships" EntitySet="PersonRelationships" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Persons_Creator" Association="Self.FK_Persons_Creator">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Persons" EntitySet="Persons" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Stories_Person" Association="Self.FK_Stories_Person">
+            <End Role="Persons" EntitySet="Persons" />
+            <End Role="Stories" EntitySet="Stories" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Users_Person" Association="Self.FK_Users_Person">
+            <End Role="Persons" EntitySet="Persons" />
+            <End Role="Users" EntitySet="Users" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Stories_Creator" Association="Self.FK_Stories_Creator">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Stories" EntitySet="Stories" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Users_Role" Association="Self.FK_Users_Role">
+            <End Role="UserRoles" EntitySet="UserRoles" />
+            <End Role="Users" EntitySet="Users" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="Хранилище GenealogyUnifiedDBModelContainer" CdmEntityContainer="GenealogyUnifiedDBEntities">
+          <EntitySetMapping Name="AnimalAssessments">
+            <EntityTypeMapping TypeName="GenealogyUnifiedDBModel.AnimalAssessments">
+              <MappingFragment StoreEntitySet="AnimalAssessments">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="AnimalId" ColumnName="AnimalId" />
+                <ScalarProperty Name="AssessmentDate" ColumnName="AssessmentDate" />
+                <ScalarProperty Name="ClassId" ColumnName="ClassId" />
+                <ScalarProperty Name="OverallScore" ColumnName="OverallScore" />
+                <ScalarProperty Name="ExteriorScore" ColumnName="ExteriorScore" />
+                <ScalarProperty Name="ProductivityScore" ColumnName="ProductivityScore" />
+                <ScalarProperty Name="OffspringScore" ColumnName="OffspringScore" />
+                <ScalarProperty Name="CommissionMembers" ColumnName="CommissionMembers" />
+                <ScalarProperty Name="CertificateNumber" ColumnName="CertificateNumber" />
+                <ScalarProperty Name="ValidUntil" ColumnName="ValidUntil" />
+                <ScalarProperty Name="Notes" ColumnName="Notes" />
+                <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="AnimalGenders">
+            <EntityTypeMapping TypeName="GenealogyUnifiedDBModel.AnimalGenders">
+              <MappingFragment StoreEntitySet="AnimalGenders">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="AnimalPedigree">
+            <EntityTypeMapping TypeName="GenealogyUnifiedDBModel.AnimalPedigree">
+              <MappingFragment StoreEntitySet="AnimalPedigree">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="AnimalId" ColumnName="AnimalId" />
+                <ScalarProperty Name="FatherId" ColumnName="FatherId" />
+                <ScalarProperty Name="MotherId" ColumnName="MotherId" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Animals">
+            <EntityTypeMapping TypeName="GenealogyUnifiedDBModel.Animals">
+              <MappingFragment StoreEntitySet="Animals">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="TreeId" ColumnName="TreeId" />
+                <ScalarProperty Name="Nickname" ColumnName="Nickname" />
+                <ScalarProperty Name="InventoryNumber" ColumnName="InventoryNumber" />
+                <ScalarProperty Name="SpeciesId" ColumnName="SpeciesId" />
+                <ScalarProperty Name="BreedId" ColumnName="BreedId" />
+                <ScalarProperty Name="ColorId" ColumnName="ColorId" />
+                <ScalarProperty Name="GenderId" ColumnName="GenderId" />
+                <ScalarProperty Name="IsCastrated" ColumnName="IsCastrated" />
+                <ScalarProperty Name="BirthDate" ColumnName="BirthDate" />
+                <ScalarProperty Name="BirthPlace" ColumnName="BirthPlace" />
+                <ScalarProperty Name="DeathDate" ColumnName="DeathDate" />
+                <ScalarProperty Name="DeathPlace" ColumnName="DeathPlace" />
+                <ScalarProperty Name="DeathReason" ColumnName="DeathReason" />
+                <ScalarProperty Name="IsAlive" ColumnName="IsAlive" />
+                <ScalarProperty Name="PedigreeClassId" ColumnName="PedigreeClassId" />
+                <ScalarProperty Name="BreedingValue" ColumnName="BreedingValue" />
+                <ScalarProperty Name="IsBreedingStock" ColumnName="IsBreedingStock" />
+                <ScalarProperty Name="ProductivityData" ColumnName="ProductivityData" />
+                <ScalarProperty Name="HeightAtWithers" ColumnName="HeightAtWithers" />
+                <ScalarProperty Name="ChestGirth" ColumnName="ChestGirth" />
+                <ScalarProperty Name="BodyLength" ColumnName="BodyLength" />
+                <ScalarProperty Name="Weight" ColumnName="Weight" />
+                <ScalarProperty Name="ChipNumber" ColumnName="ChipNumber" />
+                <ScalarProperty Name="GeneticDiseases" ColumnName="GeneticDiseases" />
+                <ScalarProperty Name="DNATestDate" ColumnName="DNATestDate" />
+                <ScalarProperty Name="DNAResults" ColumnName="DNAResults" />
+                <ScalarProperty Name="OwnerId" ColumnName="OwnerId" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="ProfilePhotoPath" ColumnName="ProfilePhotoPath" />
+                <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="UpdatedAt" ColumnName="UpdatedAt" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Breedings">
+            <EntityTypeMapping TypeName="GenealogyUnifiedDBModel.Breedings">
+              <MappingFragment StoreEntitySet="Breedings">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="TreeId" ColumnName="TreeId" />
+                <ScalarProperty Name="MaleId" ColumnName="MaleId" />
+                <ScalarProperty Name="FemaleId" ColumnName="FemaleId" />
+                <ScalarProperty Name="BreedingDate" ColumnName="BreedingDate" />
+                <ScalarProperty Name="ExpectedBirthDate" ColumnName="ExpectedBirthDate" />
+                <ScalarProperty Name="ActualBirthDate" ColumnName="ActualBirthDate" />
+                <ScalarProperty Name="IsSuccessful" ColumnName="IsSuccessful" />
+                <ScalarProperty Name="OffspringCount" ColumnName="OffspringCount" />
+                <ScalarProperty Name="AliveCount" ColumnName="AliveCount" />
+                <ScalarProperty Name="Notes" ColumnName="Notes" />
+                <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Breeds">
+            <EntityTypeMapping TypeName="GenealogyUnifiedDBModel.Breeds">
+              <MappingFragment StoreEntitySet="Breeds">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="SpeciesId" ColumnName="SpeciesId" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Colors">
+            <EntityTypeMapping TypeName="GenealogyUnifiedDBModel.Colors">
+              <MappingFragment StoreEntitySet="Colors">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="SpeciesId" ColumnName="SpeciesId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Exhibitions">
+            <EntityTypeMapping TypeName="GenealogyUnifiedDBModel.Exhibitions">
+              <MappingFragment StoreEntitySet="Exhibitions">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="TreeId" ColumnName="TreeId" />
+                <ScalarProperty Name="AnimalId" ColumnName="AnimalId" />
+                <ScalarProperty Name="ExhibitionName" ColumnName="ExhibitionName" />
+                <ScalarProperty Name="ExhibitionDate" ColumnName="ExhibitionDate" />
+                <ScalarProperty Name="Location" ColumnName="Location" />
+                <ScalarProperty Name="Result" ColumnName="Result" />
+                <ScalarProperty Name="JudgeName" ColumnName="JudgeName" />
+                <ScalarProperty Name="Rating" ColumnName="Rating" />
+                <ScalarProperty Name="CertificateNumber" ColumnName="CertificateNumber" />
+                <ScalarProperty Name="Notes" ColumnName="Notes" />
+                <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="FamilyTrees">
+            <EntityTypeMapping TypeName="GenealogyUnifiedDBModel.FamilyTrees">
+              <MappingFragment StoreEntitySet="FamilyTrees">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="ProjectTypeId" ColumnName="ProjectTypeId" />
+                <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="IsPublic" ColumnName="IsPublic" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Genders">
+            <EntityTypeMapping TypeName="GenealogyUnifiedDBModel.Genders">
+              <MappingFragment StoreEntitySet="Genders">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Symbol" ColumnName="Symbol" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="MediaFiles">
+            <EntityTypeMapping TypeName="GenealogyUnifiedDBModel.MediaFiles">
+              <MappingFragment StoreEntitySet="MediaFiles">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="FileName" ColumnName="FileName" />
+                <ScalarProperty Name="FilePath" ColumnName="FilePath" />
+                <ScalarProperty Name="FileSize" ColumnName="FileSize" />
+                <ScalarProperty Name="MediaTypeId" ColumnName="MediaTypeId" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="UploadedByUserId" ColumnName="UploadedByUserId" />
+                <ScalarProperty Name="UploadedAt" ColumnName="UploadedAt" />
+                <ScalarProperty Name="IsProfilePhoto" ColumnName="IsProfilePhoto" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="MediaLinks">
+            <EntityTypeMapping TypeName="GenealogyUnifiedDBModel.MediaLinks">
+              <MappingFragment StoreEntitySet="MediaLinks">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="MediaFileId" ColumnName="MediaFileId" />
+                <ScalarProperty Name="PersonId" ColumnName="PersonId" />
+                <ScalarProperty Name="AnimalId" ColumnName="AnimalId" />
+                <ScalarProperty Name="StoryId" ColumnName="StoryId" />
+                <ScalarProperty Name="SortOrder" ColumnName="SortOrder" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="MediaTypes">
+            <EntityTypeMapping TypeName="GenealogyUnifiedDBModel.MediaTypes">
+              <MappingFragment StoreEntitySet="MediaTypes">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Extension" ColumnName="Extension" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PedigreeClasses">
+            <EntityTypeMapping TypeName="GenealogyUnifiedDBModel.PedigreeClasses">
+              <MappingFragment StoreEntitySet="PedigreeClasses">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Code" ColumnName="Code" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PersonRelationships">
+            <EntityTypeMapping TypeName="GenealogyUnifiedDBModel.PersonRelationships">
+              <MappingFragment StoreEntitySet="PersonRelationships">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Person1Id" ColumnName="Person1Id" />
+                <ScalarProperty Name="Person2Id" ColumnName="Person2Id" />
+                <ScalarProperty Name="RelationshipType" ColumnName="RelationshipType" />
+                <ScalarProperty Name="Direction" ColumnName="Direction" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Persons">
+            <EntityTypeMapping TypeName="GenealogyUnifiedDBModel.Persons">
+              <MappingFragment StoreEntitySet="Persons">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="TreeId" ColumnName="TreeId" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="Patronymic" ColumnName="Patronymic" />
+                <ScalarProperty Name="MaidenName" ColumnName="MaidenName" />
+                <ScalarProperty Name="GenderId" ColumnName="GenderId" />
+                <ScalarProperty Name="BirthDate" ColumnName="BirthDate" />
+                <ScalarProperty Name="BirthPlace" ColumnName="BirthPlace" />
+                <ScalarProperty Name="DeathDate" ColumnName="DeathDate" />
+                <ScalarProperty Name="DeathPlace" ColumnName="DeathPlace" />
+                <ScalarProperty Name="Biography" ColumnName="Biography" />
+                <ScalarProperty Name="ProfilePhotoPath" ColumnName="ProfilePhotoPath" />
+                <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="UpdatedAt" ColumnName="UpdatedAt" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ProjectTypes">
+            <EntityTypeMapping TypeName="GenealogyUnifiedDBModel.ProjectTypes">
+              <MappingFragment StoreEntitySet="ProjectTypes">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Species">
+            <EntityTypeMapping TypeName="GenealogyUnifiedDBModel.Species">
+              <MappingFragment StoreEntitySet="Species">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Stories">
+            <EntityTypeMapping TypeName="GenealogyUnifiedDBModel.Stories">
+              <MappingFragment StoreEntitySet="Stories">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="PersonId" ColumnName="PersonId" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="Content" ColumnName="Content" />
+                <ScalarProperty Name="EventDate" ColumnName="EventDate" />
+                <ScalarProperty Name="EventDateText" ColumnName="EventDateText" />
+                <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="UpdatedAt" ColumnName="UpdatedAt" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="sysdiagrams">
+            <EntityTypeMapping TypeName="GenealogyUnifiedDBModel.sysdiagrams">
+              <MappingFragment StoreEntitySet="sysdiagrams">
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="principal_id" ColumnName="principal_id" />
+                <ScalarProperty Name="diagram_id" ColumnName="diagram_id" />
+                <ScalarProperty Name="version" ColumnName="version" />
+                <ScalarProperty Name="definition" ColumnName="definition" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="UserRoles">
+            <EntityTypeMapping TypeName="GenealogyUnifiedDBModel.UserRoles">
+              <MappingFragment StoreEntitySet="UserRoles">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Users">
+            <EntityTypeMapping TypeName="GenealogyUnifiedDBModel.Users">
+              <MappingFragment StoreEntitySet="Users">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Username" ColumnName="Username" />
+                <ScalarProperty Name="PasswordHash" ColumnName="PasswordHash" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
+                <ScalarProperty Name="PersonId" ColumnName="PersonId" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="LastLoginAt" ColumnName="LastLoginAt" />
+                <ScalarProperty Name="LastUsedMode" ColumnName="LastUsedMode" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Нет" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

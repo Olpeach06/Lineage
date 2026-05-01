@@ -1,0 +1,375 @@
+﻿<Page x:Class="Lineage.Pages.ReportsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      mc:Ignorable="d"
+      d:DesignHeight="1000" d:DesignWidth="1200"
+      Title="Отчеты"
+      Background="#F5F0E6"
+      Loaded="Page_Loaded">
+
+    <Page.Resources>
+        <DropShadowEffect x:Key="ShadowEffect"
+                          BlurRadius="10"
+                          Opacity="0.1"
+                          ShadowDepth="2"
+                          Color="#5C4E3D"/>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- ВЕРХНЕЕ МЕНЮ -->
+        <Border Grid.Row="0"
+                Background="#FDF8F0"
+                BorderBrush="#D6C9B8"
+                BorderThickness="0,0,0,1"
+                Effect="{StaticResource ShadowEffect}">
+            <Grid Margin="20,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="0,0,40,0">
+                    <Image Source="/Images/icon-tree.png" Width="32" Height="32" Margin="0,0,8,0"/>
+                    <TextBlock Text="Genealogy" FontSize="20" FontWeight="SemiBold"
+                               Foreground="#5C4E3D" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <Button Grid.Column="1" Content="Главная"
+                        Click="MainPageButton_Click" Margin="5,0"
+                        Background="Transparent" Foreground="#6B5E4A"
+                        BorderThickness="0" Padding="15,8"
+                        FontSize="14" FontWeight="Medium" Cursor="Hand">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border x:Name="border" Background="{TemplateBinding Background}"
+                                                Padding="{TemplateBinding Padding}" CornerRadius="8">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="border" Property="Background" Value="#F0E9DE"/>
+                                                <Setter Property="Foreground" Value="#8FAA7A"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Button.Style>
+                </Button>
+
+                <Button Grid.Column="2" Content="Мои проекты"
+                        Click="TreesButton_Click" Margin="5,0"
+                        Background="Transparent" Foreground="#6B5E4A"
+                        BorderThickness="0" Padding="15,8"
+                        FontSize="14" FontWeight="Medium" Cursor="Hand">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border x:Name="border" Background="{TemplateBinding Background}"
+                                                Padding="{TemplateBinding Padding}" CornerRadius="8">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="border" Property="Background" Value="#F0E9DE"/>
+                                                <Setter Property="Foreground" Value="#8FAA7A"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Button.Style>
+                </Button>
+
+                <Button Grid.Column="3" Content="Отчеты" IsEnabled="False" Margin="5,0"
+                        Background="Transparent" Foreground="#8FAA7A"
+                        BorderThickness="0" Padding="15,8"
+                        FontSize="14" FontWeight="SemiBold" Cursor="Hand"/>
+
+                <Button Grid.Column="4" x:Name="btnUsers" Content="👥 Пользователи"
+                        Click="UsersButton_Click" Margin="5,0"
+                        Background="Transparent" Foreground="#6B5E4A"
+                        BorderThickness="0" Padding="15,8"
+                        FontSize="14" FontWeight="Medium" Cursor="Hand"
+                        Visibility="Collapsed">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border x:Name="border" Background="{TemplateBinding Background}"
+                                                Padding="{TemplateBinding Padding}" CornerRadius="8">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="border" Property="Background" Value="#F0E9DE"/>
+                                                <Setter Property="Foreground" Value="#8FAA7A"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Button.Style>
+                </Button>
+
+                <StackPanel Grid.Column="6" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Border Background="#F5F0E6" CornerRadius="20" Padding="10,5,15,5" Margin="0,0,15,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="👤" FontSize="14" Foreground="#8FAA7A" Margin="0,0,8,0"/>
+                            <TextBlock x:Name="txtUserName" Text="Имя пользователя"
+                                       VerticalAlignment="Center" Foreground="#5C4E3D" FontWeight="Medium"/>
+                        </StackPanel>
+                    </Border>
+                    <Button Content="Выйти" Click="LogoutButton_Click"
+                            Background="Transparent" BorderBrush="#D6C9B8" BorderThickness="1"
+                            Foreground="#8B7E6B" Padding="12,5" Cursor="Hand">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="border" Background="{TemplateBinding Background}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                                    Padding="{TemplateBinding Padding}" CornerRadius="8">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="border" Property="Background" Value="#F0E9DE"/>
+                                                    <Setter Property="Foreground" Value="#8FAA7A"/>
+                                                    <Setter TargetName="border" Property="BorderBrush" Value="#8FAA7A"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ОСНОВНОЙ КОНТЕНТ -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="30">
+
+                <!-- Заголовок -->
+                <Grid Margin="0,0,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0"
+                               Text="ОТЧЕТЫ И СТАТИСТИКА"
+                               FontSize="24" FontWeight="SemiBold"
+                               Foreground="#5C4E3D"
+                               VerticalAlignment="Center"/>
+                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                        <TextBlock Text="Проект:" Foreground="#6B5E4A" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <ComboBox x:Name="cmbTrees" Width="200" Height="35"
+                                  Background="White" BorderBrush="#D6C9B8"
+                                  DisplayMemberPath="Name" SelectedValuePath="Id"
+                                  SelectionChanged="TreeSelectionChanged"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- ОБЩАЯ СТАТИСТИКА -->
+                <Border Background="#FDF8F0" CornerRadius="10" BorderBrush="#D6C9B8"
+                        BorderThickness="1" Padding="20" Margin="0,0,0,20">
+                    <StackPanel>
+                        <TextBlock Text="ОБЩАЯ СТАТИСТИКА"
+                                   Foreground="#5C4E3D" FontSize="16" FontWeight="Bold"
+                                   Margin="0,0,0,15"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Border Grid.Column="0" Background="#F5F0E6" CornerRadius="8"
+                                    Padding="15" Margin="0,0,5,0">
+                                <StackPanel HorizontalAlignment="Center">
+                                    <TextBlock x:Name="txtIcon1" Text="👥" FontSize="32" Foreground="#8FAA7A" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="txtTotalCount1" Text="0" FontSize="28" FontWeight="Bold"
+                                               Foreground="#5C4E3D" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="txtLabel1" Text="Всего" Foreground="#8B7E6B" FontSize="12" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Grid.Column="1" Background="#F5F0E6" CornerRadius="8"
+                                    Padding="15" Margin="5,0">
+                                <StackPanel HorizontalAlignment="Center">
+                                    <TextBlock x:Name="txtIcon2" Text="👪" FontSize="32" Foreground="#8FAA7A" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="txtTotalCount2" Text="0" FontSize="28" FontWeight="Bold"
+                                               Foreground="#5C4E3D" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="txtLabel2" Text="" Foreground="#8B7E6B" FontSize="12" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Grid.Column="2" Background="#F5F0E6" CornerRadius="8"
+                                    Padding="15" Margin="5,0">
+                                <StackPanel HorizontalAlignment="Center">
+                                    <TextBlock x:Name="txtIcon3" Text="💍" FontSize="32" Foreground="#8FAA7A" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="txtTotalCount3" Text="0" FontSize="28" FontWeight="Bold"
+                                               Foreground="#5C4E3D" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="txtLabel3" Text="" Foreground="#8B7E6B" FontSize="12" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Grid.Column="3" Background="#F5F0E6" CornerRadius="8"
+                                    Padding="15" Margin="5,0">
+                                <StackPanel HorizontalAlignment="Center">
+                                    <TextBlock x:Name="txtIcon4" Text="⚰️" FontSize="32" Foreground="#8FAA7A" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="txtTotalCount4" Text="0" FontSize="28" FontWeight="Bold"
+                                               Foreground="#5C4E3D" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="txtLabel4" Text="" Foreground="#8B7E6B" FontSize="12" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Grid.Column="4" Background="#F5F0E6" CornerRadius="8"
+                                    Padding="15" Margin="5,0,0,0">
+                                <StackPanel HorizontalAlignment="Center">
+                                    <TextBlock x:Name="txtIcon5" Text="📊" FontSize="32" Foreground="#8FAA7A" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="txtTotalCount5" Text="0" FontSize="28" FontWeight="Bold"
+                                               Foreground="#5C4E3D" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="txtLabel5" Text="" Foreground="#8B7E6B" FontSize="12" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- ДЕМОГРАФИЯ -->
+                <Border Background="#FDF8F0" CornerRadius="10" BorderBrush="#D6C9B8"
+                        BorderThickness="1" Padding="20" Margin="0,0,0,20">
+                    <StackPanel>
+                        <TextBlock x:Name="txtDemographyTitle" Text="ДЕМОГРАФИЯ"
+                                   Foreground="#5C4E3D" FontSize="16" FontWeight="Bold"
+                                   Margin="0,0,0,15"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                <TextBlock x:Name="txtGenderTitle" Text="Распределение по полу"
+                                           Foreground="#6B5E4A" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="80"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="50"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="♂ Мужчины:" Foreground="#5C4E3D" Margin="0,0,5,5"/>
+                                    <ProgressBar Grid.Row="0" Grid.Column="1" x:Name="progressMen"
+                                                 Height="20" Minimum="0" Maximum="100"
+                                                 Foreground="#5C4E3D" Background="#F5F0E6"
+                                                 BorderBrush="#D6C9B8" Margin="0,0,5,5"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="2" x:Name="txtMenPercent" Text="0%" Foreground="#6B5E4A"/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="♀ Женщины:" Foreground="#5C4E3D" Margin="0,0,5,5"/>
+                                    <ProgressBar Grid.Row="1" Grid.Column="1" x:Name="progressWomen"
+                                                 Height="20" Minimum="0" Maximum="100"
+                                                 Foreground="#8FAA7A" Background="#F5F0E6"
+                                                 BorderBrush="#D6C9B8" Margin="0,0,5,5"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="2" x:Name="txtWomenPercent" Text="0%" Foreground="#6B5E4A"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                                <TextBlock Text="Возрастная статистика"
+                                           Foreground="#6B5E4A" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Средний возраст:" Foreground="#6B5E4A"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="txtAverageAge" Text="0 лет"
+                                               Foreground="#5C4E3D" FontWeight="Bold"/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Самый старший:" Foreground="#6B5E4A" Margin="0,5,0,0"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" x:Name="txtOldestPerson" Text="---"
+                                               Foreground="#5C4E3D" FontWeight="Bold" Margin="0,5,0,0"/>
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Самый младший:" Foreground="#6B5E4A" Margin="0,5,0,0"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="1" x:Name="txtYoungestPerson" Text="---"
+                                               Foreground="#5C4E3D" FontWeight="Bold" Margin="0,5,0,0"/>
+                                </Grid>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- ДОПОЛНИТЕЛЬНАЯ СТАТИСТИКА -->
+                <Border x:Name="borderExtraStats" Background="#FDF8F0" CornerRadius="10" BorderBrush="#D6C9B8"
+                        BorderThickness="1" Padding="20" Margin="0,0,0,20">
+                    <StackPanel>
+                        <TextBlock x:Name="txtExtraStatsTitle" Text="ДОПОЛНИТЕЛЬНАЯ СТАТИСТИКА"
+                                   Foreground="#5C4E3D" FontSize="16" FontWeight="Bold"
+                                   Margin="0,0,0,15"/>
+                        <StackPanel x:Name="panelExtraStats">
+                            <TextBlock Text="Загрузка..." Foreground="#8B7E6B" HorizontalAlignment="Center" Margin="20"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- СПИСОК ВСЕХ ЗАПИСЕЙ -->
+                <Border Background="#FDF8F0" CornerRadius="10" BorderBrush="#D6C9B8"
+                        BorderThickness="1" Padding="20">
+                    <StackPanel>
+                        <TextBlock Text="СПИСОК ВСЕХ ЗАПИСЕЙ"
+                                   Foreground="#5C4E3D" FontSize="16" FontWeight="Bold"
+                                   Margin="0,0,0,15"/>
+                        <ListView x:Name="lvItems" BorderThickness="0" Background="Transparent"
+                                  ScrollViewer.VerticalScrollBarVisibility="Auto" MaxHeight="300">
+                            <ListView.View>
+                                <GridView x:Name="gridViewColumns"/>
+                            </ListView.View>
+                        </ListView>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>
