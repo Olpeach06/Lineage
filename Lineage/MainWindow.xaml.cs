@@ -27,7 +27,7 @@ namespace Lineage
         public MainWindow()
         {
             InitializeComponent();
-            AppConnect.modeldb = new GenealogyUnifiedDBEntities();
+            AppConnect.modeldb = new GenealogyUnifiedDBEntities1();
             AppFrame.frameMain = mainFrame;
             mainFrame.Navigate(new LoginPage());
 

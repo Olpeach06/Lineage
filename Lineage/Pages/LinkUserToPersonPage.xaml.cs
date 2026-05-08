@@ -43,7 +43,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var user = context.Users.Find(userId);
                     if (user != null)
@@ -62,7 +62,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var currentTreeId = Session.CurrentTreeId;
 
@@ -116,7 +116,7 @@ namespace Lineage.Pages
                     selectedPersonId = (int)cmbPerson.SelectedValue;
                 }
 
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var user = context.Users.Find(userId);
                     if (user != null)

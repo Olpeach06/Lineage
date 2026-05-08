@@ -4,7 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       mc:Ignorable="d"
-      d:DesignHeight="600" d:DesignWidth="800"
+      d:DesignHeight="900" d:DesignWidth="800"
       Title="Добавление вязки"
       Background="#F5F0E6"
       Loaded="Page_Loaded">
@@ -76,7 +76,7 @@
 
                 <!-- Примечания -->
                 <TextBlock Text="Примечания" Foreground="#6B5E4A" Margin="0,5,0,2"/>
-                <TextBox x:Name="txtNotes" Height="60" TextWrapping="Wrap" AcceptsReturn="True"
+                <TextBox x:Name="txtNotes" Height="36" TextWrapping="Wrap" AcceptsReturn="True"
                          Padding="8" BorderBrush="#B7A48B" BorderThickness="0,0,0,1"
                          Background="Transparent" Margin="0,0,0,20"/>
 

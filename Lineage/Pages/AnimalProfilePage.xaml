@@ -4,7 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       mc:Ignorable="d"
-      d:DesignHeight="800" d:DesignWidth="1000"
+      d:DesignHeight="850" d:DesignWidth="1000"
       Title="Профиль животного"
       Background="#F5F0E6"
       Loaded="Page_Loaded">
@@ -205,7 +205,6 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Племенные характеристики -->
                     <Border Grid.Column="0" Style="{StaticResource BlockStyle}">
                         <StackPanel>
                             <TextBlock Text="📊 Племенные характеристики"
@@ -239,22 +238,22 @@
                         </StackPanel>
                     </Border>
 
-                    <!-- Продуктивность -->
                     <Border Grid.Column="2" Style="{StaticResource BlockStyle}">
                         <StackPanel>
                             <TextBlock Text="🥛 Продуктивность"
                                        FontSize="18" FontWeight="SemiBold"
                                        Foreground="#5C4E3D"
                                        Margin="0,0,0,15"/>
-                            <TextBlock x:Name="txtProductivity" Text="Загрузка..." Foreground="#6B5E4A"/>
+                            <TextBlock x:Name="txtProductivity" Text="Загрузка..." Foreground="#6B5E4A" TextWrapping="Wrap"/>
                         </StackPanel>
                     </Border>
                 </Grid>
 
-                <!-- Вкладки (Вязки, Выставки, Оценки) -->
+                <!-- Вкладки (Вязки, Выставки, Оценки, Здоровье) -->
                 <Border Style="{StaticResource BlockStyle}">
                     <StackPanel>
                         <TabControl BorderThickness="0" Background="Transparent">
+                            <!-- Вкладка: Вязки -->
                             <TabItem x:Name="tabBreedings" Header="🔗 Вязки" Background="#F5F0E6">
                                 <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="250">
                                     <ItemsControl x:Name="icBreedings" Margin="5">
@@ -278,6 +277,7 @@
                                 </ScrollViewer>
                             </TabItem>
 
+                            <!-- Вкладка: Выставки -->
                             <TabItem x:Name="tabExhibitions" Header="🏆 Выставки" Background="#F5F0E6">
                                 <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="250">
                                     <ItemsControl x:Name="icExhibitions" Margin="5">
@@ -301,6 +301,7 @@
                                 </ScrollViewer>
                             </TabItem>
 
+                            <!-- Вкладка: Оценки -->
                             <TabItem x:Name="tabAssessments" Header="⭐ Оценки" Background="#F5F0E6">
                                 <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="250">
                                     <ItemsControl x:Name="icAssessments" Margin="5">
@@ -316,6 +317,32 @@
                                                         <TextBlock Grid.Column="0" Text="{Binding AssessmentDate}" Foreground="#8FAA7A" FontWeight="Bold"/>
                                                         <TextBlock Grid.Column="1" Text="{Binding Class}" Foreground="#6B5E4A" Margin="10,0"/>
                                                         <Button Grid.Column="2" Content="Подробнее" Background="#8FAA7A" Foreground="White" BorderThickness="0" Padding="10,5" FontSize="11" Cursor="Hand" Click="AssessmentDetails_Click" Tag="{Binding Id}"/>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                            </TabItem>
+
+                            <!-- Вкладка: Здоровье -->
+                            <TabItem x:Name="tabHealth" Header="💊 Здоровье" Background="#F5F0E6">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="250">
+                                    <ItemsControl x:Name="icHealthEvents" Margin="5">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="#F5F0E6" CornerRadius="8" Padding="10" Margin="0,0,0,5">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="100"/>
+                                                            <ColumnDefinition Width="150"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Column="0" Text="{Binding EventDate}" Foreground="#8FAA7A" FontWeight="Bold"/>
+                                                        <TextBlock Grid.Column="1" Text="{Binding EventType}" Foreground="#6B5E4A" Margin="5,0"/>
+                                                        <TextBlock Grid.Column="2" Text="{Binding MedicineName}" Foreground="#6B5E4A" Margin="5,0"/>
+                                                        <Button Grid.Column="3" Content="Подробнее" Background="#8FAA7A" Foreground="White" BorderThickness="0" Padding="10,5" FontSize="11" Cursor="Hand" Click="HealthDetails_Click" Tag="{Binding Id}"/>
                                                     </Grid>
                                                 </Border>
                                             </DataTemplate>

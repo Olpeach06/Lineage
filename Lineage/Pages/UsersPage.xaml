@@ -40,14 +40,12 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Логотип -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="0,0,40,0">
                     <Image Source="/Images/icon-tree.png" Width="32" Height="32" Margin="0,0,8,0"/>
                     <TextBlock Text="Genealogy" FontSize="20" FontWeight="SemiBold"
                                Foreground="#5C4E3D" VerticalAlignment="Center"/>
                 </StackPanel>
 
-                <!-- Навигация -->
                 <Button Grid.Column="1" Content="Главная"
                         Click="MainPageButton_Click" Margin="5,0"
                         Background="Transparent" Foreground="#6B5E4A"
@@ -134,11 +132,10 @@
                         BorderThickness="0" Padding="15,8"
                         FontSize="14" FontWeight="SemiBold" Cursor="Hand"/>
 
-                <!-- Профиль и выход -->
                 <StackPanel Grid.Column="6" Orientation="Horizontal" HorizontalAlignment="Right">
                     <Border Background="#F5F0E6" CornerRadius="20" Padding="10,5,15,5" Margin="0,0,15,0">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="👤" FontSize="14" Foreground="#8FAA7A" Margin="0,0,8,0"/>
+                            <TextBlock Text="👤" FontSize="14" Foreground="#8FAA7A" Margin="0,0,8,0" Height="20"/>
                             <TextBlock x:Name="txtUserName" Text="Имя пользователя"
                                        VerticalAlignment="Center" Foreground="#5C4E3D" FontWeight="Medium"/>
                         </StackPanel>
@@ -224,66 +221,114 @@
                 </StackPanel>
             </Grid>
 
-            <!-- Таблица пользователей -->
+            <!-- Список пользователей в виде карточек -->
             <Border Grid.Row="1"
                     Background="#FDF8F0"
                     CornerRadius="10"
                     BorderBrush="#D6C9B8"
                     BorderThickness="1"
-                    Padding="0">
-                <ListView x:Name="lvUsers"
-                          BorderThickness="0"
-                          Background="Transparent"
-                          ScrollViewer.VerticalScrollBarVisibility="Auto"
-                          SelectionMode="Single"
-                          MouseDoubleClick="UserDoubleClick">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="ID" Width="50" DisplayMemberBinding="{Binding Id}"/>
-                            <GridViewColumn Header="Логин" Width="150" DisplayMemberBinding="{Binding Username}"/>
-                            <GridViewColumn Header="Email" Width="200" DisplayMemberBinding="{Binding Email}"/>
-                            <GridViewColumn Header="Роль" Width="120" DisplayMemberBinding="{Binding RoleName}"/>
-                            <GridViewColumn Header="Связанная персона" Width="150">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="{Binding PersonName}" Foreground="#6B5E4A" VerticalAlignment="Center"/>
-                                            <Button x:Name="btnLinkPerson" Content="🔗" Width="25" Height="25"
+                    Padding="15">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ItemsControl x:Name="icUsers">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Width="340" Height="150"
+                                        Background="#F5F0E6"
+                                        CornerRadius="10"
+                                        BorderBrush="#D6C9B8"
+                                        BorderThickness="1"
+                                        Margin="10"
+                                        Cursor="Hand"
+                                        MouseLeftButtonUp="UserCard_Click"
+                                        Tag="{Binding Id}">
+                                    <Border.Effect>
+                                        <DropShadowEffect BlurRadius="8" Opacity="0.1" ShadowDepth="2"/>
+                                    </Border.Effect>
+
+                                    <Grid Margin="10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="60"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <!-- Аватар -->
+                                        <Border Grid.RowSpan="4" Grid.Column="0"
+                                                Width="50" Height="50"
+                                                CornerRadius="25"
+                                                Background="#8FAA7A"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center">
+                                            <TextBlock Text="👤" FontSize="28" Foreground="White" 
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+
+                                        <!-- Имя пользователя -->
+                                        <TextBlock Grid.Row="0" Grid.Column="1" 
+                                                   Text="{Binding Username}"
+                                                   FontWeight="Bold" FontSize="14"
+                                                   Foreground="#5C4E3D"
+                                                   VerticalAlignment="Center"
+                                                   Margin="5,0,0,0"/>
+
+                                        <!-- Роль с цветовой индикацией -->
+                                        <Border Grid.Row="0" Grid.Column="2"
+                                                CornerRadius="10" Padding="8,2"
+                                                Background="{Binding RoleColor}"
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Right">
+                                            <TextBlock Text="{Binding RoleName}" 
+                                                       FontSize="10" FontWeight="SemiBold"
+                                                       Foreground="White"/>
+                                        </Border>
+
+                                        <!-- Email -->
+                                        <StackPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
+                                                    Orientation="Horizontal" Margin="5,5,0,0">
+                                            <TextBlock Text="📧 " Foreground="#8FAA7A" FontSize="11"/>
+                                            <TextBlock Text="{Binding Email}" Foreground="#6B5E4A" FontSize="11"
+                                                       TextWrapping="Wrap"/>
+                                        </StackPanel>
+
+                                        <!-- Связанная персона -->
+                                        <StackPanel Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
+                                                    Orientation="Horizontal" Margin="5,5,0,0">
+                                            <TextBlock Text="👤 " Foreground="#8FAA7A" FontSize="11"/>
+                                            <TextBlock x:Name="txtPerson" Text="{Binding PersonName}" 
+                                                       Foreground="#6B5E4A" FontSize="11"
+                                                       TextDecorations="{Binding PersonUnderline}"/>
+                                            <Button x:Name="btnLinkPerson" Content="🔗" Width="20" Height="20"
                                                     Background="Transparent" BorderBrush="#D6C9B8" BorderThickness="1"
                                                     Margin="5,0,0,0" Cursor="Hand" Click="LinkPerson_Click" Tag="{Binding Id}"
                                                     ToolTip="Привязать к персоне" Visibility="{Binding CanEdit}"/>
                                         </StackPanel>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                            <GridViewColumn Header="Активен" Width="80">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <CheckBox IsChecked="{Binding IsActive}" IsEnabled="False"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                            <GridViewColumn Header="Дата регистрации" Width="120" DisplayMemberBinding="{Binding CreatedDate}"/>
-                            <GridViewColumn Header="Последний вход" Width="120" DisplayMemberBinding="{Binding LastLoginDate}"/>
-                            <GridViewColumn Header="Действия" Width="80">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <StackPanel Orientation="Horizontal">
-                                            <Button Content="✎" Width="30" Height="25"
-                                                    Background="Transparent" BorderBrush="#D6C9B8" BorderThickness="1"
-                                                    Margin="0,0,5,0" Cursor="Hand" Click="EditUser_Click" Tag="{Binding Id}"
-                                                    Visibility="{Binding CanEdit}"/>
-                                            <Button Content="🗑" Width="30" Height="25"
-                                                    Background="Transparent" BorderBrush="#FF8C00" BorderThickness="1"
-                                                    Cursor="Hand" Click="DeleteUser_Click" Tag="{Binding Id}"
-                                                    Visibility="{Binding IsAdmin}"/>
+
+                                        <!-- Статус и дата регистрации -->
+                                        <StackPanel Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2"
+                                                    Orientation="Horizontal" Margin="5,8,0,0">
+                                            <Border Width="8" Height="8" CornerRadius="4"
+                                                    Background="{Binding StatusColor}" Margin="0,3,5,0"/>
+                                            <TextBlock Text="{Binding StatusText}" Foreground="#6B5E4A" FontSize="10" Margin="0,0,10,0"/>
+                                            <TextBlock Text="📅 " Foreground="#8FAA7A" FontSize="10"/>
+                                            <TextBlock Text="{Binding CreatedDate}" Foreground="#8B7E6B" FontSize="10"/>
                                         </StackPanel>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
             </Border>
 
             <!-- Информация о количестве пользователей -->

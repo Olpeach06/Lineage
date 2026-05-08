@@ -42,7 +42,7 @@ namespace Lineage.Pages
             LoadAnimals();
 
             // Получаем пол текущего животного
-            using (var context = new GenealogyUnifiedDBEntities())
+            using (var context = new GenealogyUnifiedDBEntities1())
             {
                 var animal = context.Animals.Find(currentAnimalId);
                 if (animal != null)
@@ -57,7 +57,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var allAnimals = context.Animals
                         .Where(a => a.TreeId == currentTreeId && a.Id != currentAnimalId)
@@ -165,7 +165,7 @@ namespace Lineage.Pages
                 if (!string.IsNullOrWhiteSpace(txtAliveCount.Text))
                     int.TryParse(txtAliveCount.Text, out aliveCount);
 
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var breeding = new Breedings
                     {

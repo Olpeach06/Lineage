@@ -100,7 +100,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var person = context.Persons.FirstOrDefault(p => p.Id == personId);
                     if (person == null)
@@ -280,7 +280,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var storyList = context.Stories
                         .Where(s => s.PersonId == personId)
@@ -310,7 +310,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var stories = context.Stories.Where(s => s.PersonId == personId).Select(s => s.Id).ToList();
                     var mediaLinks = context.MediaLinks.Where(ml => ml.StoryId.HasValue && stories.Contains(ml.StoryId.Value))
@@ -383,7 +383,7 @@ namespace Lineage.Pages
             if (button?.Tag == null) return;
 
             int storyId = (int)button.Tag;
-            using (var context = new GenealogyUnifiedDBEntities())
+            using (var context = new GenealogyUnifiedDBEntities1())
             {
                 var story = context.Stories.FirstOrDefault(s => s.Id == storyId);
                 if (story != null)
@@ -464,10 +464,7 @@ namespace Lineage.Pages
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            if (NavigationService.CanGoBack)
-                NavigationService.GoBack();
-            else
-                NavigationService.Navigate(new MainPage());
+            NavigationService.Navigate(new MainPage());
         }
 
         private void DeleteAllStories_Click(object sender, RoutedEventArgs e)

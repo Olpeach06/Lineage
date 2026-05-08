@@ -27,7 +27,9 @@ namespace Lineage.AppData
             this.MediaFiles = new HashSet<MediaFiles>();
             this.PersonRelationships = new HashSet<PersonRelationships>();
             this.Persons = new HashSet<Persons>();
+            this.ProductivityRecords = new HashSet<ProductivityRecords>();
             this.Stories = new HashSet<Stories>();
+            this.VeterinaryEvents = new HashSet<VeterinaryEvents>();
         }
     
         public int Id { get; set; }
@@ -63,7 +65,11 @@ namespace Lineage.AppData
         public virtual ICollection<Persons> Persons { get; set; }
         public virtual Persons Persons1 { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ProductivityRecords> ProductivityRecords { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Stories> Stories { get; set; }
         public virtual UserRoles UserRoles { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<VeterinaryEvents> VeterinaryEvents { get; set; }
     }
 }

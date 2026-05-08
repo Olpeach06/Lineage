@@ -13,10 +13,10 @@ namespace Lineage.AppData
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class GenealogyUnifiedDBEntities : DbContext
+    public partial class GenealogyUnifiedDBEntities1 : DbContext
     {
-        public GenealogyUnifiedDBEntities()
-            : base("name=GenealogyUnifiedDBEntities")
+        public GenealogyUnifiedDBEntities1()
+            : base("name=GenealogyUnifiedDBEntities1")
         {
         }
     
@@ -41,11 +41,14 @@ namespace Lineage.AppData
         public virtual DbSet<PedigreeClasses> PedigreeClasses { get; set; }
         public virtual DbSet<PersonRelationships> PersonRelationships { get; set; }
         public virtual DbSet<Persons> Persons { get; set; }
+        public virtual DbSet<ProductivityRecords> ProductivityRecords { get; set; }
         public virtual DbSet<ProjectTypes> ProjectTypes { get; set; }
         public virtual DbSet<Species> Species { get; set; }
         public virtual DbSet<Stories> Stories { get; set; }
         public virtual DbSet<sysdiagrams> sysdiagrams { get; set; }
         public virtual DbSet<UserRoles> UserRoles { get; set; }
         public virtual DbSet<Users> Users { get; set; }
+        public virtual DbSet<VeterinaryEvents> VeterinaryEvents { get; set; }
+        public virtual DbSet<VeterinaryEventTypes> VeterinaryEventTypes { get; set; }
     }
 }

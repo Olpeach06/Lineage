@@ -54,7 +54,7 @@ namespace Lineage.Pages
                 if (!string.IsNullOrWhiteSpace(txtRating.Text))
                     int.TryParse(txtRating.Text, out rating);
 
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var exhibition = new Exhibitions
                     {

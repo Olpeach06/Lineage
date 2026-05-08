@@ -66,7 +66,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var person = context.Persons.FirstOrDefault(p => p.Id == personId);
                     if (person != null)
@@ -85,7 +85,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var story = context.Stories.FirstOrDefault(s => s.Id == storyId);
                     if (story != null)
@@ -273,7 +273,7 @@ namespace Lineage.Pages
                     return;
                 }
 
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     Stories story;
 
@@ -337,7 +337,7 @@ namespace Lineage.Pages
             }
         }
 
-        private void ProcessMediaFiles(GenealogyUnifiedDBEntities context, int storyId)
+        private void ProcessMediaFiles(GenealogyUnifiedDBEntities1 context, int storyId)
         {
             if (this.storyId.HasValue)
             {

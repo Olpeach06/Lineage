@@ -95,7 +95,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var species = context.Species
                         .Select(s => new SpeciesItem { Id = s.Id, Name = s.Name })
@@ -117,7 +117,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var breeds = context.Breeds
                         .Where(b => b.SpeciesId == speciesId || b.SpeciesId == null)
@@ -142,7 +142,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var colors = context.Colors
                         .Where(c => c.SpeciesId == speciesId || c.SpeciesId == null)
@@ -167,7 +167,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var genders = context.AnimalGenders
                         .Select(g => new GenderItem { Id = g.Id, Name = g.Name })
@@ -189,7 +189,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var classes = context.PedigreeClasses
                         .Select(pc => new PedigreeClassItem { Id = pc.Id, Name = pc.Name })
@@ -213,7 +213,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var animals = context.Animals
                         .Where(a => a.TreeId == currentTreeId)
@@ -251,7 +251,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var animal = context.Animals.FirstOrDefault(a => a.Id == animalId);
                     if (animal == null)
@@ -280,7 +280,7 @@ namespace Lineage.Pages
                     txtChestGirth.Text = animal.ChestGirth?.ToString();
                     txtWeight.Text = animal.Weight?.ToString();
                     txtChipNumber.Text = animal.ChipNumber;
-                    txtProductivityData.Text = animal.ProductivityData;
+                    //txtProductivityData.Text = animal.ProductivityData;
                     txtDescription.Text = animal.Description;
 
                     if (!string.IsNullOrEmpty(animal.ProfilePhotoPath))
@@ -380,7 +380,7 @@ namespace Lineage.Pages
                     return;
                 }
 
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     Animals animal;
 
@@ -424,7 +424,7 @@ namespace Lineage.Pages
                         animal.BreedingValue = null;
 
                     animal.IsBreedingStock = chkIsBreedingStock.IsChecked;
-                    animal.ProductivityData = string.IsNullOrWhiteSpace(txtProductivityData.Text) ? null : txtProductivityData.Text.Trim();
+                    //animal.ProductivityData = string.IsNullOrWhiteSpace(txtProductivityData.Text) ? null : txtProductivityData.Text.Trim();
 
                     if (decimal.TryParse(txtHeight.Text, out decimal height))
                         animal.HeightAtWithers = height;
@@ -470,7 +470,7 @@ namespace Lineage.Pages
             }
         }
 
-        private void SavePedigree(GenealogyUnifiedDBEntities context, int animalId)
+        private void SavePedigree(GenealogyUnifiedDBEntities1 context, int animalId)
         {
             int fatherId = cmbFather.SelectedValue != null ? (int)cmbFather.SelectedValue : 0;
             int motherId = cmbMother.SelectedValue != null ? (int)cmbMother.SelectedValue : 0;

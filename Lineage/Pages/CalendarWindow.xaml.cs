@@ -47,7 +47,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var persons = context.Persons
                         .Where(p => p.TreeId == treeId && p.BirthDate.HasValue)

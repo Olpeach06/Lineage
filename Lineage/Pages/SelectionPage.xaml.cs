@@ -72,7 +72,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var user = context.Users.Find(_currentUserId);
                     if (user != null)

@@ -22,7 +22,6 @@ namespace Lineage.Pages
         private List<UserItem> allUsers = new List<UserItem>();
         private List<RoleItem> roles = new List<RoleItem>();
         private string currentSearchText = "";
-        private bool isPageLoaded = false;
 
         public class UserItem
         {
@@ -36,8 +35,43 @@ namespace Lineage.Pages
             public bool IsActive { get; set; }
             public string CreatedDate { get; set; }
             public string LastLoginDate { get; set; }
+
             public Visibility CanEdit => Session.IsAdmin || Session.IsEditor ? Visibility.Visible : Visibility.Collapsed;
             public Visibility IsAdmin => Session.IsAdmin ? Visibility.Visible : Visibility.Collapsed;
+
+            public SolidColorBrush RoleColor
+            {
+                get
+                {
+                    if (RoleName == "Администратор") return new SolidColorBrush(System.Windows.Media.Colors.Crimson);
+                    if (RoleName == "Редактор") return new SolidColorBrush(System.Windows.Media.Colors.CadetBlue);
+                    return new SolidColorBrush(System.Windows.Media.Colors.Gray);
+                }
+            }
+
+            public SolidColorBrush StatusColor
+            {
+                get
+                {
+                    return IsActive ? new SolidColorBrush(System.Windows.Media.Colors.Green) : new SolidColorBrush(System.Windows.Media.Colors.Red);
+                }
+            }
+
+            public string StatusText
+            {
+                get
+                {
+                    return IsActive ? "Активен" : "Заблокирован";
+                }
+            }
+
+            public TextDecorationCollection PersonUnderline
+            {
+                get
+                {
+                    return PersonId.HasValue && PersonId > 0 ? TextDecorations.Underline : null;
+                }
+            }
         }
 
         public class RoleItem
@@ -65,15 +99,14 @@ namespace Lineage.Pages
             btnAddUser.Visibility = Session.IsAdmin ? Visibility.Visible : Visibility.Collapsed;
 
             LoadRoles();
-            LoadUsers();
-            isPageLoaded = true;
+            LoadUsers();  // Здесь данные загружаются и сразу отображаются
         }
 
         private void LoadRoles()
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     roles = context.UserRoles
                         .Select(r => new RoleItem { Id = r.Id, Name = r.Name })
@@ -91,7 +124,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var users = context.Users.OrderBy(u => u.Id).ToList();
                     var personIds = users.Where(u => u.PersonId.HasValue).Select(u => u.PersonId.Value).ToList();
@@ -118,7 +151,8 @@ namespace Lineage.Pages
                         LastLoginDate = u.LastLoginAt?.ToString("dd.MM.yyyy HH:mm") ?? "---"
                     }).ToList();
 
-                    ApplyFilter();
+                    // Применяем фильтр и отображаем данные
+                    DisplayUsers();
                 }
             }
             catch (Exception ex)
@@ -127,9 +161,9 @@ namespace Lineage.Pages
             }
         }
 
-        private void ApplyFilter()
+        private void DisplayUsers()
         {
-            if (lvUsers == null || !isPageLoaded) return;
+            if (icUsers == null) return;
 
             var filtered = allUsers.AsEnumerable();
 
@@ -141,17 +175,25 @@ namespace Lineage.Pages
                     u.PersonName.ToLower().Contains(currentSearchText));
             }
 
-            lvUsers.ItemsSource = filtered.ToList();
+            icUsers.ItemsSource = filtered.ToList();
             txtUsersCount.Text = $"Всего пользователей: {filtered.Count()}";
+        }
+
+        private void ApplyFilter()
+        {
+            if (icUsers == null) return;
+            DisplayUsers();
         }
 
         private void txtSearch_GotFocus(object sender, RoutedEventArgs e)
         {
+            if (txtSearch == null) return;
             if (txtSearch.Text == "Поиск...") txtSearch.Text = "";
         }
 
         private void txtSearch_LostFocus(object sender, RoutedEventArgs e)
         {
+            if (txtSearch == null) return;
             if (string.IsNullOrWhiteSpace(txtSearch.Text)) txtSearch.Text = "Поиск...";
         }
 
@@ -166,7 +208,7 @@ namespace Lineage.Pages
 
         private void txtSearch_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (!isPageLoaded) return;
+            if (btnClearSearch == null) return;
 
             if (txtSearch.Text != "Поиск..." && !string.IsNullOrWhiteSpace(txtSearch.Text))
                 btnClearSearch.Visibility = Visibility.Visible;
@@ -179,10 +221,12 @@ namespace Lineage.Pages
 
         private void ClearSearch_Click(object sender, RoutedEventArgs e)
         {
+            if (txtSearch == null) return;
             txtSearch.Text = "Поиск...";
             currentSearchText = "";
             ApplyFilter();
-            btnClearSearch.Visibility = Visibility.Collapsed;
+            if (btnClearSearch != null)
+                btnClearSearch.Visibility = Visibility.Collapsed;
         }
 
         private void SearchButton_Click(object sender, RoutedEventArgs e)
@@ -192,9 +236,25 @@ namespace Lineage.Pages
 
         private void PerformSearch()
         {
-            if (!isPageLoaded) return;
             currentSearchText = txtSearch.Text != "Поиск..." ? txtSearch.Text.ToLower() : "";
             ApplyFilter();
+        }
+
+        private void UserCard_Click(object sender, MouseButtonEventArgs e)
+        {
+            var border = sender as Border;
+            if (border?.Tag != null)
+            {
+                int userId = (int)border.Tag;
+                if (Session.IsAdmin || Session.IsEditor)
+                    NavigationService.Navigate(new EditUserPage(userId));
+                else
+                {
+                    var user = allUsers.FirstOrDefault(u => u.Id == userId);
+                    if (user != null)
+                        MessageBox.Show($"Пользователь: {user.Username}\nEmail: {user.Email}\nРоль: {user.RoleName}", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
         }
 
         private void EditUser_Click(object sender, RoutedEventArgs e)
@@ -232,7 +292,7 @@ namespace Lineage.Pages
             {
                 try
                 {
-                    using (var context = new GenealogyUnifiedDBEntities())
+                    using (var context = new GenealogyUnifiedDBEntities1())
                     {
                         var userTrees = context.FamilyTrees.Where(t => t.CreatedByUserId == userId).ToList();
                         foreach (var tree in userTrees)
@@ -260,7 +320,7 @@ namespace Lineage.Pages
                         context.SaveChanges();
 
                         MessageBox.Show("Пользователь удален!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                        LoadUsers();
+                        LoadUsers(); // Перезагружаем список
                     }
                 }
                 catch (Exception ex)
@@ -288,18 +348,6 @@ namespace Lineage.Pages
             }
 
             NavigationService.Navigate(new LinkUserToPersonPage(userId));
-        }
-
-        private void UserDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            var selectedUser = lvUsers?.SelectedItem as UserItem;
-            if (selectedUser != null)
-            {
-                if (Session.IsAdmin || Session.IsEditor)
-                    NavigationService.Navigate(new EditUserPage(selectedUser.Id));
-                else
-                    MessageBox.Show($"Пользователь: {selectedUser.Username}\nEmail: {selectedUser.Email}\nРоль: {selectedUser.RoleName}", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
         }
 
         private void MainPageButton_Click(object sender, RoutedEventArgs e)

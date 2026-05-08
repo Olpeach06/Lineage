@@ -36,7 +36,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var assessment = context.AnimalAssessments.FirstOrDefault(a => a.Id == assessmentId);
                     if (assessment == null)

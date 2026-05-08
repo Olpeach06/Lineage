@@ -64,7 +64,6 @@
           <Property Name="PedigreeClassId" Type="int" />
           <Property Name="BreedingValue" Type="decimal" Precision="10" Scale="2" />
           <Property Name="IsBreedingStock" Type="bit" />
-          <Property Name="ProductivityData" Type="nvarchar(max)" />
           <Property Name="HeightAtWithers" Type="decimal" Precision="8" Scale="2" />
           <Property Name="ChestGirth" Type="decimal" Precision="8" Scale="2" />
           <Property Name="BodyLength" Type="decimal" Precision="8" Scale="2" />
@@ -228,6 +227,21 @@
           <Property Name="CreatedAt" Type="datetime" Nullable="false" />
           <Property Name="UpdatedAt" Type="datetime" />
         </EntityType>
+        <EntityType Name="ProductivityRecords">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AnimalId" Type="int" Nullable="false" />
+          <Property Name="RecordDate" Type="date" Nullable="false" />
+          <Property Name="MilkYield" Type="decimal" Precision="10" Scale="2" />
+          <Property Name="FatContent" Type="decimal" Precision="5" Scale="2" />
+          <Property Name="ProteinContent" Type="decimal" Precision="5" Scale="2" />
+          <Property Name="RecordType" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="Notes" Type="nvarchar" MaxLength="200" />
+          <Property Name="CreatedByUserId" Type="int" Nullable="false" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+        </EntityType>
         <EntityType Name="ProjectTypes">
           <Key>
             <PropertyRef Name="Id" />
@@ -289,6 +303,34 @@
           <Property Name="CreatedAt" Type="datetime" Nullable="false" />
           <Property Name="LastLoginAt" Type="datetime" />
           <Property Name="LastUsedMode" Type="int" />
+        </EntityType>
+        <EntityType Name="VeterinaryEvents">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AnimalId" Type="int" Nullable="false" />
+          <Property Name="EventDate" Type="date" Nullable="false" />
+          <Property Name="EventTypeId" Type="int" Nullable="false" />
+          <Property Name="MedicineName" Type="nvarchar" MaxLength="100" />
+          <Property Name="Dosage" Type="nvarchar" MaxLength="50" />
+          <Property Name="WithdrawalDays" Type="int" />
+          <Property Name="VetName" Type="nvarchar" MaxLength="100" />
+          <Property Name="NextDueDate" Type="date" />
+          <Property Name="Cost" Type="decimal" Precision="10" Scale="2" />
+          <Property Name="Notes" Type="nvarchar(max)" />
+          <Property Name="CreatedByUserId" Type="int" Nullable="false" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="VeterinaryEventTypes">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="IsRequired" Type="bit" Nullable="false" />
+          <Property Name="DefaultWithdrawalDays" Type="int" />
+          <Property Name="Description" Type="nvarchar" MaxLength="255" />
         </EntityType>
         <Association Name="FK_AnimalAssessments_Animal">
           <End Role="Animals" Type="Self.Animals" Multiplicity="1" />
@@ -746,6 +788,30 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_ProductivityRecords_Animals">
+          <End Role="Animals" Type="Self.Animals" Multiplicity="1" />
+          <End Role="ProductivityRecords" Type="Self.ProductivityRecords" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Animals">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ProductivityRecords">
+              <PropertyRef Name="AnimalId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProductivityRecords_Creator">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="ProductivityRecords" Type="Self.ProductivityRecords" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ProductivityRecords">
+              <PropertyRef Name="CreatedByUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Stories_Creator">
           <End Role="Users" Type="Self.Users" Multiplicity="1" />
           <End Role="Stories" Type="Self.Stories" Multiplicity="*" />
@@ -794,6 +860,42 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_VeterinaryEvents_Animals">
+          <End Role="Animals" Type="Self.Animals" Multiplicity="1" />
+          <End Role="VeterinaryEvents" Type="Self.VeterinaryEvents" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Animals">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="VeterinaryEvents">
+              <PropertyRef Name="AnimalId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_VeterinaryEvents_Creator">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="VeterinaryEvents" Type="Self.VeterinaryEvents" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="VeterinaryEvents">
+              <PropertyRef Name="CreatedByUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_VeterinaryEvents_Types">
+          <End Role="VeterinaryEventTypes" Type="Self.VeterinaryEventTypes" Multiplicity="1" />
+          <End Role="VeterinaryEvents" Type="Self.VeterinaryEvents" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="VeterinaryEventTypes">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="VeterinaryEvents">
+              <PropertyRef Name="EventTypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityContainer Name="Хранилище GenealogyUnifiedDBModelContainer">
           <EntitySet Name="AnimalAssessments" EntityType="Self.AnimalAssessments" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AnimalGenders" EntityType="Self.AnimalGenders" Schema="dbo" store:Type="Tables" />
@@ -811,12 +913,15 @@
           <EntitySet Name="PedigreeClasses" EntityType="Self.PedigreeClasses" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="PersonRelationships" EntityType="Self.PersonRelationships" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Persons" EntityType="Self.Persons" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ProductivityRecords" EntityType="Self.ProductivityRecords" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ProjectTypes" EntityType="Self.ProjectTypes" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Species" EntityType="Self.Species" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Stories" EntityType="Self.Stories" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="UserRoles" EntityType="Self.UserRoles" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Users" EntityType="Self.Users" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="VeterinaryEvents" EntityType="Self.VeterinaryEvents" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="VeterinaryEventTypes" EntityType="Self.VeterinaryEventTypes" Schema="dbo" store:Type="Tables" />
           <AssociationSet Name="FK_AnimalAssessments_Animal" Association="Self.FK_AnimalAssessments_Animal">
             <End Role="Animals" EntitySet="Animals" />
             <End Role="AnimalAssessments" EntitySet="AnimalAssessments" />
@@ -969,6 +1074,14 @@
             <End Role="FamilyTrees" EntitySet="FamilyTrees" />
             <End Role="Persons" EntitySet="Persons" />
           </AssociationSet>
+          <AssociationSet Name="FK_ProductivityRecords_Animals" Association="Self.FK_ProductivityRecords_Animals">
+            <End Role="Animals" EntitySet="Animals" />
+            <End Role="ProductivityRecords" EntitySet="ProductivityRecords" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProductivityRecords_Creator" Association="Self.FK_ProductivityRecords_Creator">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="ProductivityRecords" EntitySet="ProductivityRecords" />
+          </AssociationSet>
           <AssociationSet Name="FK_Stories_Creator" Association="Self.FK_Stories_Creator">
             <End Role="Users" EntitySet="Users" />
             <End Role="Stories" EntitySet="Stories" />
@@ -984,6 +1097,18 @@
           <AssociationSet Name="FK_Users_Role" Association="Self.FK_Users_Role">
             <End Role="UserRoles" EntitySet="UserRoles" />
             <End Role="Users" EntitySet="Users" />
+          </AssociationSet>
+          <AssociationSet Name="FK_VeterinaryEvents_Animals" Association="Self.FK_VeterinaryEvents_Animals">
+            <End Role="Animals" EntitySet="Animals" />
+            <End Role="VeterinaryEvents" EntitySet="VeterinaryEvents" />
+          </AssociationSet>
+          <AssociationSet Name="FK_VeterinaryEvents_Creator" Association="Self.FK_VeterinaryEvents_Creator">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="VeterinaryEvents" EntitySet="VeterinaryEvents" />
+          </AssociationSet>
+          <AssociationSet Name="FK_VeterinaryEvents_Types" Association="Self.FK_VeterinaryEvents_Types">
+            <End Role="VeterinaryEventTypes" EntitySet="VeterinaryEventTypes" />
+            <End Role="VeterinaryEvents" EntitySet="VeterinaryEvents" />
           </AssociationSet>
         </EntityContainer>
       </Schema>
@@ -1058,7 +1183,6 @@
           <Property Name="PedigreeClassId" Type="Int32" />
           <Property Name="BreedingValue" Type="Decimal" Precision="10" Scale="2" />
           <Property Name="IsBreedingStock" Type="Boolean" />
-          <Property Name="ProductivityData" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="HeightAtWithers" Type="Decimal" Precision="8" Scale="2" />
           <Property Name="ChestGirth" Type="Decimal" Precision="8" Scale="2" />
           <Property Name="BodyLength" Type="Decimal" Precision="8" Scale="2" />
@@ -1089,6 +1213,8 @@
           <NavigationProperty Name="Breedings1" Relationship="Self.FK_Breedings_Male" FromRole="Animals" ToRole="Breedings" />
           <NavigationProperty Name="Exhibitions" Relationship="Self.FK_Exhibitions_Animal" FromRole="Animals" ToRole="Exhibitions" />
           <NavigationProperty Name="MediaLinks" Relationship="Self.FK_MediaLinks_Animal" FromRole="Animals" ToRole="MediaLinks" />
+          <NavigationProperty Name="ProductivityRecords" Relationship="Self.FK_ProductivityRecords_Animals" FromRole="Animals" ToRole="ProductivityRecords" />
+          <NavigationProperty Name="VeterinaryEvents" Relationship="Self.FK_VeterinaryEvents_Animals" FromRole="Animals" ToRole="VeterinaryEvents" />
         </EntityType>
         <EntityType Name="Breedings">
           <Key>
@@ -1277,6 +1403,23 @@
           <NavigationProperty Name="Stories" Relationship="Self.FK_Stories_Person" FromRole="Persons" ToRole="Stories" />
           <NavigationProperty Name="Users1" Relationship="Self.FK_Users_Person" FromRole="Persons" ToRole="Users" />
         </EntityType>
+        <EntityType Name="ProductivityRecords">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AnimalId" Type="Int32" Nullable="false" />
+          <Property Name="RecordDate" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="MilkYield" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="FatContent" Type="Decimal" Precision="5" Scale="2" />
+          <Property Name="ProteinContent" Type="Decimal" Precision="5" Scale="2" />
+          <Property Name="RecordType" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Notes" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedByUserId" Type="Int32" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Animals" Relationship="Self.FK_ProductivityRecords_Animals" FromRole="ProductivityRecords" ToRole="Animals" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_ProductivityRecords_Creator" FromRole="ProductivityRecords" ToRole="Users" />
+        </EntityType>
         <EntityType Name="ProjectTypes">
           <Key>
             <PropertyRef Name="Id" />
@@ -1357,8 +1500,42 @@
           <NavigationProperty Name="PersonRelationships" Relationship="Self.FK_PersonRelationships_Creator" FromRole="Users" ToRole="PersonRelationships" />
           <NavigationProperty Name="Persons" Relationship="Self.FK_Persons_Creator" FromRole="Users" ToRole="Persons" />
           <NavigationProperty Name="Persons1" Relationship="Self.FK_Users_Person" FromRole="Users" ToRole="Persons" />
+          <NavigationProperty Name="ProductivityRecords" Relationship="Self.FK_ProductivityRecords_Creator" FromRole="Users" ToRole="ProductivityRecords" />
           <NavigationProperty Name="Stories" Relationship="Self.FK_Stories_Creator" FromRole="Users" ToRole="Stories" />
           <NavigationProperty Name="UserRoles" Relationship="Self.FK_Users_Role" FromRole="Users" ToRole="UserRoles" />
+          <NavigationProperty Name="VeterinaryEvents" Relationship="Self.FK_VeterinaryEvents_Creator" FromRole="Users" ToRole="VeterinaryEvents" />
+        </EntityType>
+        <EntityType Name="VeterinaryEvents">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AnimalId" Type="Int32" Nullable="false" />
+          <Property Name="EventDate" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="EventTypeId" Type="Int32" Nullable="false" />
+          <Property Name="MedicineName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Dosage" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="WithdrawalDays" Type="Int32" />
+          <Property Name="VetName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="NextDueDate" Type="DateTime" Precision="0" />
+          <Property Name="Cost" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="Notes" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedByUserId" Type="Int32" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Animals" Relationship="Self.FK_VeterinaryEvents_Animals" FromRole="VeterinaryEvents" ToRole="Animals" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_VeterinaryEvents_Creator" FromRole="VeterinaryEvents" ToRole="Users" />
+          <NavigationProperty Name="VeterinaryEventTypes" Relationship="Self.FK_VeterinaryEvents_Types" FromRole="VeterinaryEvents" ToRole="VeterinaryEventTypes" />
+        </EntityType>
+        <EntityType Name="VeterinaryEventTypes">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="IsRequired" Type="Boolean" Nullable="false" />
+          <Property Name="DefaultWithdrawalDays" Type="Int32" />
+          <Property Name="Description" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="VeterinaryEvents" Relationship="Self.FK_VeterinaryEvents_Types" FromRole="VeterinaryEventTypes" ToRole="VeterinaryEvents" />
         </EntityType>
         <Association Name="FK_AnimalAssessments_Animal">
           <End Role="Animals" Type="Self.Animals" Multiplicity="1" />
@@ -1584,6 +1761,30 @@
               <PropertyRef Name="Id" />
             </Principal>
             <Dependent Role="MediaLinks">
+              <PropertyRef Name="AnimalId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProductivityRecords_Animals">
+          <End Role="Animals" Type="Self.Animals" Multiplicity="1" />
+          <End Role="ProductivityRecords" Type="Self.ProductivityRecords" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Animals">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ProductivityRecords">
+              <PropertyRef Name="AnimalId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_VeterinaryEvents_Animals">
+          <End Role="Animals" Type="Self.Animals" Multiplicity="1" />
+          <End Role="VeterinaryEvents" Type="Self.VeterinaryEvents" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Animals">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="VeterinaryEvents">
               <PropertyRef Name="AnimalId" />
             </Dependent>
           </ReferentialConstraint>
@@ -1840,6 +2041,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_ProductivityRecords_Creator">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="ProductivityRecords" Type="Self.ProductivityRecords" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ProductivityRecords">
+              <PropertyRef Name="CreatedByUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Stories_Creator">
           <End Role="Users" Type="Self.Users" Multiplicity="1" />
           <End Role="Stories" Type="Self.Stories" Multiplicity="*" />
@@ -1864,7 +2077,31 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityContainer Name="GenealogyUnifiedDBEntities" annotation:LazyLoadingEnabled="true">
+        <Association Name="FK_VeterinaryEvents_Creator">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="VeterinaryEvents" Type="Self.VeterinaryEvents" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="VeterinaryEvents">
+              <PropertyRef Name="CreatedByUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_VeterinaryEvents_Types">
+          <End Role="VeterinaryEventTypes" Type="Self.VeterinaryEventTypes" Multiplicity="1" />
+          <End Role="VeterinaryEvents" Type="Self.VeterinaryEvents" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="VeterinaryEventTypes">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="VeterinaryEvents">
+              <PropertyRef Name="EventTypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="GenealogyUnifiedDBEntities1" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="AnimalAssessments" EntityType="Self.AnimalAssessments" />
           <EntitySet Name="AnimalGenders" EntityType="Self.AnimalGenders" />
           <EntitySet Name="AnimalPedigree" EntityType="Self.AnimalPedigree" />
@@ -1881,12 +2118,15 @@
           <EntitySet Name="PedigreeClasses" EntityType="Self.PedigreeClasses" />
           <EntitySet Name="PersonRelationships" EntityType="Self.PersonRelationships" />
           <EntitySet Name="Persons" EntityType="Self.Persons" />
+          <EntitySet Name="ProductivityRecords" EntityType="Self.ProductivityRecords" />
           <EntitySet Name="ProjectTypes" EntityType="Self.ProjectTypes" />
           <EntitySet Name="Species" EntityType="Self.Species" />
           <EntitySet Name="Stories" EntityType="Self.Stories" />
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" />
           <EntitySet Name="UserRoles" EntityType="Self.UserRoles" />
           <EntitySet Name="Users" EntityType="Self.Users" />
+          <EntitySet Name="VeterinaryEvents" EntityType="Self.VeterinaryEvents" />
+          <EntitySet Name="VeterinaryEventTypes" EntityType="Self.VeterinaryEventTypes" />
           <AssociationSet Name="FK_AnimalAssessments_Animal" Association="Self.FK_AnimalAssessments_Animal">
             <End Role="Animals" EntitySet="Animals" />
             <End Role="AnimalAssessments" EntitySet="AnimalAssessments" />
@@ -1962,6 +2202,14 @@
           <AssociationSet Name="FK_MediaLinks_Animal" Association="Self.FK_MediaLinks_Animal">
             <End Role="Animals" EntitySet="Animals" />
             <End Role="MediaLinks" EntitySet="MediaLinks" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProductivityRecords_Animals" Association="Self.FK_ProductivityRecords_Animals">
+            <End Role="Animals" EntitySet="Animals" />
+            <End Role="ProductivityRecords" EntitySet="ProductivityRecords" />
+          </AssociationSet>
+          <AssociationSet Name="FK_VeterinaryEvents_Animals" Association="Self.FK_VeterinaryEvents_Animals">
+            <End Role="Animals" EntitySet="Animals" />
+            <End Role="VeterinaryEvents" EntitySet="VeterinaryEvents" />
           </AssociationSet>
           <AssociationSet Name="FK_Breedings_Creator" Association="Self.FK_Breedings_Creator">
             <End Role="Users" EntitySet="Users" />
@@ -2047,6 +2295,10 @@
             <End Role="Persons" EntitySet="Persons" />
             <End Role="Users" EntitySet="Users" />
           </AssociationSet>
+          <AssociationSet Name="FK_ProductivityRecords_Creator" Association="Self.FK_ProductivityRecords_Creator">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="ProductivityRecords" EntitySet="ProductivityRecords" />
+          </AssociationSet>
           <AssociationSet Name="FK_Stories_Creator" Association="Self.FK_Stories_Creator">
             <End Role="Users" EntitySet="Users" />
             <End Role="Stories" EntitySet="Stories" />
@@ -2055,13 +2307,21 @@
             <End Role="UserRoles" EntitySet="UserRoles" />
             <End Role="Users" EntitySet="Users" />
           </AssociationSet>
+          <AssociationSet Name="FK_VeterinaryEvents_Creator" Association="Self.FK_VeterinaryEvents_Creator">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="VeterinaryEvents" EntitySet="VeterinaryEvents" />
+          </AssociationSet>
+          <AssociationSet Name="FK_VeterinaryEvents_Types" Association="Self.FK_VeterinaryEvents_Types">
+            <End Role="VeterinaryEventTypes" EntitySet="VeterinaryEventTypes" />
+            <End Role="VeterinaryEvents" EntitySet="VeterinaryEvents" />
+          </AssociationSet>
         </EntityContainer>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="Хранилище GenealogyUnifiedDBModelContainer" CdmEntityContainer="GenealogyUnifiedDBEntities">
+        <EntityContainerMapping StorageEntityContainer="Хранилище GenealogyUnifiedDBModelContainer" CdmEntityContainer="GenealogyUnifiedDBEntities1">
           <EntitySetMapping Name="AnimalAssessments">
             <EntityTypeMapping TypeName="GenealogyUnifiedDBModel.AnimalAssessments">
               <MappingFragment StoreEntitySet="AnimalAssessments">
@@ -2123,7 +2383,6 @@
                 <ScalarProperty Name="PedigreeClassId" ColumnName="PedigreeClassId" />
                 <ScalarProperty Name="BreedingValue" ColumnName="BreedingValue" />
                 <ScalarProperty Name="IsBreedingStock" ColumnName="IsBreedingStock" />
-                <ScalarProperty Name="ProductivityData" ColumnName="ProductivityData" />
                 <ScalarProperty Name="HeightAtWithers" ColumnName="HeightAtWithers" />
                 <ScalarProperty Name="ChestGirth" ColumnName="ChestGirth" />
                 <ScalarProperty Name="BodyLength" ColumnName="BodyLength" />
@@ -2301,6 +2560,22 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="ProductivityRecords">
+            <EntityTypeMapping TypeName="GenealogyUnifiedDBModel.ProductivityRecords">
+              <MappingFragment StoreEntitySet="ProductivityRecords">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="AnimalId" ColumnName="AnimalId" />
+                <ScalarProperty Name="RecordDate" ColumnName="RecordDate" />
+                <ScalarProperty Name="MilkYield" ColumnName="MilkYield" />
+                <ScalarProperty Name="FatContent" ColumnName="FatContent" />
+                <ScalarProperty Name="ProteinContent" ColumnName="ProteinContent" />
+                <ScalarProperty Name="RecordType" ColumnName="RecordType" />
+                <ScalarProperty Name="Notes" ColumnName="Notes" />
+                <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="ProjectTypes">
             <EntityTypeMapping TypeName="GenealogyUnifiedDBModel.ProjectTypes">
               <MappingFragment StoreEntitySet="ProjectTypes">
@@ -2366,6 +2641,36 @@
                 <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
                 <ScalarProperty Name="LastLoginAt" ColumnName="LastLoginAt" />
                 <ScalarProperty Name="LastUsedMode" ColumnName="LastUsedMode" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="VeterinaryEvents">
+            <EntityTypeMapping TypeName="GenealogyUnifiedDBModel.VeterinaryEvents">
+              <MappingFragment StoreEntitySet="VeterinaryEvents">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="AnimalId" ColumnName="AnimalId" />
+                <ScalarProperty Name="EventDate" ColumnName="EventDate" />
+                <ScalarProperty Name="EventTypeId" ColumnName="EventTypeId" />
+                <ScalarProperty Name="MedicineName" ColumnName="MedicineName" />
+                <ScalarProperty Name="Dosage" ColumnName="Dosage" />
+                <ScalarProperty Name="WithdrawalDays" ColumnName="WithdrawalDays" />
+                <ScalarProperty Name="VetName" ColumnName="VetName" />
+                <ScalarProperty Name="NextDueDate" ColumnName="NextDueDate" />
+                <ScalarProperty Name="Cost" ColumnName="Cost" />
+                <ScalarProperty Name="Notes" ColumnName="Notes" />
+                <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="VeterinaryEventTypes">
+            <EntityTypeMapping TypeName="GenealogyUnifiedDBModel.VeterinaryEventTypes">
+              <MappingFragment StoreEntitySet="VeterinaryEventTypes">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="IsRequired" ColumnName="IsRequired" />
+                <ScalarProperty Name="DefaultWithdrawalDays" ColumnName="DefaultWithdrawalDays" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

@@ -25,6 +25,8 @@ namespace Lineage.AppData
             this.Breedings1 = new HashSet<Breedings>();
             this.Exhibitions = new HashSet<Exhibitions>();
             this.MediaLinks = new HashSet<MediaLinks>();
+            this.ProductivityRecords = new HashSet<ProductivityRecords>();
+            this.VeterinaryEvents = new HashSet<VeterinaryEvents>();
         }
     
         public int Id { get; set; }
@@ -45,7 +47,6 @@ namespace Lineage.AppData
         public Nullable<int> PedigreeClassId { get; set; }
         public Nullable<decimal> BreedingValue { get; set; }
         public Nullable<bool> IsBreedingStock { get; set; }
-        public string ProductivityData { get; set; }
         public Nullable<decimal> HeightAtWithers { get; set; }
         public Nullable<decimal> ChestGirth { get; set; }
         public Nullable<decimal> BodyLength { get; set; }
@@ -85,5 +86,9 @@ namespace Lineage.AppData
         public virtual ICollection<Exhibitions> Exhibitions { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<MediaLinks> MediaLinks { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ProductivityRecords> ProductivityRecords { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<VeterinaryEvents> VeterinaryEvents { get; set; }
     }
 }

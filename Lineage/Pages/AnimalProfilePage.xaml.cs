@@ -43,6 +43,15 @@ namespace Lineage.Pages
             public string Class { get; set; }
         }
 
+        public class HealthEventItem
+        {
+            public int Id { get; set; }
+            public string EventDate { get; set; }
+            public string EventType { get; set; }
+            public string MedicineName { get; set; }
+            public string Notes { get; set; }
+        }
+
         public AnimalProfilePage(int id)
         {
             InitializeComponent();
@@ -51,10 +60,13 @@ namespace Lineage.Pages
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            System.Diagnostics.Debug.WriteLine($"=== ЗАГРУЗКА ПРОФИЛЯ ЖИВОТНОГО ID: {animalId} ===");
+
             LoadAnimalData();
             LoadBreedings();
             LoadExhibitions();
             LoadAssessments();
+            LoadHealthEvents();
 
             bool canEdit = Session.IsAdmin || Session.IsEditor;
             btnEdit.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
@@ -66,7 +78,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var animal = context.Animals.FirstOrDefault(a => a.Id == animalId);
                     if (animal == null)
@@ -82,7 +94,6 @@ namespace Lineage.Pages
                     txtDeathDate.Text = animal.DeathDate?.ToString("dd.MM.yyyy") ?? "...";
                     txtBirthPlace.Text = $"Место рождения: {animal.BirthPlace ?? "не указано"}";
 
-                    // Вид и порода
                     var species = context.Species.Find(animal.SpeciesId);
                     txtSpeciesIcon.Text = GetSpeciesIcon(animal.SpeciesId);
                     txtSpecies.Text = species?.Name ?? "Неизвестно";
@@ -95,12 +106,10 @@ namespace Lineage.Pages
                     else
                         txtBreed.Text = "Не указана";
 
-                    // Пол
                     var gender = context.AnimalGenders.Find(animal.GenderId);
                     txtGender.Text = gender?.Name ?? "Не указан";
                     txtGenderSymbol.Text = animal.GenderId == 1 ? "♂" : (animal.GenderId == 2 ? "♀" : "⚲");
 
-                    // Племенной класс
                     if (animal.PedigreeClassId.HasValue)
                     {
                         var pedigreeClass = context.PedigreeClasses.Find(animal.PedigreeClassId);
@@ -112,36 +121,39 @@ namespace Lineage.Pages
                     txtBreedingValue.Text = animal.BreedingValue?.ToString("F2") ?? "—";
                     txtIsBreedingStock.Text = animal.IsBreedingStock == true ? "Да" : "Нет";
 
-                    // Промеры
                     string measurements = "";
                     if (animal.HeightAtWithers.HasValue) measurements += $"{animal.HeightAtWithers.Value} см";
                     if (animal.ChestGirth.HasValue) measurements += $" / {animal.ChestGirth.Value} см";
                     if (string.IsNullOrEmpty(measurements)) measurements = "не указаны";
                     txtMeasurements.Text = measurements;
 
-                    // Продуктивность (JSON)
-                    if (!string.IsNullOrEmpty(animal.ProductivityData))
+                    // Продуктивность
+                    var productivityRecords = context.ProductivityRecords
+                        .Where(p => p.AnimalId == animalId && p.RecordType == "lactation")
+                        .OrderByDescending(p => p.RecordDate)
+                        .ToList();
+
+                    if (productivityRecords.Any())
                     {
-                        try
+                        var latestRecord = productivityRecords.First();
+                        var prodText = new List<string>();
+
+                        if (latestRecord.MilkYield.HasValue)
+                            prodText.Add($"Удой: {latestRecord.MilkYield.Value:F0} кг");
+                        if (latestRecord.FatContent.HasValue)
+                            prodText.Add($"Жирность: {latestRecord.FatContent.Value:F2}%");
+                        if (latestRecord.ProteinContent.HasValue)
+                            prodText.Add($"Белок: {latestRecord.ProteinContent.Value:F2}%");
+
+                        if (productivityRecords.Count > 1)
                         {
-                            var productivity = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(animal.ProductivityData);
-                            var prodText = new List<string>();
-                            foreach (var item in productivity)
-                            {
-                                if (item.Key == "milkYield") prodText.Add($"Удой: {item.Value} кг");
-                                else if (item.Key == "fatContent") prodText.Add($"Жирность: {item.Value}%");
-                                else if (item.Key == "proteinContent") prodText.Add($"Белок: {item.Value}%");
-                                else if (item.Key == "offspringCount") prodText.Add($"Потомство: {item.Value}");
-                                else if (item.Key == "wins") prodText.Add($"Побед: {item.Value}");
-                                else if (item.Key == "racingClass") prodText.Add($"Класс: {item.Value}");
-                                else prodText.Add($"{item.Key}: {item.Value}");
-                            }
-                            txtProductivity.Text = string.Join(" | ", prodText);
+                            prodText.Add($"Записей: {productivityRecords.Count}");
+                            var maxMilk = productivityRecords.Max(p => p.MilkYield ?? 0);
+                            if (maxMilk > 0)
+                                prodText.Add($"Макс. удой: {maxMilk:F0} кг");
                         }
-                        catch
-                        {
-                            txtProductivity.Text = animal.ProductivityData;
-                        }
+
+                        txtProductivity.Text = prodText.Any() ? string.Join(" | ", prodText) : "Данные загружены";
                     }
                     else
                         txtProductivity.Text = "Нет данных о продуктивности";
@@ -277,64 +289,96 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
-                    var breedingsAsMale = context.Breedings
+                    // Сначала получаем данные из БД без форматирования
+                    var breedingsAsMaleRaw = context.Breedings
                         .Where(b => b.MaleId == animalId)
-                        .Select(b => new BreedingItem
-                        {
-                            Id = b.Id,
-                            BreedingDate = b.BreedingDate.ToString("dd.MM.yyyy"),
-                            Info = $"Вязка с самкой ID: {b.FemaleId}"
-                        }).ToList();
-
-                    var breedingsAsFemale = context.Breedings
-                        .Where(b => b.FemaleId == animalId)
-                        .Select(b => new BreedingItem
-                        {
-                            Id = b.Id,
-                            BreedingDate = b.BreedingDate.ToString("dd.MM.yyyy"),
-                            Info = $"Вязка с самцом ID: {b.MaleId}"
-                        }).ToList();
-
-                    var allBreedings = breedingsAsMale.Concat(breedingsAsFemale)
-                        .OrderByDescending(b => b.BreedingDate)
                         .ToList();
+
+                    var breedingsAsFemaleRaw = context.Breedings
+                        .Where(b => b.FemaleId == animalId)
+                        .ToList();
+
+                    var allBreedings = new List<BreedingItem>();
+
+                    foreach (var b in breedingsAsMaleRaw)
+                    {
+                        allBreedings.Add(new BreedingItem
+                        {
+                            Id = b.Id,
+                            BreedingDate = b.BreedingDate.ToString("dd.MM.yyyy"),
+                            Info = $"Вязка с самкой: {GetAnimalNickname(b.FemaleId, context)}"
+                        });
+                    }
+
+                    foreach (var b in breedingsAsFemaleRaw)
+                    {
+                        allBreedings.Add(new BreedingItem
+                        {
+                            Id = b.Id,
+                            BreedingDate = b.BreedingDate.ToString("dd.MM.yyyy"),
+                            Info = $"Вязка с самцом: {GetAnimalNickname(b.MaleId, context)}"
+                        });
+                    }
+
+                    allBreedings = allBreedings.OrderByDescending(b => b.BreedingDate).ToList();
 
                     icBreedings.ItemsSource = allBreedings;
                     tabBreedings.Header = $"🔗 Вязки ({allBreedings.Count})";
+
+                    System.Diagnostics.Debug.WriteLine($"Загружено вязок: {allBreedings.Count}");
                 }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Ошибка загрузки вязок: {ex.Message}");
+                MessageBox.Show($"Ошибка загрузки вязок: {ex.Message}");
             }
+        }
+
+        // Вспомогательный метод для получения клички животного по ID
+        private string GetAnimalNickname(int animalId, GenealogyUnifiedDBEntities1 context)
+        {
+            var animal = context.Animals.Find(animalId);
+            return animal?.Nickname ?? $"ID:{animalId}";
         }
 
         private void LoadExhibitions()
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
-                    var exhibitions = context.Exhibitions
+                    // Сначала получаем данные из БД без форматирования
+                    var exhibitionsRaw = context.Exhibitions
                         .Where(e => e.AnimalId == animalId)
-                        .Select(e => new ExhibitionItem
+                        .ToList();
+
+                    var exhibitions = new List<ExhibitionItem>();
+
+                    foreach (var e in exhibitionsRaw)
+                    {
+                        exhibitions.Add(new ExhibitionItem
                         {
                             Id = e.Id,
                             ExhibitionDate = e.ExhibitionDate.ToString("dd.MM.yyyy"),
                             Name = e.ExhibitionName
-                        })
-                        .OrderByDescending(e => e.ExhibitionDate)
-                        .ToList();
+                        });
+                    }
+
+                    exhibitions = exhibitions.OrderByDescending(e => e.ExhibitionDate).ToList();
 
                     icExhibitions.ItemsSource = exhibitions;
                     tabExhibitions.Header = $"🏆 Выставки ({exhibitions.Count})";
+
+                    System.Diagnostics.Debug.WriteLine($"Загружено выставок: {exhibitions.Count}");
                 }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Ошибка загрузки выставок: {ex.Message}");
+                MessageBox.Show($"Ошибка загрузки выставок: {ex.Message}");
             }
         }
 
@@ -342,35 +386,97 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
-                    var assessments = context.AnimalAssessments
+                    // Сначала получаем данные из БД без форматирования
+                    var assessmentsRaw = context.AnimalAssessments
                         .Where(a => a.AnimalId == animalId)
-                        .Select(a => new AssessmentItem
+                        .ToList();
+
+                    var assessments = new List<AssessmentItem>();
+
+                    foreach (var a in assessmentsRaw)
+                    {
+                        assessments.Add(new AssessmentItem
                         {
                             Id = a.Id,
                             AssessmentDate = a.AssessmentDate.ToString("dd.MM.yyyy"),
                             Class = a.ClassId.ToString()
-                        })
-                        .OrderByDescending(a => a.AssessmentDate)
-                        .ToList();
+                        });
+                    }
+
+                    assessments = assessments.OrderByDescending(a => a.AssessmentDate).ToList();
 
                     // Получаем названия классов
                     foreach (var assessment in assessments)
                     {
-                        int classId = int.Parse(assessment.Class);
-                        var pc = context.PedigreeClasses.Find(classId);
-                        assessment.Class = pc?.Name ?? $"Класс {classId}";
+                        if (int.TryParse(assessment.Class, out int classId))
+                        {
+                            using (var tempContext = new GenealogyUnifiedDBEntities1())
+                            {
+                                var pc = tempContext.PedigreeClasses.Find(classId);
+                                assessment.Class = pc?.Name ?? $"Класс {classId}";
+                            }
+                        }
                     }
 
                     icAssessments.ItemsSource = assessments;
                     tabAssessments.Header = $"⭐ Оценки ({assessments.Count})";
+
+                    System.Diagnostics.Debug.WriteLine($"Загружено оценок: {assessments.Count}");
                 }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Ошибка загрузки оценок: {ex.Message}");
+                MessageBox.Show($"Ошибка загрузки оценок: {ex.Message}");
             }
+        }
+
+        private void LoadHealthEvents()
+        {
+            try
+            {
+                using (var context = new GenealogyUnifiedDBEntities1())
+                {
+                    var vetEvents = context.VeterinaryEvents
+                        .Where(v => v.AnimalId == animalId)
+                        .OrderByDescending(v => v.EventDate)
+                        .ToList();
+
+                    var eventTypes = context.VeterinaryEventTypes.ToDictionary(t => t.Id, t => t.Name);
+
+                    var healthItems = new List<HealthEventItem>();
+
+                    foreach (var ev in vetEvents)
+                    {
+                        healthItems.Add(new HealthEventItem
+                        {
+                            Id = ev.Id,
+                            EventDate = ev.EventDate.ToString("dd.MM.yyyy"),
+                            EventType = eventTypes.ContainsKey(ev.EventTypeId) ? eventTypes[ev.EventTypeId] : "—",
+                            MedicineName = ev.MedicineName ?? "—",
+                            Notes = ev.Notes ?? "—"
+                        });
+                    }
+
+                    icHealthEvents.ItemsSource = healthItems;
+                    tabHealth.Header = $"💊 Здоровье ({healthItems.Count})";
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Ошибка загрузки ветеринарных событий: {ex.Message}");
+            }
+        }
+
+        private void HealthDetails_Click(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            if (button?.Tag == null) return;
+            int eventId = (int)button.Tag;
+            // NavigationService.Navigate(new VeterinaryEventDetailPage(eventId));
+            MessageBox.Show($"Детали события ID: {eventId}\n(Страница деталей будет реализована позже)", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void EditButton_Click(object sender, RoutedEventArgs e)
@@ -414,10 +520,7 @@ namespace Lineage.Pages
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            if (NavigationService.CanGoBack)
-                NavigationService.GoBack();
-            else
-                NavigationService.Navigate(new MainPage());
+            NavigationService.Navigate(new MainPage());
         }
     }
 }

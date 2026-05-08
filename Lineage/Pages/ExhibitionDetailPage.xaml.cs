@@ -36,7 +36,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var exhibition = context.Exhibitions.FirstOrDefault(e => e.Id == exhibitionId);
                     if (exhibition == null)

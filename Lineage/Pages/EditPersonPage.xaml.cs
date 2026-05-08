@@ -72,7 +72,7 @@ namespace Lineage.Pages
                 currentTreeId = Session.CurrentTreeId;
             else
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var firstTree = context.FamilyTrees.Where(t => t.CreatedByUserId == Session.UserId).FirstOrDefault();
                     if (firstTree != null)
@@ -102,7 +102,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var persons = context.Persons.Where(p => p.TreeId == currentTreeId).ToList();
                     allPersons = persons.Select(p => new PersonComboItem
@@ -128,7 +128,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var person = context.Persons.FirstOrDefault(p => p.Id == personId);
                     if (person == null)
@@ -168,7 +168,7 @@ namespace Lineage.Pages
             }
         }
 
-        private void LoadPersonRelationships(int personId, GenealogyUnifiedDBEntities context)
+        private void LoadPersonRelationships(int personId, GenealogyUnifiedDBEntities1 context)
         {
             try
             {
@@ -320,7 +320,7 @@ namespace Lineage.Pages
                 if (!ValidateRelationships())
                     return;
 
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     Persons person;
 
@@ -391,7 +391,7 @@ namespace Lineage.Pages
             }
         }
 
-        private void SaveRelationships(GenealogyUnifiedDBEntities context, int personId)
+        private void SaveRelationships(GenealogyUnifiedDBEntities1 context, int personId)
         {
             try
             {

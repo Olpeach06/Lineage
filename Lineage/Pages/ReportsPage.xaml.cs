@@ -14,44 +14,86 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Lineage.AppData;
 using Lineage.Classes;
+using Microsoft.Win32;
 
 namespace Lineage.Pages
 {
     public partial class ReportsPage : Page
     {
-        private int currentTreeId = 1;
+        private int currentTreeId = 0;
         private List<TreeItem> trees = new List<TreeItem>();
+        private List<AnimalFilterItem> allAnimals = new List<AnimalFilterItem>();
+        private List<PersonReportItem> allPersons = new List<PersonReportItem>();
 
+        // Классы для фильтров
         public class TreeItem
         {
             public int Id { get; set; }
             public string Name { get; set; }
         }
 
+        public class SpeciesItem
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+        }
+
+        public class BreedItem
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+        }
+
+        public class ClassItem
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+        }
+
+        // Класс для отображения персоны в отчете
         public class PersonReportItem
         {
             public int Id { get; set; }
             public string LastName { get; set; }
             public string FirstName { get; set; }
             public string Patronymic { get; set; }
+            public string Gender { get; set; }
             public string BirthDate { get; set; }
             public string DeathDate { get; set; }
-            public string Gender { get; set; }
             public string BirthPlace { get; set; }
             public string DeathPlace { get; set; }
         }
 
-        public class AnimalReportItem
+        // Класс для отображения животного в отчете
+        public class AnimalFilterItem
         {
             public int Id { get; set; }
             public string Nickname { get; set; }
             public string InventoryNumber { get; set; }
-            public string Species { get; set; }
-            public string Breed { get; set; }
-            public string Color { get; set; }
-            public string Gender { get; set; }
-            public string BirthDate { get; set; }
-            public string PedigreeClass { get; set; }
+            public int SpeciesId { get; set; }
+            public string SpeciesName { get; set; }
+            public int? BreedId { get; set; }
+            public string BreedName { get; set; }
+            public int? ColorId { get; set; }
+            public string ColorName { get; set; }
+            public int GenderId { get; set; }
+            public string GenderName { get; set; }
+            public DateTime? BirthDate { get; set; }
+            public string BirthDateStr { get; set; }
+            public int? PedigreeClassId { get; set; }
+            public string ClassName { get; set; }
+            public bool IsBreedingStock { get; set; }
+            public string IsBreedingStockStr { get; set; }
+            public bool IsAlive { get; set; }
+            public string Status { get; set; }
+        }
+
+        // Класс для распределения по классам
+        public class ClassDistributionItem
+        {
+            public string ClassName { get; set; }
+            public int Count { get; set; }
+            public string Percent { get; set; }
         }
 
         public ReportsPage()
@@ -62,6 +104,40 @@ namespace Lineage.Pages
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            // Настройка UI в зависимости от режима
+            if (AppSettings.IsFamilyMode)
+            {
+                txtPageTitle.Text = "СЕМЕЙНОЕ ДРЕВО - ОТЧЕТЫ И СТАТИСТИКА";
+                panelFamilyStats.Visibility = Visibility.Visible;
+                panelAnimalStats.Visibility = Visibility.Collapsed;
+                btnCalendar.Visibility = Visibility.Visible;
+
+                // Скрываем фильтры для животных
+                panelSpecies.Visibility = Visibility.Collapsed;
+                panelBreed.Visibility = Visibility.Collapsed;
+                panelStatus.Visibility = Visibility.Collapsed;
+                panelClass.Visibility = Visibility.Collapsed;
+
+                // Настраиваем фильтр пола для людей
+                SetupGenderFilterForFamily();
+            }
+            else
+            {
+                txtPageTitle.Text = "ПЛЕМЕННАЯ КНИГА - ОТЧЕТЫ И СТАТИСТИКА";
+                panelFamilyStats.Visibility = Visibility.Collapsed;
+                panelAnimalStats.Visibility = Visibility.Visible;
+                btnCalendar.Visibility = Visibility.Collapsed;
+
+                // Показываем фильтры для животных
+                panelSpecies.Visibility = Visibility.Visible;
+                panelBreed.Visibility = Visibility.Visible;
+                panelStatus.Visibility = Visibility.Visible;
+                panelClass.Visibility = Visibility.Visible;
+
+                // Настраиваем фильтр пола для животных
+                SetupGenderFilterForAnimals();
+            }
+
             if (Session.IsGuest)
             {
                 txtUserName.Text = "Гость";
@@ -76,39 +152,42 @@ namespace Lineage.Pages
 
             currentTreeId = Session.CurrentTreeId;
             LoadTrees();
-            LoadReports();
-            UpdateUIByMode();
-        }
+            LoadFilters();
 
-        private void UpdateUIByMode()
-        {
             if (AppSettings.IsFamilyMode)
             {
-                txtLabel1.Text = "Всего персон";
-                txtLabel2.Text = "Семей";
-                txtLabel3.Text = "Браков";
-                txtLabel4.Text = "Умерших";
-                txtLabel5.Text = "Поколений";
-                txtDemographyTitle.Text = "ДЕМОГРАФИЯ";
-                txtExtraStatsTitle.Text = "ПОПУЛЯРНЫЕ ИМЕНА И ФАМИЛИИ";
+                LoadPersons();
+                ApplyPersonFilters();
             }
             else
             {
-                txtLabel1.Text = "Всего животных";
-                txtLabel2.Text = "Видов";
-                txtLabel3.Text = "Пород";
-                txtLabel4.Text = "Самцов/Самок";
-                txtLabel5.Text = "Племенных";
-                txtDemographyTitle.Text = "РАСПРЕДЕЛЕНИЕ ПО ВИДАМ";
-                txtExtraStatsTitle.Text = "ПОРОДЫ И КЛАССЫ";
+                LoadAnimals();
+                ApplyAnimalFilters();
             }
+        }
+        private void SetupGenderFilterForFamily()
+        {
+            cmbFilterGender.Items.Clear();
+            cmbFilterGender.Items.Add("Все");
+            cmbFilterGender.Items.Add("Мужской");
+            cmbFilterGender.Items.Add("Женский");
+            cmbFilterGender.SelectedIndex = 0;
+        }
+
+        private void SetupGenderFilterForAnimals()
+        {
+            cmbFilterGender.Items.Clear();
+            cmbFilterGender.Items.Add("Все");
+            cmbFilterGender.Items.Add("Самец");
+            cmbFilterGender.Items.Add("Самка");
+            cmbFilterGender.SelectedIndex = 0;
         }
 
         private void LoadTrees()
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var userTrees = context.FamilyTrees
                         .Where(t => t.CreatedByUserId == Session.UserId)
@@ -118,364 +197,656 @@ namespace Lineage.Pages
                     trees.Clear();
                     foreach (var tree in userTrees)
                     {
-                        trees.Add(new TreeItem { Id = tree.Id, Name = tree.Name });
+                        // Показываем только проекты соответствующего типа
+                        if ((AppSettings.IsFamilyMode && tree.ProjectTypeId == 1) ||
+                            (!AppSettings.IsFamilyMode && tree.ProjectTypeId == 2))
+                        {
+                            trees.Add(new TreeItem { Id = tree.Id, Name = tree.Name });
+                        }
                     }
 
-                    cmbTrees.ItemsSource = trees;
-
+                    cmbFilterTree.ItemsSource = trees;
                     if (trees.Any())
                     {
-                        cmbTrees.SelectedItem = trees.FirstOrDefault(t => t.Id == currentTreeId) ?? trees.First();
+                        var selected = trees.FirstOrDefault(t => t.Id == currentTreeId);
+                        cmbFilterTree.SelectedItem = selected ?? trees.First();
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка загрузки списка проектов: {ex.Message}");
+                MessageBox.Show($"Ошибка загрузки проектов: {ex.Message}");
             }
         }
 
-        private void LoadReports()
+        private void LoadFilters()
+        {
+            if (!AppSettings.IsFamilyMode)
+            {
+                try
+                {
+                    using (var context = new GenealogyUnifiedDBEntities1())
+                    {
+                        // Виды
+                        var species = context.Species
+                            .Select(s => new SpeciesItem { Id = s.Id, Name = s.Name })
+                            .OrderBy(s => s.Name)
+                            .ToList();
+                        species.Insert(0, new SpeciesItem { Id = 0, Name = "Все виды" });
+                        cmbFilterSpecies.ItemsSource = species;
+                        cmbFilterSpecies.SelectedIndex = 0;
+
+                        // Племенные классы
+                        var classes = context.PedigreeClasses
+                            .Select(c => new ClassItem { Id = c.Id, Name = c.Name })
+                            .OrderBy(c => c.Name)
+                            .ToList();
+                        classes.Insert(0, new ClassItem { Id = 0, Name = "Все классы" });
+                        cmbFilterClass.ItemsSource = classes;
+                        cmbFilterClass.SelectedIndex = 0;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка загрузки фильтров: {ex.Message}");
+                }
+            }
+        }
+
+        private void LoadBreeds(int speciesId)
+        {
+            try
+            {
+                using (var context = new GenealogyUnifiedDBEntities1())
+                {
+                    var breeds = context.Breeds
+                        .Where(b => speciesId == 0 || b.SpeciesId == speciesId)
+                        .Select(b => new BreedItem { Id = b.Id, Name = b.Name })
+                        .OrderBy(b => b.Name)
+                        .ToList();
+                    breeds.Insert(0, new BreedItem { Id = 0, Name = "Все породы" });
+                    cmbFilterBreed.ItemsSource = breeds;
+                    cmbFilterBreed.SelectedIndex = 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки пород: {ex.Message}");
+            }
+        }
+
+        // ==================== ЗАГРУЗКА ДАННЫХ ДЛЯ ЛЮДЕЙ ====================
+
+        private void LoadPersons()
+        {
+            try
+            {
+                if (cmbFilterTree.SelectedItem == null) return;
+
+                int treeId = (int)cmbFilterTree.SelectedValue;
+                allPersons.Clear();
+
+                using (var context = new GenealogyUnifiedDBEntities1())
+                {
+                    var persons = context.Persons
+                        .Where(p => p.TreeId == treeId)
+                        .ToList();
+
+                    var genders = context.Genders.ToDictionary(g => g.Id, g => g.Name);
+
+                    foreach (var person in persons)
+                    {
+                        allPersons.Add(new PersonReportItem
+                        {
+                            Id = person.Id,
+                            LastName = person.LastName,
+                            FirstName = person.FirstName,
+                            Patronymic = person.Patronymic ?? "",
+                            Gender = genders.ContainsKey(person.GenderId) ? genders[person.GenderId] : "—",
+                            BirthDate = person.BirthDate?.ToString("dd.MM.yyyy") ?? "—",
+                            DeathDate = person.DeathDate?.ToString("dd.MM.yyyy") ?? "—",
+                            BirthPlace = person.BirthPlace ?? "—",
+                            DeathPlace = person.DeathPlace ?? "—"
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки персон: {ex.Message}");
+            }
+        }
+
+        // ==================== ЗАГРУЗКА ДАННЫХ ДЛЯ ЖИВОТНЫХ ====================
+
+        private void LoadAnimals()
+        {
+            try
+            {
+                if (cmbFilterTree.SelectedItem == null) return;
+
+                int treeId = (int)cmbFilterTree.SelectedValue;
+                allAnimals.Clear();
+
+                using (var context = new GenealogyUnifiedDBEntities1())
+                {
+                    var animals = context.Animals
+                        .Where(a => a.TreeId == treeId)
+                        .ToList();
+
+                    var speciesList = context.Species.ToDictionary(s => s.Id, s => s.Name);
+                    var breedsList = context.Breeds.ToDictionary(b => b.Id, b => b.Name);
+                    var gendersList = context.AnimalGenders.ToDictionary(g => g.Id, g => g.Name);
+                    var classesList = context.PedigreeClasses.ToDictionary(c => c.Id, c => c.Name);
+
+                    foreach (var animal in animals)
+                    {
+                        allAnimals.Add(new AnimalFilterItem
+                        {
+                            Id = animal.Id,
+                            Nickname = animal.Nickname,
+                            InventoryNumber = animal.InventoryNumber ?? "—",
+                            SpeciesId = animal.SpeciesId,
+                            SpeciesName = speciesList.ContainsKey(animal.SpeciesId) ? speciesList[animal.SpeciesId] : "Неизвестно",
+                            BreedId = animal.BreedId,
+                            BreedName = animal.BreedId.HasValue && breedsList.ContainsKey(animal.BreedId.Value) ? breedsList[animal.BreedId.Value] : "—",
+                            ColorId = animal.ColorId,
+                            ColorName = animal.ColorId.HasValue ? "—" : "—",
+                            GenderId = animal.GenderId,
+                            GenderName = gendersList.ContainsKey(animal.GenderId) ? gendersList[animal.GenderId] : "—",
+                            BirthDate = animal.BirthDate,
+                            BirthDateStr = animal.BirthDate?.ToString("dd.MM.yyyy") ?? "—",
+                            PedigreeClassId = animal.PedigreeClassId,
+                            ClassName = animal.PedigreeClassId.HasValue && classesList.ContainsKey(animal.PedigreeClassId.Value) ? classesList[animal.PedigreeClassId.Value] : "—",
+                            IsBreedingStock = animal.IsBreedingStock == true,
+                            IsBreedingStockStr = animal.IsBreedingStock == true ? "Да" : "Нет",
+                            IsAlive = animal.IsAlive == true,
+                            Status = animal.IsAlive == true ? "Живое" : (animal.DeathDate.HasValue ? "Выбыло" : "—")
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки животных: {ex.Message}");
+            }
+        }
+
+        // ==================== ФИЛЬТРЫ ====================
+
+        private void FilterTree_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (cmbFilterTree.SelectedItem != null)
+            {
+                int treeId = (int)cmbFilterTree.SelectedValue;
+                currentTreeId = treeId;
+                Session.CurrentTreeId = treeId;
+
+                if (AppSettings.IsFamilyMode)
+                {
+                    LoadPersons();
+                    ApplyPersonFilters();
+                }
+                else
+                {
+                    LoadAnimals();
+                    ApplyAnimalFilters();
+                }
+            }
+        }
+
+        private void FilterSpecies_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (cmbFilterSpecies.SelectedItem != null)
+            {
+                int speciesId = (int)cmbFilterSpecies.SelectedValue;
+                LoadBreeds(speciesId);
+                ApplyAnimalFilters();
+            }
+        }
+
+        private void ApplyFilters_Click(object sender, RoutedEventArgs e)
         {
             if (AppSettings.IsFamilyMode)
             {
-                LoadFamilyReports();
+                ApplyPersonFilters();
             }
             else
             {
-                LoadAnimalReports();
+                ApplyAnimalFilters();
             }
         }
 
-        private void LoadFamilyReports()
+        private void ApplyPersonFilters()
+        {
+            if (!allPersons.Any())
+            {
+                ShowEmptyPersonReports();
+                return;
+            }
+
+            var filtered = allPersons.AsEnumerable();
+
+            // Фильтр по полу (для людей)
+            string selectedGender = cmbFilterGender.SelectedItem?.ToString();
+            if (selectedGender == "Мужской")
+            {
+                filtered = filtered.Where(p => p.Gender == "Мужской");
+            }
+            else if (selectedGender == "Женский")
+            {
+                filtered = filtered.Where(p => p.Gender == "Женский");
+            }
+
+            var resultList = filtered.ToList();
+
+            UpdatePersonStatistics(resultList);
+            UpdatePersonNames(resultList);
+
+            lvPersons.ItemsSource = resultList;
+            txtNoPersons.Visibility = resultList.Any() ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        private void ApplyAnimalFilters()
+        {
+            if (!allAnimals.Any())
+            {
+                ShowEmptyAnimalReports();
+                return;
+            }
+
+            var filtered = allAnimals.AsEnumerable();
+
+            // Фильтр по виду
+            if (cmbFilterSpecies.SelectedItem != null && (int)cmbFilterSpecies.SelectedValue > 0)
+            {
+                int speciesId = (int)cmbFilterSpecies.SelectedValue;
+                filtered = filtered.Where(a => a.SpeciesId == speciesId);
+            }
+
+            // Фильтр по породе
+            if (cmbFilterBreed.SelectedItem != null && (int)cmbFilterBreed.SelectedValue > 0)
+            {
+                int breedId = (int)cmbFilterBreed.SelectedValue;
+                filtered = filtered.Where(a => a.BreedId == breedId);
+            }
+
+            // Фильтр по классу
+            if (cmbFilterClass.SelectedItem != null && (int)cmbFilterClass.SelectedValue > 0)
+            {
+                int classId = (int)cmbFilterClass.SelectedValue;
+                filtered = filtered.Where(a => a.PedigreeClassId == classId);
+            }
+
+            // Фильтр по статусу
+            if (cmbFilterStatus.SelectedIndex == 1)
+            {
+                filtered = filtered.Where(a => a.IsAlive);
+            }
+            else if (cmbFilterStatus.SelectedIndex == 2)
+            {
+                filtered = filtered.Where(a => a.IsBreedingStock);
+            }
+            else if (cmbFilterStatus.SelectedIndex == 3)
+            {
+                filtered = filtered.Where(a => !a.IsAlive);
+            }
+
+            // Фильтр по полу (для животных)
+            string selectedGender = cmbFilterGender.SelectedItem?.ToString();
+            if (selectedGender == "Самец")
+            {
+                filtered = filtered.Where(a => a.GenderName == "Самец");
+            }
+            else if (selectedGender == "Самка")
+            {
+                filtered = filtered.Where(a => a.GenderName == "Самка");
+            }
+
+            var resultList = filtered.ToList();
+
+            UpdateAnimalStatistics(resultList);
+            UpdateClassDistribution(resultList);
+            UpdateBreedingStatistics();
+            UpdateProductivityStatistics();
+
+            lvAnimals.ItemsSource = resultList;
+            txtNoAnimals.Visibility = resultList.Any() ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        private void ResetFilters_Click(object sender, RoutedEventArgs e)
+        {
+            cmbFilterGender.SelectedIndex = 0;
+
+            if (!AppSettings.IsFamilyMode)
+            {
+                cmbFilterSpecies.SelectedIndex = 0;
+                LoadBreeds(0);
+                cmbFilterClass.SelectedIndex = 0;
+                cmbFilterStatus.SelectedIndex = 0;
+            }
+
+            ApplyFilters_Click(null, null);
+        }
+
+        // ==================== СТАТИСТИКА ДЛЯ ЛЮДЕЙ ====================
+
+        private void UpdatePersonStatistics(List<PersonReportItem> persons)
+        {
+            int total = persons.Count;
+            int men = persons.Count(p => p.Gender == "Мужской");
+            int women = persons.Count(p => p.Gender == "Женский");
+            int marriages = 0; // Для браков нужно отдельное вычисление
+            int deceased = persons.Count(p => p.DeathDate != "—");
+            int generations = 0; // Для поколений нужно отдельное вычисление
+
+            txtTotalPersons.Text = total.ToString();
+            txtPersonGenderRatio.Text = $"{men}/{women}";
+            txtMarriages.Text = marriages.ToString();
+            txtDeceased.Text = deceased.ToString();
+            txtGenerations.Text = generations.ToString();
+
+            // Возрастная статистика
+            var livingPersons = persons.Where(p => p.DeathDate == "—").ToList();
+            // Для упрощения показываем базовые данные
+            txtAvgAgePerson.Text = "—";
+
+            if (persons.Any())
+            {
+                var oldest = persons.OrderBy(p => p.BirthDate).FirstOrDefault();
+                if (oldest != null && oldest.BirthDate != "—")
+                    txtOldestPerson.Text = $"{oldest.LastName} {oldest.FirstName}";
+
+                var youngest = persons.OrderByDescending(p => p.BirthDate).FirstOrDefault();
+                if (youngest != null && youngest.BirthDate != "—")
+                    txtYoungestPerson.Text = $"{youngest.LastName} {youngest.FirstName}";
+            }
+
+            // Пол
+            double menPercent = total > 0 ? (men * 100.0 / total) : 0;
+            double womenPercent = total > 0 ? (women * 100.0 / total) : 0;
+            progressMen.Value = menPercent;
+            progressWomen.Value = womenPercent;
+            txtMenPercent.Text = $"{menPercent:F1}% мужчин";
+            txtWomenPercent.Text = $"{womenPercent:F1}% женщин";
+        }
+
+        private void UpdatePersonNames(List<PersonReportItem> persons)
+        {
+            var maleNames = persons.Where(p => p.Gender == "Мужской")
+                .GroupBy(p => p.FirstName)
+                .Select(g => new { Name = g.Key, Count = g.Count() })
+                .OrderByDescending(x => x.Count)
+                .Take(5)
+                .ToList();
+
+            var femaleNames = persons.Where(p => p.Gender == "Женский")
+                .GroupBy(p => p.FirstName)
+                .Select(g => new { Name = g.Key, Count = g.Count() })
+                .OrderByDescending(x => x.Count)
+                .Take(5)
+                .ToList();
+
+            var surnames = persons.GroupBy(p => p.LastName)
+                .Select(g => new { Name = g.Key, Count = g.Count() })
+                .OrderByDescending(x => x.Count)
+                .Take(5)
+                .ToList();
+
+            icMaleNames.ItemsSource = maleNames.Select(n => $"{n.Name} — {n.Count}");
+            icFemaleNames.ItemsSource = femaleNames.Select(n => $"{n.Name} — {n.Count}");
+            icSurnames.ItemsSource = surnames.Select(n => $"{n.Name} — {n.Count}");
+        }
+
+        // ==================== СТАТИСТИКА ДЛЯ ЖИВОТНЫХ ====================
+
+        private void UpdateAnimalStatistics(List<AnimalFilterItem> animals)
+        {
+            int total = animals.Count;
+            int males = animals.Count(a => a.GenderName == "Самец");
+            int females = animals.Count(a => a.GenderName == "Самка");
+            int breedingStock = animals.Count(a => a.IsBreedingStock);
+            int alive = animals.Count(a => a.IsAlive);
+            int elite = animals.Count(a => a.ClassName == "Элита");
+
+            // Средний возраст (в месяцах)
+            double avgAgeMonths = 0;
+            var animalsWithBirthDate = animals.Where(a => a.BirthDate.HasValue && a.IsAlive).ToList();
+            if (animalsWithBirthDate.Any())
+            {
+                var today = DateTime.Today;
+                double totalMonths = 0;
+                foreach (var a in animalsWithBirthDate)
+                {
+                    var age = today.Year - a.BirthDate.Value.Year;
+                    if (today < a.BirthDate.Value.AddYears(age)) age--;
+                    totalMonths += age * 12;
+                }
+                avgAgeMonths = totalMonths / animalsWithBirthDate.Count;
+            }
+
+            txtTotalAnimals.Text = total.ToString();
+            txtAnimalGenderRatio.Text = $"{males}/{females}";
+            txtBreedingStock.Text = breedingStock.ToString();
+            txtAliveAnimals.Text = alive.ToString();
+            txtAvgAgeAnimal.Text = avgAgeMonths > 0 ? $"{avgAgeMonths:F0}" : "0";
+            txtEliteCount.Text = elite.ToString();
+        }
+
+        private void UpdateClassDistribution(List<AnimalFilterItem> animals)
+        {
+            var classDistribution = animals
+                .Where(a => a.PedigreeClassId.HasValue && a.ClassName != "—")
+                .GroupBy(a => a.ClassName)
+                .Select(g => new ClassDistributionItem
+                {
+                    ClassName = g.Key,
+                    Count = g.Count(),
+                    Percent = animals.Any() ? $"{(g.Count() * 100.0 / animals.Count):F1}%" : "0%"
+                })
+                .OrderByDescending(c => c.Count)
+                .ToList();
+
+            int noClassCount = animals.Count(a => !a.PedigreeClassId.HasValue || a.ClassName == "—");
+            if (noClassCount > 0)
+            {
+                classDistribution.Add(new ClassDistributionItem
+                {
+                    ClassName = "Не указан",
+                    Count = noClassCount,
+                    Percent = animals.Any() ? $"{(noClassCount * 100.0 / animals.Count):F1}%" : "0%"
+                });
+            }
+
+            icClassDistribution.ItemsSource = classDistribution;
+        }
+
+        private void UpdateBreedingStatistics()
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                if (cmbFilterTree.SelectedItem == null) return;
+
+                int treeId = (int)cmbFilterTree.SelectedValue;
+
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
-                    var persons = context.Persons.Where(p => p.TreeId == currentTreeId).ToList();
-
-                    if (!persons.Any())
-                    {
-                        ShowEmptyReports();
-                        return;
-                    }
-
-                    var personIds = persons.Select(p => p.Id).ToList();
-                    var relationships = context.PersonRelationships
-                        .Where(r => personIds.Contains(r.Person1Id) && personIds.Contains(r.Person2Id))
+                    var breedings = context.Breedings
+                        .Where(b => b.TreeId == treeId)
                         .ToList();
 
-                    // Общая статистика
-                    int totalPersons = persons.Count;
-                    int totalDeceased = persons.Count(p => p.DeathDate.HasValue);
-                    int totalFamilies = relationships.Where(r => r.RelationshipType == 1)
-                        .GroupBy(r => r.Person1Id).Select(g => g.Key).Count();
-                    int totalMarriages = relationships.Count(r => r.RelationshipType == 2) / 2;
+                    int total = breedings.Count;
+                    int successful = breedings.Count(b => b.IsSuccessful == true);
+                    double successRate = total > 0 ? (successful * 100.0 / total) : 0;
+                    int totalOffspring = breedings.Sum(b => b.OffspringCount ?? 0);
+                    int totalAlive = breedings.Sum(b => b.AliveCount ?? 0);
 
-                    txtTotalCount1.Text = totalPersons.ToString();
-                    txtTotalCount2.Text = totalFamilies.ToString();
-                    txtTotalCount3.Text = totalMarriages.ToString();
-                    txtTotalCount4.Text = totalDeceased.ToString();
-
-                    // Поколения (грубая оценка по годам)
-                    int maxGeneration = persons.Any(p => p.BirthDate.HasValue)
-                        ? persons.Max(p => GetGenerationByYear(p.BirthDate?.Year))
-                        : 1;
-                    txtTotalCount5.Text = maxGeneration.ToString();
-
-                    // Демография по полу
-                    int menCount = persons.Count(p => p.GenderId == 1);
-                    int womenCount = persons.Count(p => p.GenderId == 2);
-                    double menPercent = totalPersons > 0 ? (menCount * 100.0 / totalPersons) : 0;
-                    double womenPercent = totalPersons > 0 ? (womenCount * 100.0 / totalPersons) : 0;
-
-                    progressMen.Value = menPercent;
-                    progressWomen.Value = womenPercent;
-                    txtMenPercent.Text = $"{menPercent:F1}%";
-                    txtWomenPercent.Text = $"{womenPercent:F1}%";
-
-                    // Возрастная статистика
-                    var livingPersons = persons.Where(p => !p.DeathDate.HasValue && p.BirthDate.HasValue).ToList();
-                    if (livingPersons.Any())
-                    {
-                        int totalAge = 0;
-                        foreach (var p in livingPersons)
-                        {
-                            int age = DateTime.Now.Year - p.BirthDate.Value.Year;
-                            if (DateTime.Now < p.BirthDate.Value.AddYears(age)) age--;
-                            totalAge += age;
-                        }
-                        txtAverageAge.Text = $"{totalAge / livingPersons.Count} лет";
-
-                        var oldest = persons.Where(p => p.BirthDate.HasValue).OrderBy(p => p.BirthDate).FirstOrDefault();
-                        if (oldest != null)
-                        {
-                            int age = DateTime.Now.Year - oldest.BirthDate.Value.Year;
-                            if (DateTime.Now < oldest.BirthDate.Value.AddYears(age)) age--;
-                            txtOldestPerson.Text = $"{oldest.FirstName} {oldest.LastName} ({age} лет)";
-                        }
-
-                        var youngest = persons.Where(p => p.BirthDate.HasValue).OrderByDescending(p => p.BirthDate).FirstOrDefault();
-                        if (youngest != null)
-                        {
-                            int age = DateTime.Now.Year - youngest.BirthDate.Value.Year;
-                            if (DateTime.Now < youngest.BirthDate.Value.AddYears(age)) age--;
-                            txtYoungestPerson.Text = $"{youngest.FirstName} {youngest.LastName} ({age} лет)";
-                        }
-                    }
-
-                    // Дополнительная статистика: популярные имена
-                    var maleNames = persons.Where(p => p.GenderId == 1)
-                        .GroupBy(p => p.FirstName)
-                        .Select(g => new { Name = g.Key, Count = g.Count() })
-                        .OrderByDescending(x => x.Count)
-                        .Take(5)
-                        .ToList();
-
-                    var femaleNames = persons.Where(p => p.GenderId == 2)
-                        .GroupBy(p => p.FirstName)
-                        .Select(g => new { Name = g.Key, Count = g.Count() })
-                        .OrderByDescending(x => x.Count)
-                        .Take(5)
-                        .ToList();
-
-                    var surnames = persons.GroupBy(p => p.LastName)
-                        .Select(g => new { Name = g.Key, Count = g.Count() })
-                        .OrderByDescending(x => x.Count)
-                        .Take(5)
-                        .ToList();
-
-                    var extraPanel = new StackPanel();
-                    extraPanel.Children.Add(new TextBlock { Text = "Мужские имена:", FontWeight = FontWeights.Bold, Foreground = FindResource("Brush6B5E4A") as System.Windows.Media.Brush });
-                    foreach (var name in maleNames)
-                        extraPanel.Children.Add(new TextBlock { Text = $"{name.Name} — {name.Count}", Margin = new Thickness(10, 2, 0, 0) });
-                    extraPanel.Children.Add(new TextBlock { Text = "Женские имена:", FontWeight = FontWeights.Bold, Margin = new Thickness(0, 10, 0, 0) });
-                    foreach (var name in femaleNames)
-                        extraPanel.Children.Add(new TextBlock { Text = $"{name.Name} — {name.Count}", Margin = new Thickness(10, 2, 0, 0) });
-                    extraPanel.Children.Add(new TextBlock { Text = "Популярные фамилии:", FontWeight = FontWeights.Bold, Margin = new Thickness(0, 10, 0, 0) });
-                    foreach (var surname in surnames)
-                        extraPanel.Children.Add(new TextBlock { Text = $"{surname.Name} — {surname.Count}", Margin = new Thickness(10, 2, 0, 0) });
-
-                    panelExtraStats.Children.Clear();
-                    panelExtraStats.Children.Add(extraPanel);
-
-                    // Список всех персон
-                    var reportItems = persons.Select(p => new PersonReportItem
-                    {
-                        Id = p.Id,
-                        LastName = p.LastName,
-                        FirstName = p.FirstName,
-                        Patronymic = p.Patronymic ?? "",
-                        BirthDate = p.BirthDate?.ToString("dd.MM.yyyy") ?? "—",
-                        DeathDate = p.DeathDate?.ToString("dd.MM.yyyy") ?? "—",
-                        Gender = p.GenderId == 1 ? "Мужской" : (p.GenderId == 2 ? "Женский" : "—"),
-                        BirthPlace = p.BirthPlace ?? "—",
-                        DeathPlace = p.DeathPlace ?? "—"
-                    }).ToList();
-
-                    lvItems.ItemsSource = reportItems;
-                    UpdateGridViewColumns(true);
+                    txtTotalBreedings.Text = total.ToString();
+                    txtSuccessfulBreedings.Text = successful.ToString();
+                    txtSuccessRate.Text = $"{successRate:F1}%";
+                    txtTotalOffspring.Text = totalOffspring.ToString();
+                    txtAliveOffspring.Text = totalAlive.ToString();
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка загрузки отчётов: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Ошибка загрузки статистики воспроизводства: {ex.Message}");
             }
         }
 
-        private void LoadAnimalReports()
+        private void UpdateProductivityStatistics()
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                if (cmbFilterTree.SelectedItem == null) return;
+
+                int treeId = (int)cmbFilterTree.SelectedValue;
+
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
-                    var animals = context.Animals.Where(a => a.TreeId == currentTreeId).ToList();
-
-                    if (!animals.Any())
-                    {
-                        ShowEmptyReports();
-                        return;
-                    }
-
-                    int totalAnimals = animals.Count;
-                    int totalSpecies = animals.Select(a => a.SpeciesId).Distinct().Count();
-                    int totalBreeds = animals.Where(a => a.BreedId.HasValue).Select(a => a.BreedId).Distinct().Count();
-                    int totalMales = animals.Count(a => a.GenderId == 1);
-                    int totalFemales = animals.Count(a => a.GenderId == 2);
-                    int totalBreedingStock = animals.Count(a => a.IsBreedingStock == true);
-
-                    txtTotalCount1.Text = totalAnimals.ToString();
-                    txtTotalCount2.Text = totalSpecies.ToString();
-                    txtTotalCount3.Text = totalBreeds.ToString();
-                    txtTotalCount4.Text = $"{totalMales}/{totalFemales}";
-                    txtTotalCount5.Text = totalBreedingStock.ToString();
-
-                    // Распределение по видам
-                    var speciesDistribution = animals.GroupBy(a => a.SpeciesId)
-                        .Select(g => new { SpeciesId = g.Key, Count = g.Count() })
+                    var animalIds = context.Animals
+                        .Where(a => a.TreeId == treeId)
+                        .Select(a => a.Id)
                         .ToList();
 
-                    var extraPanel = new StackPanel();
-                    extraPanel.Children.Add(new TextBlock { Text = "Распределение по видам:", FontWeight = FontWeights.Bold });
-                    foreach (var item in speciesDistribution)
-                    {
-                        string speciesName = GetSpeciesName(item.SpeciesId, context);
-                        extraPanel.Children.Add(new TextBlock { Text = $"{speciesName} — {item.Count}", Margin = new Thickness(10, 2, 0, 0) });
-                    }
-
-                    // Распределение по классам
-                    var classDistribution = animals.Where(a => a.PedigreeClassId.HasValue)
-                        .GroupBy(a => a.PedigreeClassId)
-                        .Select(g => new { ClassId = g.Key, Count = g.Count() })
+                    var productivityRecords = context.ProductivityRecords
+                        .Where(p => animalIds.Contains(p.AnimalId) && p.RecordType == "lactation")
                         .ToList();
 
-                    if (classDistribution.Any())
+                    if (productivityRecords.Any())
                     {
-                        extraPanel.Children.Add(new TextBlock { Text = "Распределение по племенным классам:", FontWeight = FontWeights.Bold, Margin = new Thickness(0, 10, 0, 0) });
-                        foreach (var item in classDistribution)
-                        {
-                            string className = GetPedigreeClassName(item.ClassId.Value, context);
-                            extraPanel.Children.Add(new TextBlock { Text = $"{className} — {item.Count}", Margin = new Thickness(10, 2, 0, 0) });
-                        }
+                        double avgMilk = (double)productivityRecords.Average(p => p.MilkYield ?? 0);
+                        double avgFat = (double)productivityRecords.Average(p => p.FatContent ?? 0);
+                        double avgProtein = (double)productivityRecords.Average(p => p.ProteinContent ?? 0);
+                        double maxMilk = (double)productivityRecords.Max(p => p.MilkYield ?? 0);
+
+                        txtAvgMilkYield.Text = $"{avgMilk:F0} кг";
+                        txtAvgFatContent.Text = $"{avgFat:F2}%";
+                        txtAvgProteinContent.Text = $"{avgProtein:F2}%";
+                        txtMaxMilkYield.Text = $"{maxMilk:F0} кг";
                     }
-
-                    panelExtraStats.Children.Clear();
-                    panelExtraStats.Children.Add(extraPanel);
-
-                    var reportItems = animals.Select(a => new AnimalReportItem
+                    else
                     {
-                        Id = a.Id,
-                        Nickname = a.Nickname,
-                        InventoryNumber = a.InventoryNumber ?? "—",
-                        Species = GetSpeciesName(a.SpeciesId, context),
-                        Breed = GetBreedName(a.BreedId, context),
-                        Color = GetColorName(a.ColorId, context),
-                        Gender = GetAnimalGenderName(a.GenderId, context),
-                        BirthDate = a.BirthDate?.ToString("dd.MM.yyyy") ?? "—",
-                        PedigreeClass = GetPedigreeClassName(a.PedigreeClassId, context)
-                    }).ToList();
-
-                    lvItems.ItemsSource = reportItems;
-                    UpdateGridViewColumns(false);
+                        txtAvgMilkYield.Text = "Нет данных";
+                        txtAvgFatContent.Text = "Нет данных";
+                        txtAvgProteinContent.Text = "Нет данных";
+                        txtMaxMilkYield.Text = "Нет данных";
+                    }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка загрузки отчётов: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Ошибка загрузки продуктивности: {ex.Message}");
             }
         }
 
-        private int GetGenerationByYear(int? year)
-        {
-            if (!year.HasValue) return 1;
-            if (year < 1950) return 1;
-            if (year < 1980) return 2;
-            if (year < 2000) return 3;
-            if (year < 2020) return 4;
-            return 5;
-        }
+        // ==================== ПУСТЫЕ СОСТОЯНИЯ ====================
 
-        private string GetSpeciesName(int speciesId, GenealogyUnifiedDBEntities context)
+        private void ShowEmptyPersonReports()
         {
-            var species = context.Species.Find(speciesId);
-            return species?.Name ?? "Неизвестно";
-        }
-
-        private string GetBreedName(int? breedId, GenealogyUnifiedDBEntities context)
-        {
-            if (breedId == null) return "—";
-            var breed = context.Breeds.Find(breedId);
-            return breed?.Name ?? "—";
-        }
-
-        private string GetColorName(int? colorId, GenealogyUnifiedDBEntities context)
-        {
-            if (colorId == null) return "—";
-            var color = context.Colors.Find(colorId);
-            return color?.Name ?? "—";
-        }
-
-        private string GetAnimalGenderName(int genderId, GenealogyUnifiedDBEntities context)
-        {
-            var gender = context.AnimalGenders.Find(genderId);
-            return gender?.Name ?? "—";
-        }
-
-        private string GetPedigreeClassName(int? classId, GenealogyUnifiedDBEntities context)
-        {
-            if (classId == null) return "—";
-            var pc = context.PedigreeClasses.Find(classId);
-            return pc?.Name ?? "—";
-        }
-
-        private void UpdateGridViewColumns(bool isFamilyMode)
-        {
-            gridViewColumns.Columns.Clear();
-
-            if (isFamilyMode)
-            {
-                gridViewColumns.Columns.Add(new GridViewColumn { Header = "ID", Width = 50, DisplayMemberBinding = new System.Windows.Data.Binding("Id") });
-                gridViewColumns.Columns.Add(new GridViewColumn { Header = "Фамилия", Width = 120, DisplayMemberBinding = new System.Windows.Data.Binding("LastName") });
-                gridViewColumns.Columns.Add(new GridViewColumn { Header = "Имя", Width = 100, DisplayMemberBinding = new System.Windows.Data.Binding("FirstName") });
-                gridViewColumns.Columns.Add(new GridViewColumn { Header = "Отчество", Width = 100, DisplayMemberBinding = new System.Windows.Data.Binding("Patronymic") });
-                gridViewColumns.Columns.Add(new GridViewColumn { Header = "Дата рождения", Width = 100, DisplayMemberBinding = new System.Windows.Data.Binding("BirthDate") });
-                gridViewColumns.Columns.Add(new GridViewColumn { Header = "Дата смерти", Width = 100, DisplayMemberBinding = new System.Windows.Data.Binding("DeathDate") });
-                gridViewColumns.Columns.Add(new GridViewColumn { Header = "Пол", Width = 80, DisplayMemberBinding = new System.Windows.Data.Binding("Gender") });
-                gridViewColumns.Columns.Add(new GridViewColumn { Header = "Место рождения", Width = 150, DisplayMemberBinding = new System.Windows.Data.Binding("BirthPlace") });
-                gridViewColumns.Columns.Add(new GridViewColumn { Header = "Место смерти", Width = 150, DisplayMemberBinding = new System.Windows.Data.Binding("DeathPlace") });
-            }
-            else
-            {
-                gridViewColumns.Columns.Add(new GridViewColumn { Header = "ID", Width = 50, DisplayMemberBinding = new System.Windows.Data.Binding("Id") });
-                gridViewColumns.Columns.Add(new GridViewColumn { Header = "Кличка", Width = 120, DisplayMemberBinding = new System.Windows.Data.Binding("Nickname") });
-                gridViewColumns.Columns.Add(new GridViewColumn { Header = "Инв. номер", Width = 100, DisplayMemberBinding = new System.Windows.Data.Binding("InventoryNumber") });
-                gridViewColumns.Columns.Add(new GridViewColumn { Header = "Вид", Width = 100, DisplayMemberBinding = new System.Windows.Data.Binding("Species") });
-                gridViewColumns.Columns.Add(new GridViewColumn { Header = "Порода", Width = 100, DisplayMemberBinding = new System.Windows.Data.Binding("Breed") });
-                gridViewColumns.Columns.Add(new GridViewColumn { Header = "Масть", Width = 100, DisplayMemberBinding = new System.Windows.Data.Binding("Color") });
-                gridViewColumns.Columns.Add(new GridViewColumn { Header = "Пол", Width = 80, DisplayMemberBinding = new System.Windows.Data.Binding("Gender") });
-                gridViewColumns.Columns.Add(new GridViewColumn { Header = "Дата рождения", Width = 100, DisplayMemberBinding = new System.Windows.Data.Binding("BirthDate") });
-                gridViewColumns.Columns.Add(new GridViewColumn { Header = "Класс", Width = 80, DisplayMemberBinding = new System.Windows.Data.Binding("PedigreeClass") });
-            }
-        }
-
-        private void ShowEmptyReports()
-        {
-            txtTotalCount1.Text = "0";
-            txtTotalCount2.Text = "0";
-            txtTotalCount3.Text = "0";
-            txtTotalCount4.Text = "0";
-            txtTotalCount5.Text = "0";
+            txtTotalPersons.Text = "0";
+            txtPersonGenderRatio.Text = "0/0";
+            txtMarriages.Text = "0";
+            txtDeceased.Text = "0";
+            txtGenerations.Text = "0";
+            txtAvgAgePerson.Text = "—";
+            txtOldestPerson.Text = "—";
+            txtYoungestPerson.Text = "—";
             progressMen.Value = 0;
             progressWomen.Value = 0;
-            txtMenPercent.Text = "0%";
-            txtWomenPercent.Text = "0%";
-            txtAverageAge.Text = "---";
-            txtOldestPerson.Text = "---";
-            txtYoungestPerson.Text = "---";
-            lvItems.ItemsSource = null;
-            panelExtraStats.Children.Clear();
-            panelExtraStats.Children.Add(new TextBlock
-            {
-                Text = "Нет данных для отображения",
-                Foreground = (System.Windows.Media.Brush)FindResource("Brush8B7E6B"),
-                HorizontalAlignment = HorizontalAlignment.Center,
-                Margin = new Thickness(20)
-            });
+            txtMenPercent.Text = "0% мужчин";
+            txtWomenPercent.Text = "0% женщин";
+            icMaleNames.ItemsSource = null;
+            icFemaleNames.ItemsSource = null;
+            icSurnames.ItemsSource = null;
+            lvPersons.ItemsSource = null;
+            txtNoPersons.Visibility = Visibility.Visible;
         }
 
-        private void TreeSelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ShowEmptyAnimalReports()
         {
-            if (cmbTrees.SelectedItem != null)
+            txtTotalAnimals.Text = "0";
+            txtAnimalGenderRatio.Text = "0/0";
+            txtBreedingStock.Text = "0";
+            txtAliveAnimals.Text = "0";
+            txtAvgAgeAnimal.Text = "0";
+            txtEliteCount.Text = "0";
+            icClassDistribution.ItemsSource = null;
+            txtTotalBreedings.Text = "0";
+            txtSuccessfulBreedings.Text = "0";
+            txtSuccessRate.Text = "0%";
+            txtTotalOffspring.Text = "0";
+            txtAliveOffspring.Text = "0";
+            txtAvgMilkYield.Text = "Нет данных";
+            txtAvgFatContent.Text = "Нет данных";
+            txtAvgProteinContent.Text = "Нет данных";
+            txtMaxMilkYield.Text = "Нет данных";
+            lvAnimals.ItemsSource = null;
+            txtNoAnimals.Visibility = Visibility.Visible;
+        }
+
+        // ==================== ЭКСПОРТ ====================
+
+        private void ExportToExcel_Click(object sender, RoutedEventArgs e)
+        {
+            var saveDialog = new SaveFileDialog
             {
-                var selectedTree = cmbTrees.SelectedItem as TreeItem;
-                if (selectedTree != null)
+                Filter = "CSV файлы (*.csv)|*.csv",
+                FileName = AppSettings.IsFamilyMode
+                    ? $"Отчет_персоны_{DateTime.Now:yyyyMMdd_HHmmss}.csv"
+                    : $"Отчет_животные_{DateTime.Now:yyyyMMdd_HHmmss}.csv"
+            };
+
+            if (saveDialog.ShowDialog() == true)
+            {
+                try
                 {
-                    currentTreeId = selectedTree.Id;
-                    LoadReports();
+                    var sb = new System.Text.StringBuilder();
+
+                    if (AppSettings.IsFamilyMode)
+                    {
+                        if (lvPersons.ItemsSource == null) return;
+                        var items = lvPersons.ItemsSource as List<PersonReportItem>;
+                        if (items == null || !items.Any())
+                        {
+                            MessageBox.Show("Нет данных для экспорта!");
+                            return;
+                        }
+
+                        sb.AppendLine("ID;Фамилия;Имя;Отчество;Пол;Дата рождения;Дата смерти;Место рождения;Место смерти");
+                        foreach (var item in items)
+                        {
+                            sb.AppendLine($"{item.Id};{item.LastName};{item.FirstName};{item.Patronymic};{item.Gender};{item.BirthDate};{item.DeathDate};{item.BirthPlace};{item.DeathPlace}");
+                        }
+                    }
+                    else
+                    {
+                        if (lvAnimals.ItemsSource == null) return;
+                        var items = lvAnimals.ItemsSource as List<AnimalFilterItem>;
+                        if (items == null || !items.Any())
+                        {
+                            MessageBox.Show("Нет данных для экспорта!");
+                            return;
+                        }
+
+                        sb.AppendLine("ID;Кличка;Инв.номер;Вид;Порода;Пол;Дата рождения;Класс;Племенное;Статус");
+                        foreach (var item in items)
+                        {
+                            sb.AppendLine($"{item.Id};{item.Nickname};{item.InventoryNumber};{item.SpeciesName};{item.BreedName};{item.GenderName};{item.BirthDateStr};{item.ClassName};{item.IsBreedingStockStr};{item.Status}");
+                        }
+                    }
+
+                    System.IO.File.WriteAllText(saveDialog.FileName, sb.ToString(), System.Text.Encoding.UTF8);
+                    MessageBox.Show($"Экспорт выполнен!\nФайл сохранён: {saveDialog.FileName}", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка экспорта: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
+
+        // ==================== НАВИГАЦИЯ ====================
 
         private void MainPageButton_Click(object sender, RoutedEventArgs e)
         {
@@ -500,6 +871,30 @@ namespace Lineage.Pages
             {
                 Session.Clear();
                 NavigationService.Navigate(new LoginPage());
+            }
+        }
+        private void CalendarButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (cmbFilterTree.SelectedItem == null)
+                {
+                    MessageBox.Show("Выберите проект!", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+
+                int treeId = (int)cmbFilterTree.SelectedValue;
+                string treeName = (cmbFilterTree.SelectedItem as TreeItem)?.Name ?? "Неизвестно";
+
+                var calendarWindow = new CalendarWindow(treeId, treeName)
+                {
+                    Owner = Window.GetWindow(this)
+                };
+                calendarWindow.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка открытия календаря: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

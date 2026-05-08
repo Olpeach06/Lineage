@@ -64,7 +64,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var trees = context.FamilyTrees
                         .Where(t => t.CreatedByUserId == Session.UserId)
@@ -146,7 +146,7 @@ namespace Lineage.Pages
             {
                 try
                 {
-                    using (var context = new GenealogyUnifiedDBEntities())
+                    using (var context = new GenealogyUnifiedDBEntities1())
                     {
                         int projectTypeId = AppSettings.IsFamilyMode ? 1 : 2;
 
@@ -199,7 +199,7 @@ namespace Lineage.Pages
 
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var tree = context.FamilyTrees.FirstOrDefault(t => t.Id == treeId);
                     if (tree == null) return;
@@ -244,7 +244,7 @@ namespace Lineage.Pages
             {
                 try
                 {
-                    using (var context = new GenealogyUnifiedDBEntities())
+                    using (var context = new GenealogyUnifiedDBEntities1())
                     {
                         var persons = context.Persons.Where(p => p.TreeId == treeId).ToList();
                         var personIds = persons.Select(p => p.Id).ToList();

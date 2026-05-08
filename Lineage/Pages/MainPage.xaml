@@ -55,7 +55,7 @@
                         BorderThickness="0" Padding="15,8"
                         FontSize="14" FontWeight="SemiBold" Cursor="Hand"/>
 
-                <Button Grid.Column="2" Content="Мои деревья"
+                <Button Grid.Column="2" Content="Мои проекты"
                         Click="MyTreesButton_Click" Margin="5,0"
                         Background="Transparent" Foreground="#6B5E4A"
                         BorderThickness="0" Padding="15,8"

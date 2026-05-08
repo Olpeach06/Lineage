@@ -128,7 +128,7 @@ namespace Lineage.Pages
                     return;
                 }
 
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     // Проверка уникальности логина
                     var existingUser = context.Users

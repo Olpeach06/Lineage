@@ -50,7 +50,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities())
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     var story = context.Stories.FirstOrDefault(s => s.Id == storyId);
                     if (story == null)
