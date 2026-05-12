@@ -19,6 +19,7 @@ namespace Lineage.AppData
             : base("name=GenealogyUnifiedDBEntities1")
         {
         }
+
     
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

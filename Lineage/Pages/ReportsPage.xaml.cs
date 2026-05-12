@@ -296,6 +296,18 @@ namespace Lineage.Pages
 
                     foreach (var person in persons)
                     {
+                        string birthDateStr = "—";
+                        if (person.BirthDate.HasValue)
+                        {
+                            birthDateStr = person.BirthDate.Value.ToString("dd.MM.yyyy");
+                        }
+
+                        string deathDateStr = "—";
+                        if (person.DeathDate.HasValue)
+                        {
+                            deathDateStr = person.DeathDate.Value.ToString("dd.MM.yyyy");
+                        }
+
                         allPersons.Add(new PersonReportItem
                         {
                             Id = person.Id,
@@ -303,8 +315,8 @@ namespace Lineage.Pages
                             FirstName = person.FirstName,
                             Patronymic = person.Patronymic ?? "",
                             Gender = genders.ContainsKey(person.GenderId) ? genders[person.GenderId] : "—",
-                            BirthDate = person.BirthDate?.ToString("dd.MM.yyyy") ?? "—",
-                            DeathDate = person.DeathDate?.ToString("dd.MM.yyyy") ?? "—",
+                            BirthDate = birthDateStr,
+                            DeathDate = deathDateStr,
                             BirthPlace = person.BirthPlace ?? "—",
                             DeathPlace = person.DeathPlace ?? "—"
                         });
@@ -536,9 +548,75 @@ namespace Lineage.Pages
             int total = persons.Count;
             int men = persons.Count(p => p.Gender == "Мужской");
             int women = persons.Count(p => p.Gender == "Женский");
-            int marriages = 0; // Для браков нужно отдельное вычисление
             int deceased = persons.Count(p => p.DeathDate != "—");
-            int generations = 0; // Для поколений нужно отдельное вычисление
+
+            // Расчёт количества браков (RelationshipType = 2)
+            int marriages = 0;
+            try
+            {
+                using (var context = new GenealogyUnifiedDBEntities1())
+                {
+                    // Получаем ID персон из отфильтрованного списка
+                    var personIds = persons.Select(p => p.Id).ToList();
+
+                    // Считаем уникальные пары супругов (RelationshipType = 2)
+                    // Каждый брак представлен одной записью, поэтому просто считаем количество
+                    marriages = context.PersonRelationships
+                        .Where(r => personIds.Contains(r.Person1Id) &&
+                                    personIds.Contains(r.Person2Id) &&
+                                    r.RelationshipType == 2)
+                        .Count();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Ошибка расчёта браков: {ex.Message}");
+            }
+
+            // Расчёт количества поколений
+            int generations = 0;
+            try
+            {
+                using (var context = new GenealogyUnifiedDBEntities1())
+                {
+                    var personIds = persons.Select(p => p.Id).ToList();
+                    var allRelationships = context.PersonRelationships
+                        .Where(r => personIds.Contains(r.Person1Id) && personIds.Contains(r.Person2Id))
+                        .ToList();
+
+                    // Строим дерево для определения поколений
+                    var childrenDict = new Dictionary<int, List<int>>();
+                    foreach (var person in persons)
+                    {
+                        childrenDict[person.Id] = new List<int>();
+                    }
+
+                    foreach (var rel in allRelationships.Where(r => r.RelationshipType == 1))
+                    {
+                        if (!childrenDict.ContainsKey(rel.Person1Id))
+                            childrenDict[rel.Person1Id] = new List<int>();
+                        childrenDict[rel.Person1Id].Add(rel.Person2Id);
+                    }
+
+                    // Находим корни (те, у кого нет родителей)
+                    var allChildren = childrenDict.Values.SelectMany(v => v).Distinct().ToHashSet();
+                    var roots = persons.Where(p => !allChildren.Contains(p.Id)).ToList();
+
+                    // Вычисляем глубину дерева
+                    var generationMap = new Dictionary<int, int>();
+                    foreach (var root in roots)
+                    {
+                        CalculateGenerationDepth(root.Id, 0, childrenDict, generationMap);
+                    }
+
+                    generations = generationMap.Any() ? generationMap.Values.Max() + 1 : 1;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Ошибка расчёта поколений: {ex.Message}");
+                generations = 1;
+            }
 
             txtTotalPersons.Text = total.ToString();
             txtPersonGenderRatio.Text = $"{men}/{women}";
@@ -547,28 +625,89 @@ namespace Lineage.Pages
             txtGenerations.Text = generations.ToString();
 
             // Возрастная статистика
-            var livingPersons = persons.Where(p => p.DeathDate == "—").ToList();
-            // Для упрощения показываем базовые данные
-            txtAvgAgePerson.Text = "—";
+            var today = DateTime.Today;
+            var personsWithAge = persons
+                .Where(p => p.BirthDate != "—" && p.BirthDate != "?")
+                .Select(p => new { Person = p, BirthDate = DateTime.ParseExact(p.BirthDate, "dd.MM.yyyy", null) })
+                .ToList();
 
-            if (persons.Any())
+            if (personsWithAge.Any())
             {
-                var oldest = persons.OrderBy(p => p.BirthDate).FirstOrDefault();
-                if (oldest != null && oldest.BirthDate != "—")
-                    txtOldestPerson.Text = $"{oldest.LastName} {oldest.FirstName}";
+                // Средний возраст
+                var livingPersons = personsWithAge
+                    .Where(p => p.Person.DeathDate == "—" || p.Person.DeathDate == "...")
+                    .ToList();
 
-                var youngest = persons.OrderByDescending(p => p.BirthDate).FirstOrDefault();
-                if (youngest != null && youngest.BirthDate != "—")
-                    txtYoungestPerson.Text = $"{youngest.LastName} {youngest.FirstName}";
+                if (livingPersons.Any())
+                {
+                    double totalAge = 0;
+                    foreach (var p in livingPersons)
+                    {
+                        int age = today.Year - p.BirthDate.Year;
+                        if (today < p.BirthDate.AddYears(age)) age--;
+                        totalAge += age;
+                    }
+                    double avgAge = totalAge / livingPersons.Count;
+                    txtAvgAgePerson.Text = $"{avgAge:F1} лет";
+                }
+                else
+                {
+                    txtAvgAgePerson.Text = "Нет живых";
+                }
+
+                // Самый старший
+                var oldest = personsWithAge.OrderBy(p => p.BirthDate).FirstOrDefault();
+                if (oldest != null)
+                {
+                    int age = today.Year - oldest.BirthDate.Year;
+                    if (today < oldest.BirthDate.AddYears(age)) age--;
+                    txtOldestPerson.Text = $"{oldest.Person.LastName} {oldest.Person.FirstName} ({age} лет)";
+                }
+
+                // Самый младший (живой)
+                var youngest = livingPersons.OrderByDescending(p => p.BirthDate).FirstOrDefault();
+                if (youngest != null)
+                {
+                    int age = today.Year - youngest.BirthDate.Year;
+                    if (today < youngest.BirthDate.AddYears(age)) age--;
+                    txtYoungestPerson.Text = $"{youngest.Person.LastName} {youngest.Person.FirstName} ({age} лет)";
+                }
+                else
+                {
+                    txtYoungestPerson.Text = "—";
+                }
+            }
+            else
+            {
+                txtAvgAgePerson.Text = "—";
+                txtOldestPerson.Text = "—";
+                txtYoungestPerson.Text = "—";
             }
 
-            // Пол
+            // Распределение по полу
             double menPercent = total > 0 ? (men * 100.0 / total) : 0;
             double womenPercent = total > 0 ? (women * 100.0 / total) : 0;
             progressMen.Value = menPercent;
             progressWomen.Value = womenPercent;
             txtMenPercent.Text = $"{menPercent:F1}% мужчин";
             txtWomenPercent.Text = $"{womenPercent:F1}% женщин";
+        }
+
+        // Вспомогательный метод для расчёта глубины поколений
+        private void CalculateGenerationDepth(int personId, int depth, Dictionary<int, List<int>> childrenDict, Dictionary<int, int> generationMap)
+        {
+            if (generationMap.ContainsKey(personId) && generationMap[personId] >= depth)
+                return;
+
+            generationMap[personId] = depth;
+
+            if (childrenDict.ContainsKey(personId))
+            {
+                foreach (var childId in childrenDict[personId])
+                {
+                    CalculateGenerationDepth(childId, depth + 1, childrenDict, generationMap);
+                }
+            }
         }
 
         private void UpdatePersonNames(List<PersonReportItem> persons)

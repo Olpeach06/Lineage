@@ -28,11 +28,14 @@ namespace Lineage.Pages
             public string Description { get; set; }
             public string Stats { get; set; }
             public string CreatedDate { get; set; }
+            public int ProjectTypeId { get; set; }
             public int PersonsCount { get; set; }
+            public int AnimalsCount { get; set; }
             public int StoriesCount { get; set; }
             public int MediaCount { get; set; }
             public bool IsCurrent { get; set; }
             public Visibility ShowDeleteButton { get; set; }
+            public int CreatedByUserId { get; set; }
         }
 
         public TreesPage()
@@ -66,6 +69,7 @@ namespace Lineage.Pages
             {
                 using (var context = new GenealogyUnifiedDBEntities1())
                 {
+                    // Получаем проекты, созданные пользователем (независимо от режима)
                     var trees = context.FamilyTrees
                         .Where(t => t.CreatedByUserId == Session.UserId)
                         .OrderByDescending(t => t.CreatedAt)
@@ -86,28 +90,61 @@ namespace Lineage.Pages
 
                     foreach (var tree in trees)
                     {
-                        var personsCount = context.Persons.Count(p => p.TreeId == tree.Id);
-                        var personIds = context.Persons
-                            .Where(p => p.TreeId == tree.Id)
-                            .Select(p => p.Id)
-                            .ToList();
-                        var storiesCount = context.Stories.Count(s => personIds.Contains(s.PersonId));
-                        var mediaCount = context.MediaLinks.Count(ml => personIds.Contains(ml.PersonId ?? 0));
+                        // Подсчитываем статистику в зависимости от типа проекта
+                        string statsText = "";
+                        int personsCount = 0;
+                        int animalsCount = 0;
+                        int storiesCount = 0;
+                        int mediaCount = 0;
+
+                        if (tree.ProjectTypeId == 1) // Семейное древо
+                        {
+                            personsCount = context.Persons.Count(p => p.TreeId == tree.Id);
+                            var personIds = context.Persons
+                                .Where(p => p.TreeId == tree.Id)
+                                .Select(p => p.Id)
+                                .ToList();
+                            storiesCount = context.Stories.Count(s => personIds.Contains(s.PersonId));
+                            mediaCount = context.MediaLinks.Count(ml => personIds.Contains(ml.PersonId ?? 0));
+
+                            statsText = $"👥 {personsCount} персон | 📖 {storiesCount} историй | 📷 {mediaCount} фото";
+                        }
+                        else // Племенная книга (животные)
+                        {
+                            animalsCount = context.Animals.Count(a => a.TreeId == tree.Id);
+                            // Для животных считаем количество вязок, выставок и оценок
+                            var animalIds = context.Animals
+                                .Where(a => a.TreeId == tree.Id)
+                                .Select(a => a.Id)
+                                .ToList();
+
+                            int breedingsCount = context.Breedings.Count(b => b.TreeId == tree.Id);
+                            int exhibitionsCount = context.Exhibitions.Count(e => animalIds.Contains(e.AnimalId));
+                            int assessmentsCount = context.AnimalAssessments.Count(a => animalIds.Contains(a.AnimalId));
+
+                            statsText = $"🐄 {animalsCount} животных | 🔗 {breedingsCount} вязок | 🏆 {exhibitionsCount} выставок | ⭐ {assessmentsCount} оценок";
+                        }
 
                         bool isCurrent = (tree.Id == Session.CurrentTreeId);
+
+                        // Право на удаление: только администратор ИЛИ создатель проекта
+                        bool canDelete = Session.IsAdmin || tree.CreatedByUserId == Session.UserId;
 
                         allTrees.Add(new TreeItem
                         {
                             Id = tree.Id,
                             Name = tree.Name,
                             Description = tree.Description ?? "Нет описания",
-                            Stats = $"👥 {personsCount} персон | 📖 {storiesCount} историй | 📷 {mediaCount} фото",
+                            Stats = statsText,
                             CreatedDate = $"Создано: {tree.CreatedAt:dd.MM.yyyy}",
+                            ProjectTypeId = tree.ProjectTypeId,
                             PersonsCount = personsCount,
+                            AnimalsCount = animalsCount,
                             StoriesCount = storiesCount,
                             MediaCount = mediaCount,
                             IsCurrent = isCurrent,
-                            ShowDeleteButton = Session.IsAdmin ? Visibility.Visible : Visibility.Collapsed
+                            ShowDeleteButton = canDelete ? Visibility.Visible : Visibility.Collapsed,
+                            CreatedByUserId = tree.CreatedByUserId
                         });
                     }
 
@@ -123,7 +160,10 @@ namespace Lineage.Pages
                         txtCurrentTreeDate.Text = currentTree.CreatedDate;
                         btnEditCurrent.Tag = currentTree.Id;
                         btnDeleteCurrent.Tag = currentTree.Id;
-                        btnDeleteCurrent.Visibility = Session.IsAdmin ? Visibility.Visible : Visibility.Collapsed;
+
+                        // Право на удаление текущего дерева
+                        bool canDeleteCurrent = Session.IsAdmin || currentTree.CreatedByUserId == Session.UserId;
+                        btnDeleteCurrent.Visibility = canDeleteCurrent ? Visibility.Visible : Visibility.Collapsed;
                     }
                     else
                     {
@@ -186,7 +226,21 @@ namespace Lineage.Pages
             if (button?.Tag == null) return;
 
             int treeId = (int)button.Tag;
-            Session.CurrentTreeId = treeId;
+
+            // Проверяем, имеет ли пользователь доступ к этому дереву
+            using (var context = new GenealogyUnifiedDBEntities1())
+            {
+                var tree = context.FamilyTrees.Find(treeId);
+                if (tree != null && (tree.IsPublic || tree.CreatedByUserId == Session.UserId || Session.IsAdmin))
+                {
+                    Session.CurrentTreeId = treeId;
+
+                    // Устанавливаем режим в соответствии с типом проекта
+                    AppSettings.CurrentMode = tree.ProjectTypeId;
+                    Session.CurrentMode = tree.ProjectTypeId;
+                }
+            }
+
             NavigationService.Navigate(new MainPage());
         }
 
@@ -203,6 +257,14 @@ namespace Lineage.Pages
                 {
                     var tree = context.FamilyTrees.FirstOrDefault(t => t.Id == treeId);
                     if (tree == null) return;
+
+                    // Проверяем права на редактирование (только создатель или админ)
+                    if (tree.CreatedByUserId != Session.UserId && !Session.IsAdmin)
+                    {
+                        MessageBox.Show("Вы можете редактировать только свои проекты!", "Доступ запрещён",
+                            MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
 
                     var dialog = new TreeEditDialog(tree);
                     if (dialog.ShowDialog() == true)
@@ -230,11 +292,19 @@ namespace Lineage.Pages
 
             int treeId = (int)button.Tag;
 
-            if (!Session.IsAdmin)
+            // Проверяем права на удаление
+            using (var checkContext = new GenealogyUnifiedDBEntities1())
             {
-                MessageBox.Show("Только администратор может удалять проекты!", "Доступ запрещён",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
+                var tree = checkContext.FamilyTrees.Find(treeId);
+                if (tree == null) return;
+
+                // Только создатель или администратор может удалять
+                if (tree.CreatedByUserId != Session.UserId && !Session.IsAdmin)
+                {
+                    MessageBox.Show("Вы можете удалять только свои проекты!", "Доступ запрещён",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
             }
 
             var result = MessageBox.Show("Вы уверены, что хотите удалить этот проект?\nВсе связанные данные будут также удалены!",
@@ -246,26 +316,64 @@ namespace Lineage.Pages
                 {
                     using (var context = new GenealogyUnifiedDBEntities1())
                     {
-                        var persons = context.Persons.Where(p => p.TreeId == treeId).ToList();
-                        var personIds = persons.Select(p => p.Id).ToList();
-
-                        var mediaLinks = context.MediaLinks.Where(ml => personIds.Contains(ml.PersonId ?? 0)).ToList();
-                        context.MediaLinks.RemoveRange(mediaLinks);
-
-                        var stories = context.Stories.Where(s => personIds.Contains(s.PersonId)).ToList();
-                        context.Stories.RemoveRange(stories);
-
-                        var relationships = context.PersonRelationships
-                            .Where(r => personIds.Contains(r.Person1Id) || personIds.Contains(r.Person2Id))
-                            .ToList();
-                        context.PersonRelationships.RemoveRange(relationships);
-
-                        context.Persons.RemoveRange(persons);
-
                         var tree = context.FamilyTrees.FirstOrDefault(t => t.Id == treeId);
-                        if (tree != null)
-                            context.FamilyTrees.Remove(tree);
+                        if (tree == null) return;
 
+                        if (tree.ProjectTypeId == 1) // Семейное древо
+                        {
+                            var persons = context.Persons.Where(p => p.TreeId == treeId).ToList();
+                            var personIds = persons.Select(p => p.Id).ToList();
+
+                            var mediaLinks = context.MediaLinks.Where(ml => personIds.Contains(ml.PersonId ?? 0)).ToList();
+                            context.MediaLinks.RemoveRange(mediaLinks);
+
+                            var stories = context.Stories.Where(s => personIds.Contains(s.PersonId)).ToList();
+                            context.Stories.RemoveRange(stories);
+
+                            var relationships = context.PersonRelationships
+                                .Where(r => personIds.Contains(r.Person1Id) || personIds.Contains(r.Person2Id))
+                                .ToList();
+                            context.PersonRelationships.RemoveRange(relationships);
+
+                            context.Persons.RemoveRange(persons);
+                        }
+                        else // Племенная книга (животные)
+                        {
+                            var animals = context.Animals.Where(a => a.TreeId == treeId).ToList();
+                            var animalIds = animals.Select(a => a.Id).ToList();
+
+                            // Удаляем вязки
+                            var breedings = context.Breedings.Where(b => b.TreeId == treeId).ToList();
+                            context.Breedings.RemoveRange(breedings);
+
+                            // Удаляем выставки (исправлено: переменная ex вместо e)
+                            var exhibitions = context.Exhibitions.Where(ex => animalIds.Contains(ex.AnimalId)).ToList();
+                            context.Exhibitions.RemoveRange(exhibitions);
+
+                            // Удаляем оценки
+                            var assessments = context.AnimalAssessments.Where(a => animalIds.Contains(a.AnimalId)).ToList();
+                            context.AnimalAssessments.RemoveRange(assessments);
+
+                            // Удаляем родословные
+                            var pedigrees = context.AnimalPedigree.Where(p => animalIds.Contains(p.AnimalId)).ToList();
+                            context.AnimalPedigree.RemoveRange(pedigrees);
+
+                            // Удаляем ветеринарные события
+                            var vetEvents = context.VeterinaryEvents.Where(v => animalIds.Contains(v.AnimalId)).ToList();
+                            context.VeterinaryEvents.RemoveRange(vetEvents);
+
+                            // Удаляем записи продуктивности
+                            var productivityRecords = context.ProductivityRecords.Where(p => animalIds.Contains(p.AnimalId)).ToList();
+                            context.ProductivityRecords.RemoveRange(productivityRecords);
+
+                            // Удаляем медиа связи для животных
+                            var mediaLinks = context.MediaLinks.Where(ml => animalIds.Contains(ml.AnimalId ?? 0)).ToList();
+                            context.MediaLinks.RemoveRange(mediaLinks);
+
+                            context.Animals.RemoveRange(animals);
+                        }
+
+                        context.FamilyTrees.Remove(tree);
                         context.SaveChanges();
 
                         if (treeId == Session.CurrentTreeId)
@@ -274,6 +382,12 @@ namespace Lineage.Pages
                                 .Where(t => t.CreatedByUserId == Session.UserId)
                                 .FirstOrDefault();
                             Session.CurrentTreeId = anyTree?.Id ?? 0;
+
+                            if (anyTree != null)
+                            {
+                                AppSettings.CurrentMode = anyTree.ProjectTypeId;
+                                Session.CurrentMode = anyTree.ProjectTypeId;
+                            }
                         }
 
                         MessageBox.Show("Проект удалён!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
