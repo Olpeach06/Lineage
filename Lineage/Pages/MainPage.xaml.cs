@@ -58,6 +58,12 @@ namespace Lineage.Pages
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            // Важно: сначала обновляем режим по текущему проекту
+            if (Session.CurrentTreeId != 0)
+            {
+                Session.UpdateModeByTreeId(Session.CurrentTreeId);
+            }
+
             if (Session.IsGuest)
             {
                 txtUserName.Text = "Гость";
@@ -67,20 +73,22 @@ namespace Lineage.Pages
                 btnSideEdit.Visibility = Visibility.Collapsed;
                 btnSideStory.Visibility = Visibility.Collapsed;
                 btnUsers.Visibility = Visibility.Collapsed;
-            }
-            else
-            {
-                txtUserName.Text = Session.Username;
-                bool canEdit = Session.IsAdmin || Session.IsEditor;
-                bool isAdmin = Session.IsAdmin;
 
-                btnAdd.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
-                btnEdit.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
-                btnDelete.Visibility = isAdmin ? Visibility.Visible : Visibility.Collapsed;
-                btnSideEdit.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
-                btnSideStory.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
-                btnUsers.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
+                // Для гостя загружаем публичное дерево
+                LoadPublicTree();
+                return;
             }
+
+            txtUserName.Text = Session.Username;
+            bool canEdit = Session.IsAdmin || Session.IsEditor;
+            bool isAdmin = Session.IsAdmin;
+
+            btnAdd.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
+            btnEdit.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
+            btnDelete.Visibility = isAdmin ? Visibility.Visible : Visibility.Collapsed;
+            btnSideEdit.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
+            btnSideStory.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
+            btnUsers.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
 
             currentTreeId = Session.CurrentTreeId;
             parentScrollViewer = FindVisualChild<ScrollViewer>(this);
@@ -88,7 +96,62 @@ namespace Lineage.Pages
             SetupFilter();
             LoadTree();
         }
+        private void LoadPublicTree()
+        {
+            try
+            {
+                using (var context = new GenealogyUnifiedDBEntities1())
+                {
+                    int projectTypeId = Session.IsFamilyMode ? 1 : 2;
 
+                    // Ищем первое публичное дерево нужного типа
+                    var publicTree = context.FamilyTrees
+                        .FirstOrDefault(t => t.IsPublic == true && t.ProjectTypeId == projectTypeId);
+
+                    if (publicTree != null)
+                    {
+                        currentTreeId = publicTree.Id;
+                        Session.CurrentTreeId = publicTree.Id;
+                        Session.CurrentMode = publicTree.ProjectTypeId;
+                        AppSettings.CurrentMode = publicTree.ProjectTypeId;
+
+                        parentScrollViewer = FindVisualChild<ScrollViewer>(this);
+                        SetupFilter();
+                        LoadTree();
+                    }
+                    else
+                    {
+                        ShowNoPublicTreeMessage();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки публичного дерева: {ex.Message}");
+                ShowNoPublicTreeMessage();
+            }
+        }
+
+        private void ShowNoPublicTreeMessage()
+        {
+            if (treeCanvas == null) return;
+            treeCanvas.Children.Clear();
+
+            var tb = new TextBlock
+            {
+                Text = Session.IsFamilyMode
+                    ? "Нет доступных публичных семейных деревьев.\nСоздайте своё дерево или войдите в аккаунт с публичными данными."
+                    : "Нет доступных публичных племенных книг.\nСоздайте свою племенную книгу или войдите в аккаунт с публичными данными.",
+                FontSize = 16,
+                Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#8B7E6B")),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                TextAlignment = TextAlignment.Center
+            };
+            Canvas.SetLeft(tb, 400);
+            Canvas.SetTop(tb, 300);
+            treeCanvas.Children.Add(tb);
+        }
         private void SetupFilter()
         {
             cmbFilter.Items.Clear();
@@ -1537,6 +1600,20 @@ namespace Lineage.Pages
         private void UsersButton_Click(object sender, RoutedEventArgs e)
         {
             NavigationService.Navigate(new UsersPage());
+        }
+        private void SwitchModeButton_Click(object sender, RoutedEventArgs e)
+        {
+            var result = MessageBox.Show("Переключить режим работы?\nНесохранённые изменения будут потеряны.",
+                "Смена режима", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                // Сохраняем последний использованный режим
+                Session.LastUsedMode = Session.CurrentMode;
+
+                // Переходим на страницу выбора режима
+                NavigationService.Navigate(new SelectionPage(Session.UserId, Session.LastUsedMode));
+            }
         }
 
         private void LogoutButton_Click(object sender, RoutedEventArgs e)

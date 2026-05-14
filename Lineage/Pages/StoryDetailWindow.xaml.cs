@@ -43,6 +43,15 @@ namespace Lineage.Pages
 
         private void StoryDetailWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            // Истории доступны только в режиме семейного древа
+            if (!Session.IsFamilyMode)
+            {
+                MessageBox.Show("Истории доступны только в режиме семейного древа!", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                Close();
+                return;
+            }
+
             LoadStory();
         }
 

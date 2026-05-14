@@ -58,6 +58,15 @@ namespace Lineage.Pages
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            // Проверка: истории доступны только в режиме семейного древа
+            if (!Session.IsFamilyMode)
+            {
+                MessageBox.Show("Истории доступны только в режиме семейного древа!", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                NavigationService.GoBack();
+                return;
+            }
+
             dpEventDate.DisplayDateEnd = DateTime.Today;
             ValidateFields(null, null);
         }

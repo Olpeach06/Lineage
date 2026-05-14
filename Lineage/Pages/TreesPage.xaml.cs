@@ -69,9 +69,12 @@ namespace Lineage.Pages
             {
                 using (var context = new GenealogyUnifiedDBEntities1())
                 {
-                    // Получаем проекты, созданные пользователем (независимо от режима)
+                    // Получаем тип текущего режима (1 - семейный, 2 - животноводство)
+                    int currentProjectTypeId = Session.IsFamilyMode ? 1 : 2;
+
+                    // Получаем проекты, созданные пользователем, ТОЛЬКО текущего типа
                     var trees = context.FamilyTrees
-                        .Where(t => t.CreatedByUserId == Session.UserId)
+                        .Where(t => t.CreatedByUserId == Session.UserId && t.ProjectTypeId == currentProjectTypeId)
                         .OrderByDescending(t => t.CreatedAt)
                         .ToList();
 
@@ -80,6 +83,12 @@ namespace Lineage.Pages
                         borderCurrentTree.Visibility = Visibility.Collapsed;
                         borderNoTrees.Visibility = Visibility.Visible;
                         lvTrees.Visibility = Visibility.Collapsed;
+
+                        // Показываем сообщение в зависимости от режима
+                        string message = Session.IsFamilyMode
+                            ? "У вас нет семейных деревьев. Создайте новое!"
+                            : "У вас нет племенных книг. Создайте новую!";
+                        txtNoTrees.Text = message;
                         return;
                     }
 
@@ -188,7 +197,7 @@ namespace Lineage.Pages
                 {
                     using (var context = new GenealogyUnifiedDBEntities1())
                     {
-                        int projectTypeId = AppSettings.IsFamilyMode ? 1 : 2;
+                        int projectTypeId = Session.IsFamilyMode ? 1 : 2;
 
                         var newTree = new FamilyTrees
                         {
@@ -231,13 +240,27 @@ namespace Lineage.Pages
             using (var context = new GenealogyUnifiedDBEntities1())
             {
                 var tree = context.FamilyTrees.Find(treeId);
-                if (tree != null && (tree.IsPublic || tree.CreatedByUserId == Session.UserId || Session.IsAdmin))
+                if (tree == null) return;
+
+                // Дополнительная проверка: проект должен соответствовать текущему режиму
+                if ((Session.IsFamilyMode && tree.ProjectTypeId != 1) ||
+                    (!Session.IsFamilyMode && tree.ProjectTypeId != 2))
+                {
+                    MessageBox.Show("Этот проект не соответствует текущему режиму работы.\n" +
+                        "Для работы с этим проектом переключите режим на странице выбора.",
+                        "Проект недоступен", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                if (tree.IsPublic || tree.CreatedByUserId == Session.UserId || Session.IsAdmin)
                 {
                     Session.CurrentTreeId = treeId;
 
                     // Устанавливаем режим в соответствии с типом проекта
-                    AppSettings.CurrentMode = tree.ProjectTypeId;
                     Session.CurrentMode = tree.ProjectTypeId;
+                    AppSettings.CurrentMode = tree.ProjectTypeId;
+
+                    System.Diagnostics.Debug.WriteLine($"Выбран проект: {tree.Name}, режим: {(tree.ProjectTypeId == 1 ? "Семейный" : "Животноводство")}");
                 }
             }
 
@@ -342,31 +365,24 @@ namespace Lineage.Pages
                             var animals = context.Animals.Where(a => a.TreeId == treeId).ToList();
                             var animalIds = animals.Select(a => a.Id).ToList();
 
-                            // Удаляем вязки
                             var breedings = context.Breedings.Where(b => b.TreeId == treeId).ToList();
                             context.Breedings.RemoveRange(breedings);
 
-                            // Удаляем выставки (исправлено: переменная ex вместо e)
                             var exhibitions = context.Exhibitions.Where(ex => animalIds.Contains(ex.AnimalId)).ToList();
                             context.Exhibitions.RemoveRange(exhibitions);
 
-                            // Удаляем оценки
                             var assessments = context.AnimalAssessments.Where(a => animalIds.Contains(a.AnimalId)).ToList();
                             context.AnimalAssessments.RemoveRange(assessments);
 
-                            // Удаляем родословные
                             var pedigrees = context.AnimalPedigree.Where(p => animalIds.Contains(p.AnimalId)).ToList();
                             context.AnimalPedigree.RemoveRange(pedigrees);
 
-                            // Удаляем ветеринарные события
                             var vetEvents = context.VeterinaryEvents.Where(v => animalIds.Contains(v.AnimalId)).ToList();
                             context.VeterinaryEvents.RemoveRange(vetEvents);
 
-                            // Удаляем записи продуктивности
                             var productivityRecords = context.ProductivityRecords.Where(p => animalIds.Contains(p.AnimalId)).ToList();
                             context.ProductivityRecords.RemoveRange(productivityRecords);
 
-                            // Удаляем медиа связи для животных
                             var mediaLinks = context.MediaLinks.Where(ml => animalIds.Contains(ml.AnimalId ?? 0)).ToList();
                             context.MediaLinks.RemoveRange(mediaLinks);
 
@@ -379,7 +395,7 @@ namespace Lineage.Pages
                         if (treeId == Session.CurrentTreeId)
                         {
                             var anyTree = context.FamilyTrees
-                                .Where(t => t.CreatedByUserId == Session.UserId)
+                                .Where(t => t.CreatedByUserId == Session.UserId && t.ProjectTypeId == Session.CurrentMode)
                                 .FirstOrDefault();
                             Session.CurrentTreeId = anyTree?.Id ?? 0;
 

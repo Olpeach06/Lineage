@@ -68,6 +68,15 @@ namespace Lineage.Pages
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            // Проверка: страница доступна только в режиме семейного древа
+            if (!Session.IsFamilyMode)
+            {
+                MessageBox.Show("Эта страница доступна только в режиме семейного древа!", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                NavigationService.GoBack();
+                return;
+            }
+
             if (Session.CurrentTreeId > 0)
                 currentTreeId = Session.CurrentTreeId;
             else

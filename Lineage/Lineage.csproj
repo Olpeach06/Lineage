@@ -179,11 +179,19 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Pages\AddBreedingPage.xaml">
+    <Page Include="Pages\AddEditAssessmentPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\AddExhibitionPage.xaml">
+    <Page Include="Pages\AddEditBreedingPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\AddEditExhibitionPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\AddEditHealthEventPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -269,11 +277,17 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Pages\AddBreedingPage.xaml.cs">
-      <DependentUpon>AddBreedingPage.xaml</DependentUpon>
+    <Compile Include="Pages\AddEditAssessmentPage.xaml.cs">
+      <DependentUpon>AddEditAssessmentPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\AddExhibitionPage.xaml.cs">
-      <DependentUpon>AddExhibitionPage.xaml</DependentUpon>
+    <Compile Include="Pages\AddEditBreedingPage.xaml.cs">
+      <DependentUpon>AddEditBreedingPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\AddEditExhibitionPage.xaml.cs">
+      <DependentUpon>AddEditExhibitionPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\AddEditHealthEventPage.xaml.cs">
+      <DependentUpon>AddEditHealthEventPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\AnimalProfilePage.xaml.cs">
       <DependentUpon>AnimalProfilePage.xaml</DependentUpon>

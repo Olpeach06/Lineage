@@ -104,6 +104,11 @@ namespace Lineage.Pages
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            // Синхронизируем режим по текущему проекту
+            if (Session.CurrentTreeId != 0)
+            {
+                Session.UpdateModeByTreeId(Session.CurrentTreeId);
+            }
             // Настройка UI в зависимости от режима
             if (AppSettings.IsFamilyMode)
             {

@@ -63,8 +63,11 @@ namespace Lineage.Pages
                 SaveLastUsedMode(modeType);
             }
 
-            AppSettings.CurrentMode = modeType;
+            // Устанавливаем режим в Session и AppSettings
             Session.CurrentMode = modeType;
+            AppSettings.CurrentMode = modeType;
+
+            // Переход на главную страницу
             NavigationService.Navigate(new MainPage());
         }
 

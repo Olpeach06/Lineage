@@ -40,7 +40,8 @@ namespace Lineage.Pages
         {
             public int Id { get; set; }
             public string AssessmentDate { get; set; }
-            public string Class { get; set; }
+            public string ClassName { get; set; }
+            public int ClassId { get; set; }
         }
 
         public class HealthEventItem
@@ -60,7 +61,13 @@ namespace Lineage.Pages
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine($"=== ЗАГРУЗКА ПРОФИЛЯ ЖИВОТНОГО ID: {animalId} ===");
+            if (!Session.IsBreedingMode)
+            {
+                MessageBox.Show("Эта страница доступна только в режиме племенной книги!", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                NavigationService.GoBack();
+                return;
+            }
 
             LoadAnimalData();
             LoadBreedings();
@@ -72,6 +79,8 @@ namespace Lineage.Pages
             btnEdit.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
             btnAddBreeding.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
             btnAddExhibition.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
+            btnAddAssessment.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
+            btnAddHealthEvent.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void LoadAnimalData()
@@ -291,7 +300,6 @@ namespace Lineage.Pages
             {
                 using (var context = new GenealogyUnifiedDBEntities1())
                 {
-                    // Сначала получаем данные из БД без форматирования
                     var breedingsAsMaleRaw = context.Breedings
                         .Where(b => b.MaleId == animalId)
                         .ToList();
@@ -325,19 +333,15 @@ namespace Lineage.Pages
                     allBreedings = allBreedings.OrderByDescending(b => b.BreedingDate).ToList();
 
                     icBreedings.ItemsSource = allBreedings;
-                    tabBreedings.Header = $"🔗 Вязки ({allBreedings.Count})";
-
-                    System.Diagnostics.Debug.WriteLine($"Загружено вязок: {allBreedings.Count}");
+                    txtBreedingsCount.Text = $" ({allBreedings.Count})";
                 }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Ошибка загрузки вязок: {ex.Message}");
-                MessageBox.Show($"Ошибка загрузки вязок: {ex.Message}");
             }
         }
 
-        // Вспомогательный метод для получения клички животного по ID
         private string GetAnimalNickname(int animalId, GenealogyUnifiedDBEntities1 context)
         {
             var animal = context.Animals.Find(animalId);
@@ -350,7 +354,6 @@ namespace Lineage.Pages
             {
                 using (var context = new GenealogyUnifiedDBEntities1())
                 {
-                    // Сначала получаем данные из БД без форматирования
                     var exhibitionsRaw = context.Exhibitions
                         .Where(e => e.AnimalId == animalId)
                         .ToList();
@@ -370,15 +373,12 @@ namespace Lineage.Pages
                     exhibitions = exhibitions.OrderByDescending(e => e.ExhibitionDate).ToList();
 
                     icExhibitions.ItemsSource = exhibitions;
-                    tabExhibitions.Header = $"🏆 Выставки ({exhibitions.Count})";
-
-                    System.Diagnostics.Debug.WriteLine($"Загружено выставок: {exhibitions.Count}");
+                    txtExhibitionsCount.Text = $" ({exhibitions.Count})";
                 }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Ошибка загрузки выставок: {ex.Message}");
-                MessageBox.Show($"Ошибка загрузки выставок: {ex.Message}");
             }
         }
 
@@ -388,10 +388,11 @@ namespace Lineage.Pages
             {
                 using (var context = new GenealogyUnifiedDBEntities1())
                 {
-                    // Сначала получаем данные из БД без форматирования
                     var assessmentsRaw = context.AnimalAssessments
                         .Where(a => a.AnimalId == animalId)
                         .ToList();
+
+                    var classNames = context.PedigreeClasses.ToDictionary(c => c.Id, c => c.Name);
 
                     var assessments = new List<AssessmentItem>();
 
@@ -401,35 +402,20 @@ namespace Lineage.Pages
                         {
                             Id = a.Id,
                             AssessmentDate = a.AssessmentDate.ToString("dd.MM.yyyy"),
-                            Class = a.ClassId.ToString()
+                            ClassId = a.ClassId,
+                            ClassName = classNames.ContainsKey(a.ClassId) ? classNames[a.ClassId] : $"Класс {a.ClassId}"
                         });
                     }
 
                     assessments = assessments.OrderByDescending(a => a.AssessmentDate).ToList();
 
-                    // Получаем названия классов
-                    foreach (var assessment in assessments)
-                    {
-                        if (int.TryParse(assessment.Class, out int classId))
-                        {
-                            using (var tempContext = new GenealogyUnifiedDBEntities1())
-                            {
-                                var pc = tempContext.PedigreeClasses.Find(classId);
-                                assessment.Class = pc?.Name ?? $"Класс {classId}";
-                            }
-                        }
-                    }
-
                     icAssessments.ItemsSource = assessments;
-                    tabAssessments.Header = $"⭐ Оценки ({assessments.Count})";
-
-                    System.Diagnostics.Debug.WriteLine($"Загружено оценок: {assessments.Count}");
+                    txtAssessmentsCount.Text = $" ({assessments.Count})";
                 }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Ошибка загрузки оценок: {ex.Message}");
-                MessageBox.Show($"Ошибка загрузки оценок: {ex.Message}");
             }
         }
 
@@ -461,7 +447,7 @@ namespace Lineage.Pages
                     }
 
                     icHealthEvents.ItemsSource = healthItems;
-                    tabHealth.Header = $"💊 Здоровье ({healthItems.Count})";
+                    txtHealthCount.Text = $" ({healthItems.Count})";
                 }
             }
             catch (Exception ex)
@@ -470,15 +456,47 @@ namespace Lineage.Pages
             }
         }
 
-        private void HealthDetails_Click(object sender, RoutedEventArgs e)
+        // ============================================
+        // ОБРАБОТЧИКИ КЛИКОВ ПО ЭЛЕМЕНТАМ (открывают редактирование)
+        // ============================================
+
+        private void Breeding_Click(object sender, MouseButtonEventArgs e)
         {
-            var button = sender as Button;
-            if (button?.Tag == null) return;
-            int eventId = (int)button.Tag;
-            // NavigationService.Navigate(new VeterinaryEventDetailPage(eventId));
-            MessageBox.Show($"Детали события ID: {eventId}\n(Страница деталей будет реализована позже)", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+            var border = sender as Border;
+            if (border?.DataContext is BreedingItem breeding)
+            {
+                NavigationService.Navigate(new AddEditBreedingPage(animalId, breeding.Id));
+            }
         }
 
+        private void Exhibition_Click(object sender, MouseButtonEventArgs e)
+        {
+            var border = sender as Border;
+            if (border?.DataContext is ExhibitionItem exhibition)
+            {
+                NavigationService.Navigate(new AddEditExhibitionPage(animalId, exhibition.Id));
+            }
+        }
+
+        private void Assessment_Click(object sender, MouseButtonEventArgs e)
+        {
+            var border = sender as Border;
+            if (border?.DataContext is AssessmentItem assessment)
+            {
+                // Для страницы - просто навигация
+                NavigationService.Navigate(new AddEditAssessmentPage(animalId, assessment.Id));
+            }
+        }
+
+        private void HealthEvent_Click(object sender, MouseButtonEventArgs e)
+        {
+            var border = sender as Border;
+            if (border?.DataContext is HealthEventItem healthEvent)
+            {
+                // Для страницы - просто навигация
+                NavigationService.Navigate(new AddEditHealthEventPage(animalId, healthEvent.Id));
+            }
+        }
         private void EditButton_Click(object sender, RoutedEventArgs e)
         {
             NavigationService.Navigate(new EditAnimalPage(animalId));
@@ -486,36 +504,24 @@ namespace Lineage.Pages
 
         private void AddBreedingButton_Click(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(new AddBreedingPage(animalId));
+            NavigationService.Navigate(new AddEditBreedingPage(animalId, null));
         }
 
         private void AddExhibitionButton_Click(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(new AddExhibitionPage(animalId));
+            NavigationService.Navigate(new AddEditExhibitionPage(animalId, null));
         }
 
-        private void BreedingDetails_Click(object sender, RoutedEventArgs e)
+        private void AddAssessmentButton_Click(object sender, RoutedEventArgs e)
         {
-            var button = sender as Button;
-            if (button?.Tag == null) return;
-            int breedingId = (int)button.Tag;
-            NavigationService.Navigate(new BreedingDetailPage(breedingId));
+            // Для страницы - просто навигация, без ShowDialog и Owner
+            NavigationService.Navigate(new AddEditAssessmentPage(animalId, null));
         }
 
-        private void ExhibitionDetails_Click(object sender, RoutedEventArgs e)
+        private void AddHealthEventButton_Click(object sender, RoutedEventArgs e)
         {
-            var button = sender as Button;
-            if (button?.Tag == null) return;
-            int exhibitionId = (int)button.Tag;
-            NavigationService.Navigate(new ExhibitionDetailPage(exhibitionId));
-        }
-
-        private void AssessmentDetails_Click(object sender, RoutedEventArgs e)
-        {
-            var button = sender as Button;
-            if (button?.Tag == null) return;
-            int assessmentId = (int)button.Tag;
-            NavigationService.Navigate(new AssessmentDetailPage(assessmentId));
+            // Для страницы - просто навигация, без ShowDialog и Owner
+            NavigationService.Navigate(new AddEditHealthEventPage(animalId, null));
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)

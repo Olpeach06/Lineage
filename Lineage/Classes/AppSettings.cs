@@ -8,20 +8,24 @@ namespace Lineage.Classes
 {
     public static class AppSettings
     {
-        private static int _currentMode = 1; // 1 - семейный, 2 - животноводство
-
+        // Текущий режим (синхронизируется с Session.CurrentMode)
         public static int CurrentMode
         {
-            get => _currentMode;
-            set
-            {
-                _currentMode = value;
-                System.Diagnostics.Debug.WriteLine($"Режим изменён на: {(value == 1 ? "Семейный" : "Животноводство")}");
-            }
+            get { return Session.CurrentMode; }
+            set { Session.CurrentMode = value; }
         }
 
+        // Проверка режимов
         public static bool IsFamilyMode => CurrentMode == 1;
         public static bool IsBreedingMode => CurrentMode == 2;
+
+        // Суффикс для заголовков
         public static string ModeSuffix => IsFamilyMode ? " (Семейный режим)" : " (Племенная книга)";
+
+        // Обновить режим по проекту
+        public static void UpdateModeByTreeId(int treeId)
+        {
+            Session.UpdateModeByTreeId(treeId);
+        }
     }
 }

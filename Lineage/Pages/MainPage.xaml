@@ -136,7 +136,6 @@
                         </Style>
                     </Button.Style>
                 </Button>
-
                 <!-- Профиль и выход -->
                 <StackPanel Grid.Column="6" Orientation="Horizontal" HorizontalAlignment="Right">
                     <Border Background="#F5F0E6" CornerRadius="20" Padding="10,5,15,5" Margin="0,0,15,0">
@@ -146,6 +145,15 @@
                                        VerticalAlignment="Center" Foreground="#5C4E3D" FontWeight="Medium"/>
                         </StackPanel>
                     </Border>
+                    <Button Grid.Column="5" Content="🔄 Сменить режим"
+                            Click="SwitchModeButton_Click"
+                            Background="Transparent" 
+                            BorderBrush="#D6C9B8" 
+                            BorderThickness="1"
+                            Foreground="#6B5E4A"
+                            Padding="12,8"
+                            Margin="10,0"
+                            Cursor="Hand"/>
                     <Button Content="Выйти" Click="LogoutButton_Click"
                             Background="Transparent" BorderBrush="#D6C9B8" BorderThickness="1"
                             Foreground="#8B7E6B" Padding="12,5" Cursor="Hand">

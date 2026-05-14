@@ -3,6 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:sys="clr-namespace:System;assembly=mscorlib"
       mc:Ignorable="d"
       d:DesignHeight="850" d:DesignWidth="1000"
       Title="Профиль животного"
@@ -16,6 +17,23 @@
             <Setter Property="Padding" Value="20"/>
             <Setter Property="BorderBrush" Value="#B7A48B"/>
             <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <Style x:Key="AddButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#8FAA7A"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="10,0,0,0"/>
+        </Style>
+
+        <Style x:Key="ActionButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="140"/>
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
         </Style>
     </Page.Resources>
 
@@ -120,29 +138,43 @@
                         <StackPanel Grid.Column="2" VerticalAlignment="Top">
                             <Button x:Name="btnEdit"
                                     Content="✎ Редактировать"
-                                    Width="140" Height="35"
+                                    Style="{StaticResource ActionButtonStyle}"
                                     Background="#8FAA7A"
                                     Foreground="White"
                                     BorderThickness="0"
-                                    Margin="0,0,0,10"
                                     Click="EditButton_Click"/>
                             <Button x:Name="btnAddBreeding"
                                     Content="🔗 Добавить вязку"
-                                    Width="140" Height="35"
+                                    Style="{StaticResource ActionButtonStyle}"
                                     Background="Transparent"
                                     BorderBrush="#B7A48B"
                                     Foreground="#5C4E3D"
                                     BorderThickness="1"
-                                    Margin="0,0,0,10"
                                     Click="AddBreedingButton_Click"/>
                             <Button x:Name="btnAddExhibition"
                                     Content="🏆 Добавить выставку"
-                                    Width="140" Height="35"
+                                    Style="{StaticResource ActionButtonStyle}"
                                     Background="Transparent"
                                     BorderBrush="#B7A48B"
                                     Foreground="#5C4E3D"
                                     BorderThickness="1"
                                     Click="AddExhibitionButton_Click"/>
+                            <Button x:Name="btnAddAssessment"
+                                    Content="⭐ Добавить оценку"
+                                    Style="{StaticResource ActionButtonStyle}"
+                                    Background="Transparent"
+                                    BorderBrush="#B7A48B"
+                                    Foreground="#5C4E3D"
+                                    BorderThickness="1"
+                                    Click="AddAssessmentButton_Click"/>
+                            <Button x:Name="btnAddHealthEvent"
+                                    Content="💊 Добавить событие здоровья"
+                                    Style="{StaticResource ActionButtonStyle}"
+                                    Background="Transparent"
+                                    BorderBrush="#B7A48B"
+                                    Foreground="#5C4E3D"
+                                    BorderThickness="1"
+                                    Click="AddHealthEventButton_Click"/>
                         </StackPanel>
                     </Grid>
                 </Border>
@@ -219,7 +251,7 @@
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="130"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
@@ -254,21 +286,26 @@
                     <StackPanel>
                         <TabControl BorderThickness="0" Background="Transparent">
                             <!-- Вкладка: Вязки -->
-                            <TabItem x:Name="tabBreedings" Header="🔗 Вязки" Background="#F5F0E6">
+                            <TabItem x:Name="tabBreedings" Background="#F5F0E6">
+                                <TabItem.Header>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="🔗 Вязки" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="txtBreedingsCount" Text=" (0)" VerticalAlignment="Center" Foreground="#8FAA7A"/>
+                                    </StackPanel>
+                                </TabItem.Header>
                                 <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="250">
                                     <ItemsControl x:Name="icBreedings" Margin="5">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <Border Background="#F5F0E6" CornerRadius="8" Padding="10" Margin="0,0,0,5">
+                                                <Border Background="#F5F0E6" CornerRadius="8" Padding="10" Margin="0,0,0,5"
+                                                        Cursor="Hand" MouseLeftButtonUp="Breeding_Click">
                                                     <Grid>
                                                         <Grid.ColumnDefinitions>
                                                             <ColumnDefinition Width="100"/>
                                                             <ColumnDefinition Width="*"/>
-                                                            <ColumnDefinition Width="Auto"/>
                                                         </Grid.ColumnDefinitions>
                                                         <TextBlock Grid.Column="0" Text="{Binding BreedingDate}" Foreground="#8FAA7A" FontWeight="Bold"/>
                                                         <TextBlock Grid.Column="1" Text="{Binding Info}" Foreground="#6B5E4A" Margin="10,0"/>
-                                                        <Button Grid.Column="2" Content="Подробнее" Background="#8FAA7A" Foreground="White" BorderThickness="0" Padding="10,5" FontSize="11" Cursor="Hand" Click="BreedingDetails_Click" Tag="{Binding Id}"/>
                                                     </Grid>
                                                 </Border>
                                             </DataTemplate>
@@ -278,21 +315,26 @@
                             </TabItem>
 
                             <!-- Вкладка: Выставки -->
-                            <TabItem x:Name="tabExhibitions" Header="🏆 Выставки" Background="#F5F0E6">
+                            <TabItem x:Name="tabExhibitions" Background="#F5F0E6">
+                                <TabItem.Header>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="🏆 Выставки" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="txtExhibitionsCount" Text=" (0)" VerticalAlignment="Center" Foreground="#8FAA7A"/>
+                                    </StackPanel>
+                                </TabItem.Header>
                                 <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="250">
                                     <ItemsControl x:Name="icExhibitions" Margin="5">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <Border Background="#F5F0E6" CornerRadius="8" Padding="10" Margin="0,0,0,5">
+                                                <Border Background="#F5F0E6" CornerRadius="8" Padding="10" Margin="0,0,0,5"
+                                                        Cursor="Hand" MouseLeftButtonUp="Exhibition_Click">
                                                     <Grid>
                                                         <Grid.ColumnDefinitions>
                                                             <ColumnDefinition Width="100"/>
                                                             <ColumnDefinition Width="*"/>
-                                                            <ColumnDefinition Width="Auto"/>
                                                         </Grid.ColumnDefinitions>
                                                         <TextBlock Grid.Column="0" Text="{Binding ExhibitionDate}" Foreground="#8FAA7A" FontWeight="Bold"/>
                                                         <TextBlock Grid.Column="1" Text="{Binding Name}" Foreground="#6B5E4A" Margin="10,0"/>
-                                                        <Button Grid.Column="2" Content="Подробнее" Background="#8FAA7A" Foreground="White" BorderThickness="0" Padding="10,5" FontSize="11" Cursor="Hand" Click="ExhibitionDetails_Click" Tag="{Binding Id}"/>
                                                     </Grid>
                                                 </Border>
                                             </DataTemplate>
@@ -302,21 +344,26 @@
                             </TabItem>
 
                             <!-- Вкладка: Оценки -->
-                            <TabItem x:Name="tabAssessments" Header="⭐ Оценки" Background="#F5F0E6">
+                            <TabItem x:Name="tabAssessments" Background="#F5F0E6">
+                                <TabItem.Header>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="⭐ Оценки" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="txtAssessmentsCount" Text=" (0)" VerticalAlignment="Center" Foreground="#8FAA7A"/>
+                                    </StackPanel>
+                                </TabItem.Header>
                                 <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="250">
                                     <ItemsControl x:Name="icAssessments" Margin="5">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <Border Background="#F5F0E6" CornerRadius="8" Padding="10" Margin="0,0,0,5">
+                                                <Border Background="#F5F0E6" CornerRadius="8" Padding="10" Margin="0,0,0,5"
+                                                        Cursor="Hand" MouseLeftButtonUp="Assessment_Click">
                                                     <Grid>
                                                         <Grid.ColumnDefinitions>
                                                             <ColumnDefinition Width="100"/>
                                                             <ColumnDefinition Width="*"/>
-                                                            <ColumnDefinition Width="Auto"/>
                                                         </Grid.ColumnDefinitions>
                                                         <TextBlock Grid.Column="0" Text="{Binding AssessmentDate}" Foreground="#8FAA7A" FontWeight="Bold"/>
-                                                        <TextBlock Grid.Column="1" Text="{Binding Class}" Foreground="#6B5E4A" Margin="10,0"/>
-                                                        <Button Grid.Column="2" Content="Подробнее" Background="#8FAA7A" Foreground="White" BorderThickness="0" Padding="10,5" FontSize="11" Cursor="Hand" Click="AssessmentDetails_Click" Tag="{Binding Id}"/>
+                                                        <TextBlock Grid.Column="1" Text="{Binding ClassName}" Foreground="#6B5E4A" Margin="10,0"/>
                                                     </Grid>
                                                 </Border>
                                             </DataTemplate>
@@ -326,23 +373,28 @@
                             </TabItem>
 
                             <!-- Вкладка: Здоровье -->
-                            <TabItem x:Name="tabHealth" Header="💊 Здоровье" Background="#F5F0E6">
+                            <TabItem x:Name="tabHealth" Background="#F5F0E6">
+                                <TabItem.Header>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="💊 Здоровье" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="txtHealthCount" Text=" (0)" VerticalAlignment="Center" Foreground="#8FAA7A"/>
+                                    </StackPanel>
+                                </TabItem.Header>
                                 <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="250">
                                     <ItemsControl x:Name="icHealthEvents" Margin="5">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <Border Background="#F5F0E6" CornerRadius="8" Padding="10" Margin="0,0,0,5">
+                                                <Border Background="#F5F0E6" CornerRadius="8" Padding="10" Margin="0,0,0,5"
+                                                        Cursor="Hand" MouseLeftButtonUp="HealthEvent_Click">
                                                     <Grid>
                                                         <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="100"/>
-                                                            <ColumnDefinition Width="150"/>
+                                                            <ColumnDefinition Width="90"/>
+                                                            <ColumnDefinition Width="130"/>
                                                             <ColumnDefinition Width="*"/>
-                                                            <ColumnDefinition Width="Auto"/>
                                                         </Grid.ColumnDefinitions>
                                                         <TextBlock Grid.Column="0" Text="{Binding EventDate}" Foreground="#8FAA7A" FontWeight="Bold"/>
                                                         <TextBlock Grid.Column="1" Text="{Binding EventType}" Foreground="#6B5E4A" Margin="5,0"/>
-                                                        <TextBlock Grid.Column="2" Text="{Binding MedicineName}" Foreground="#6B5E4A" Margin="5,0"/>
-                                                        <Button Grid.Column="3" Content="Подробнее" Background="#8FAA7A" Foreground="White" BorderThickness="0" Padding="10,5" FontSize="11" Cursor="Hand" Click="HealthDetails_Click" Tag="{Binding Id}"/>
+                                                        <TextBlock Grid.Column="2" Text="{Binding MedicineName}" Foreground="#6B5E4A" Margin="5,0" TextTrimming="CharacterEllipsis"/>
                                                     </Grid>
                                                 </Border>
                                             </DataTemplate>

@@ -80,6 +80,14 @@ namespace Lineage.Pages
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            // Проверка: страница доступна только в режиме животноводства
+            if (!Session.IsBreedingMode)
+            {
+                MessageBox.Show("Эта страница доступна только в режиме племенной книги!", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                NavigationService.GoBack();
+                return;
+            }
             currentTreeId = Session.CurrentTreeId;
 
             LoadSpecies();

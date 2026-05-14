@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Lineage.AppData;
+using Lineage.Classes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +13,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using Lineage.AppData;
 
 namespace Lineage.Pages
 {
@@ -21,6 +22,7 @@ namespace Lineage.Pages
         public string TreeDescription { get; private set; }
         public bool IsPublic { get; private set; }
         private bool isEditMode = false;
+        int projectTypeId = AppSettings.IsFamilyMode ? 1 : 2;
 
         public TreeEditDialog()
         {

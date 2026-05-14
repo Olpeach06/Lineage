@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Lineage.AppData;
+using Lineage.Classes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +13,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using Lineage.AppData;
 
 namespace Lineage.Pages
 {
@@ -40,6 +41,15 @@ namespace Lineage.Pages
 
         private void CalendarWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            // Календарь доступен только в режиме семейного древа
+            if (!Session.IsFamilyMode)
+            {
+                MessageBox.Show("Календарь дней рождения доступен только в режиме семейного древа!", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                Close();
+                return;
+            }
+
             LoadBirthdays();
         }
 
