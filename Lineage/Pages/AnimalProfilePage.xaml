@@ -308,21 +308,20 @@
                                                         <TextBlock Grid.Column="0" Text="{Binding BreedingDate}" Foreground="#8FAA7A" FontWeight="Bold"/>
                                                         <TextBlock Grid.Column="1" Text="{Binding Info}" Foreground="#6B5E4A" Margin="10,0"/>
                                                         <Button x:Name="btnDetails" Grid.Column="2" 
-                                                Content="Подробнее" 
-                                                Background="#8FAA7A" Foreground="White" 
-                                                BorderThickness="0" Padding="10,5" 
-                                                FontSize="11" Cursor="Hand" 
-                                                Margin="5,0"
-                                                Click="BreedingDetails_Click" 
-                                                Tag="{Binding Id}"/>
+                                                                Content="Подробнее" 
+                                                                Background="#8FAA7A" Foreground="White" 
+                                                                BorderThickness="0" Padding="10,5" 
+                                                                FontSize="11" Cursor="Hand" 
+                                                                Margin="5,0"
+                                                                Click="BreedingDetails_Click" 
+                                                                Tag="{Binding Id}"/>
                                                         <Button x:Name="btnDelete" Grid.Column="3"
-                                                Content="🗑" 
-                                                Background="#E57373" Foreground="White" 
-                                                BorderThickness="0" Padding="10,5" 
-                                                FontSize="11" Cursor="Hand" 
-                                                Click="BreedingDelete_Click" 
-                                                Tag="{Binding Id}"
-                                                Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Page}}, Path=DataContext.CanDelete}"/>
+                                                                Content="🗑" 
+                                                                Background="#E57373" Foreground="White" 
+                                                                BorderThickness="0" Padding="10,5" 
+                                                                FontSize="11" Cursor="Hand" 
+                                                                Click="BreedingDelete_Click" 
+                                                                Tag="{Binding Id}"/>
                                                     </Grid>
                                                 </Border>
                                             </DataTemplate>
@@ -354,21 +353,20 @@
                                                         <TextBlock Grid.Column="0" Text="{Binding ExhibitionDate}" Foreground="#8FAA7A" FontWeight="Bold"/>
                                                         <TextBlock Grid.Column="1" Text="{Binding Name}" Foreground="#6B5E4A" Margin="10,0"/>
                                                         <Button x:Name="btnDetails" Grid.Column="2" 
-                                                Content="Подробнее" 
-                                                Background="#8FAA7A" Foreground="White" 
-                                                BorderThickness="0" Padding="10,5" 
-                                                FontSize="11" Cursor="Hand" 
-                                                Margin="5,0"
-                                                Click="ExhibitionDetails_Click" 
-                                                Tag="{Binding Id}"/>
+                                                                Content="Подробнее" 
+                                                                Background="#8FAA7A" Foreground="White" 
+                                                                BorderThickness="0" Padding="10,5" 
+                                                                FontSize="11" Cursor="Hand" 
+                                                                Margin="5,0"
+                                                                Click="ExhibitionDetails_Click" 
+                                                                Tag="{Binding Id}"/>
                                                         <Button x:Name="btnDelete" Grid.Column="3"
-                                                Content="🗑" 
-                                                Background="#E57373" Foreground="White" 
-                                                BorderThickness="0" Padding="10,5" 
-                                                FontSize="11" Cursor="Hand" 
-                                                Click="ExhibitionDelete_Click" 
-                                                Tag="{Binding Id}"
-                                                Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Page}}, Path=DataContext.CanDelete}"/>
+                                                                Content="🗑" 
+                                                                Background="#E57373" Foreground="White" 
+                                                                BorderThickness="0" Padding="10,5" 
+                                                                FontSize="11" Cursor="Hand" 
+                                                                Click="ExhibitionDelete_Click" 
+                                                                Tag="{Binding Id}"/>
                                                     </Grid>
                                                 </Border>
                                             </DataTemplate>
@@ -400,21 +398,20 @@
                                                         <TextBlock Grid.Column="0" Text="{Binding AssessmentDate}" Foreground="#8FAA7A" FontWeight="Bold"/>
                                                         <TextBlock Grid.Column="1" Text="{Binding ClassName}" Foreground="#6B5E4A" Margin="10,0"/>
                                                         <Button x:Name="btnDetails" Grid.Column="2" 
-                                                Content="Подробнее" 
-                                                Background="#8FAA7A" Foreground="White" 
-                                                BorderThickness="0" Padding="10,5" 
-                                                FontSize="11" Cursor="Hand" 
-                                                Margin="5,0"
-                                                Click="AssessmentDetails_Click" 
-                                                Tag="{Binding Id}"/>
+                                                                Content="Подробнее" 
+                                                                Background="#8FAA7A" Foreground="White" 
+                                                                BorderThickness="0" Padding="10,5" 
+                                                                FontSize="11" Cursor="Hand" 
+                                                                Margin="5,0"
+                                                                Click="AssessmentDetails_Click" 
+                                                                Tag="{Binding Id}"/>
                                                         <Button x:Name="btnDelete" Grid.Column="3"
-                                                Content="🗑" 
-                                                Background="#E57373" Foreground="White" 
-                                                BorderThickness="0" Padding="10,5" 
-                                                FontSize="11" Cursor="Hand" 
-                                                Click="AssessmentDelete_Click" 
-                                                Tag="{Binding Id}"
-                                                Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Page}}, Path=DataContext.CanDelete}"/>
+                                                                Content="🗑" 
+                                                                Background="#E57373" Foreground="White" 
+                                                                BorderThickness="0" Padding="10,5" 
+                                                                FontSize="11" Cursor="Hand" 
+                                                                Click="AssessmentDelete_Click" 
+                                                                Tag="{Binding Id}"/>
                                                     </Grid>
                                                 </Border>
                                             </DataTemplate>
@@ -448,21 +445,20 @@
                                                         <TextBlock Grid.Column="1" Text="{Binding EventType}" Foreground="#6B5E4A" Margin="5,0"/>
                                                         <TextBlock Grid.Column="2" Text="{Binding MedicineName}" Foreground="#6B5E4A" Margin="5,0" TextTrimming="CharacterEllipsis"/>
                                                         <Button x:Name="btnDetails" Grid.Column="3" 
-                                                Content="Подробнее" 
-                                                Background="#8FAA7A" Foreground="White" 
-                                                BorderThickness="0" Padding="10,5" 
-                                                FontSize="11" Cursor="Hand" 
-                                                Margin="5,0"
-                                                Click="HealthEventDetails_Click" 
-                                                Tag="{Binding Id}"/>
+                                                                Content="Подробнее" 
+                                                                Background="#8FAA7A" Foreground="White" 
+                                                                BorderThickness="0" Padding="10,5" 
+                                                                FontSize="11" Cursor="Hand" 
+                                                                Margin="5,0"
+                                                                Click="HealthEventDetails_Click" 
+                                                                Tag="{Binding Id}"/>
                                                         <Button x:Name="btnDelete" Grid.Column="4"
-                                                Content="🗑" 
-                                                Background="#E57373" Foreground="White" 
-                                                BorderThickness="0" Padding="10,5" 
-                                                FontSize="11" Cursor="Hand" 
-                                                Click="HealthEventDelete_Click" 
-                                                Tag="{Binding Id}"
-                                                Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Page}}, Path=DataContext.CanDelete}"/>
+                                                                Content="🗑" 
+                                                                Background="#E57373" Foreground="White" 
+                                                                BorderThickness="0" Padding="10,5" 
+                                                                FontSize="11" Cursor="Hand" 
+                                                                Click="HealthEventDelete_Click" 
+                                                                Tag="{Binding Id}"/>
                                                     </Grid>
                                                 </Border>
                                             </DataTemplate>

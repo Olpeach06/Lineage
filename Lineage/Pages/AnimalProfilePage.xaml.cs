@@ -21,7 +21,7 @@ namespace Lineage.Pages
     public partial class AnimalProfilePage : Page
     {
         private int animalId;
-        private bool canDelete; // Может ли пользователь удалять записи
+        private bool canDelete;
 
         public class BreedingItem
         {
@@ -58,11 +58,7 @@ namespace Lineage.Pages
         {
             InitializeComponent();
             animalId = id;
-            this.DataContext = this;
         }
-
-        // Свойство для видимости кнопки удаления
-        public bool CanDelete => canDelete;
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
@@ -91,7 +87,6 @@ namespace Lineage.Pages
             btnAddHealthEvent.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        // Проверка, является ли пользователь владельцем животного или создателем проекта
         private bool IsAnimalOwner()
         {
             try
@@ -104,8 +99,6 @@ namespace Lineage.Pages
                     var tree = context.FamilyTrees.Find(animal.TreeId);
                     if (tree == null) return false;
 
-                    // Администратор уже может удалять, проверяем редактора
-                    // Редактор может удалять только если он создатель проекта
                     return tree.CreatedByUserId == Session.UserId;
                 }
             }
@@ -168,7 +161,6 @@ namespace Lineage.Pages
                     if (string.IsNullOrEmpty(measurements)) measurements = "не указаны";
                     txtMeasurements.Text = measurements;
 
-                    // Продуктивность
                     var productivityRecords = context.ProductivityRecords
                         .Where(p => p.AnimalId == animalId && p.RecordType == "lactation")
                         .OrderByDescending(p => p.RecordDate)
@@ -199,7 +191,6 @@ namespace Lineage.Pages
                     else
                         txtProductivity.Text = "Нет данных о продуктивности";
 
-                    // Фото
                     string photoFullPath = PhotoHelper.GetProfilePhoto(animal.ProfilePhotoPath);
                     if (File.Exists(photoFullPath))
                     {
@@ -213,7 +204,6 @@ namespace Lineage.Pages
                         txtNoProfilePhoto.Visibility = Visibility.Collapsed;
                     }
 
-                    // Родители
                     var pedigree = context.AnimalPedigree.FirstOrDefault(p => p.AnimalId == animalId);
                     if (pedigree != null)
                     {
@@ -255,7 +245,6 @@ namespace Lineage.Pages
                         txtMother.Text = "Не указана";
                     }
 
-                    // Потомство
                     var offspringList = context.AnimalPedigree
                         .Where(p => p.FatherId == animalId || p.MotherId == animalId)
                         .Select(p => p.AnimalId)
@@ -443,6 +432,9 @@ namespace Lineage.Pages
 
                     icAssessments.ItemsSource = assessments;
                     txtAssessmentsCount.Text = $" ({assessments.Count})";
+
+                    // Управление видимостью кнопок удаления в оценках
+                    UpdateDeleteButtonsVisibility(icAssessments);
                 }
             }
             catch (Exception ex)
@@ -480,12 +472,55 @@ namespace Lineage.Pages
 
                     icHealthEvents.ItemsSource = healthItems;
                     txtHealthCount.Text = $" ({healthItems.Count})";
+
+                    // Управление видимостью кнопок удаления в здоровье
+                    UpdateDeleteButtonsVisibility(icHealthEvents);
                 }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Ошибка загрузки ветеринарных событий: {ex.Message}");
             }
+        }
+
+        // Метод для управления видимостью кнопок удаления в ItemsControl
+        private void UpdateDeleteButtonsVisibility(ItemsControl itemsControl)
+        {
+            if (itemsControl?.ItemsSource == null) return;
+
+            // Ждём, пока элементы отрисуются
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                foreach (var item in itemsControl.Items)
+                {
+                    var container = itemsControl.ItemContainerGenerator.ContainerFromItem(item) as Border;
+                    if (container != null)
+                    {
+                        // Ищем кнопку удаления внутри контейнера
+                        var deleteButton = FindVisualChild<Button>(container, "btnDelete");
+                        if (deleteButton != null)
+                        {
+                            deleteButton.Visibility = canDelete ? Visibility.Visible : Visibility.Collapsed;
+                        }
+                    }
+                }
+            }), System.Windows.Threading.DispatcherPriority.Loaded);
+        }
+
+        // Вспомогательный метод для поиска элемента по имени
+        private T FindVisualChild<T>(DependencyObject parent, string name) where T : FrameworkElement
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                if (child is T element && element.Name == name)
+                    return element;
+
+                var result = FindVisualChild<T>(child, name);
+                if (result != null)
+                    return result;
+            }
+            return null;
         }
 
         // ============================================
