@@ -855,7 +855,7 @@ namespace Lineage.Pages
             var card = new Border
             {
                 Width = 200,
-                Height = 80,
+                Height = 100,  // ← ТОЛЬКО ЭТО ИЗМЕНИЛ (было 80)
                 Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FDF8F0")),
                 BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#B7A48B")),
                 BorderThickness = new Thickness(1),
@@ -865,6 +865,8 @@ namespace Lineage.Pages
             };
 
             var grid = new Grid();
+            grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
@@ -904,32 +906,34 @@ namespace Lineage.Pages
                 avatarBorder.Child = avatarText;
             }
 
+            Grid.SetRow(avatarBorder, 0);
             Grid.SetColumn(avatarBorder, 0);
             grid.Children.Add(avatarBorder);
 
             var infoPanel = new StackPanel { Margin = new Thickness(5, 10, 5, 10), VerticalAlignment = VerticalAlignment.Center };
             infoPanel.Children.Add(new TextBlock { Text = nickname, FontWeight = FontWeights.Bold, Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#5C4E3D")) });
             infoPanel.Children.Add(new TextBlock { Text = info, FontSize = 11, Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#8B7E6B")) });
+            Grid.SetRow(infoPanel, 0);
             Grid.SetColumn(infoPanel, 1);
             grid.Children.Add(infoPanel);
 
+            // ← НОВАЯ КНОПКА ВНИЗУ (раньше была справа)
             var selectButton = new Button
             {
                 Content = "Выбрать",
-                Width = 60,
-                Height = 22,
+                Height = 25,
                 Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#8FAA7A")),
                 Foreground = Brushes.White,
                 BorderThickness = new Thickness(0),
-                FontSize = 10,
+                FontSize = 11,
                 Cursor = Cursors.Hand,
                 Tag = id,
-                Margin = new Thickness(0, 2, 5, 5),
-                HorizontalAlignment = HorizontalAlignment.Right
+                Margin = new Thickness(5, 0, 5, 5),
+                HorizontalAlignment = HorizontalAlignment.Stretch
             };
             selectButton.Click += SelectButton_Click;
-            Grid.SetRow(selectButton, 0);
-            Grid.SetColumn(selectButton, 1);
+            Grid.SetRow(selectButton, 1);
+            Grid.SetColumnSpan(selectButton, 2);
             grid.Children.Add(selectButton);
 
             card.Child = grid;
