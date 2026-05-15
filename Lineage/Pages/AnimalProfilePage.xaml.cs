@@ -21,6 +21,7 @@ namespace Lineage.Pages
     public partial class AnimalProfilePage : Page
     {
         private int animalId;
+        private bool canDelete; // Может ли пользователь удалять записи
 
         public class BreedingItem
         {
@@ -57,7 +58,11 @@ namespace Lineage.Pages
         {
             InitializeComponent();
             animalId = id;
+            this.DataContext = this;
         }
+
+        // Свойство для видимости кнопки удаления
+        public bool CanDelete => canDelete;
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
@@ -75,12 +80,39 @@ namespace Lineage.Pages
             LoadAssessments();
             LoadHealthEvents();
 
+            // Определяем права доступа
             bool canEdit = Session.IsAdmin || Session.IsEditor;
+            canDelete = Session.IsAdmin || IsAnimalOwner();
+
             btnEdit.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
             btnAddBreeding.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
             btnAddExhibition.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
             btnAddAssessment.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
             btnAddHealthEvent.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        // Проверка, является ли пользователь владельцем животного или создателем проекта
+        private bool IsAnimalOwner()
+        {
+            try
+            {
+                using (var context = new GenealogyUnifiedDBEntities1())
+                {
+                    var animal = context.Animals.Find(animalId);
+                    if (animal == null) return false;
+
+                    var tree = context.FamilyTrees.Find(animal.TreeId);
+                    if (tree == null) return false;
+
+                    // Администратор уже может удалять, проверяем редактора
+                    // Редактор может удалять только если он создатель проекта
+                    return tree.CreatedByUserId == Session.UserId;
+                }
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private void LoadAnimalData()
@@ -457,46 +489,205 @@ namespace Lineage.Pages
         }
 
         // ============================================
-        // ОБРАБОТЧИКИ КЛИКОВ ПО ЭЛЕМЕНТАМ (открывают редактирование)
+        // ДЕТАЛИ (открытие страниц с подробной информацией)
         // ============================================
 
-        private void Breeding_Click(object sender, MouseButtonEventArgs e)
+        private void BreedingDetails_Click(object sender, RoutedEventArgs e)
         {
-            var border = sender as Border;
-            if (border?.DataContext is BreedingItem breeding)
+            var button = sender as Button;
+            if (button?.Tag == null) return;
+            int breedingId = (int)button.Tag;
+            NavigationService.Navigate(new BreedingDetailPage(breedingId));
+        }
+
+        private void ExhibitionDetails_Click(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            if (button?.Tag == null) return;
+            int exhibitionId = (int)button.Tag;
+            NavigationService.Navigate(new ExhibitionDetailPage(exhibitionId));
+        }
+
+        private void AssessmentDetails_Click(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            if (button?.Tag == null) return;
+            int assessmentId = (int)button.Tag;
+            NavigationService.Navigate(new AssessmentDetailPage(assessmentId));
+        }
+
+        private void HealthEventDetails_Click(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            if (button?.Tag == null) return;
+            int eventId = (int)button.Tag;
+            NavigationService.Navigate(new HealthEventDetailPage(eventId));
+        }
+
+        // ============================================
+        // УДАЛЕНИЕ
+        // ============================================
+
+        private void BreedingDelete_Click(object sender, RoutedEventArgs e)
+        {
+            if (!canDelete)
             {
-                NavigationService.Navigate(new AddEditBreedingPage(animalId, breeding.Id));
+                MessageBox.Show("У вас нет прав на удаление этой записи", "Доступ запрещён",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var button = sender as Button;
+            if (button?.Tag == null) return;
+            int breedingId = (int)button.Tag;
+
+            var result = MessageBox.Show("Вы уверены, что хотите удалить эту вязку?",
+                "Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    using (var context = new GenealogyUnifiedDBEntities1())
+                    {
+                        var breeding = context.Breedings.Find(breedingId);
+                        if (breeding != null)
+                        {
+                            context.Breedings.Remove(breeding);
+                            context.SaveChanges();
+                            LoadBreedings();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка удаления: {ex.Message}", "Ошибка",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
 
-        private void Exhibition_Click(object sender, MouseButtonEventArgs e)
+        private void ExhibitionDelete_Click(object sender, RoutedEventArgs e)
         {
-            var border = sender as Border;
-            if (border?.DataContext is ExhibitionItem exhibition)
+            if (!canDelete)
             {
-                NavigationService.Navigate(new AddEditExhibitionPage(animalId, exhibition.Id));
+                MessageBox.Show("У вас нет прав на удаление этой записи", "Доступ запрещён",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var button = sender as Button;
+            if (button?.Tag == null) return;
+            int exhibitionId = (int)button.Tag;
+
+            var result = MessageBox.Show("Вы уверены, что хотите удалить эту выставку?",
+                "Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    using (var context = new GenealogyUnifiedDBEntities1())
+                    {
+                        var exhibition = context.Exhibitions.Find(exhibitionId);
+                        if (exhibition != null)
+                        {
+                            context.Exhibitions.Remove(exhibition);
+                            context.SaveChanges();
+                            LoadExhibitions();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка удаления: {ex.Message}", "Ошибка",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
 
-        private void Assessment_Click(object sender, MouseButtonEventArgs e)
+        private void AssessmentDelete_Click(object sender, RoutedEventArgs e)
         {
-            var border = sender as Border;
-            if (border?.DataContext is AssessmentItem assessment)
+            if (!canDelete)
             {
-                // Для страницы - просто навигация
-                NavigationService.Navigate(new AddEditAssessmentPage(animalId, assessment.Id));
+                MessageBox.Show("У вас нет прав на удаление этой записи", "Доступ запрещён",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var button = sender as Button;
+            if (button?.Tag == null) return;
+            int assessmentId = (int)button.Tag;
+
+            var result = MessageBox.Show("Вы уверены, что хотите удалить эту оценку?",
+                "Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    using (var context = new GenealogyUnifiedDBEntities1())
+                    {
+                        var assessment = context.AnimalAssessments.Find(assessmentId);
+                        if (assessment != null)
+                        {
+                            context.AnimalAssessments.Remove(assessment);
+                            context.SaveChanges();
+                            LoadAssessments();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка удаления: {ex.Message}", "Ошибка",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
 
-        private void HealthEvent_Click(object sender, MouseButtonEventArgs e)
+        private void HealthEventDelete_Click(object sender, RoutedEventArgs e)
         {
-            var border = sender as Border;
-            if (border?.DataContext is HealthEventItem healthEvent)
+            if (!canDelete)
             {
-                // Для страницы - просто навигация
-                NavigationService.Navigate(new AddEditHealthEventPage(animalId, healthEvent.Id));
+                MessageBox.Show("У вас нет прав на удаление этой записи", "Доступ запрещён",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var button = sender as Button;
+            if (button?.Tag == null) return;
+            int eventId = (int)button.Tag;
+
+            var result = MessageBox.Show("Вы уверены, что хотите удалить это ветеринарное событие?",
+                "Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    using (var context = new GenealogyUnifiedDBEntities1())
+                    {
+                        var vetEvent = context.VeterinaryEvents.Find(eventId);
+                        if (vetEvent != null)
+                        {
+                            context.VeterinaryEvents.Remove(vetEvent);
+                            context.SaveChanges();
+                            LoadHealthEvents();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка удаления: {ex.Message}", "Ошибка",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
+
+        // ============================================
+        // РЕДАКТИРОВАНИЕ (через навигацию)
+        // ============================================
+
         private void EditButton_Click(object sender, RoutedEventArgs e)
         {
             NavigationService.Navigate(new EditAnimalPage(animalId));
@@ -514,13 +705,11 @@ namespace Lineage.Pages
 
         private void AddAssessmentButton_Click(object sender, RoutedEventArgs e)
         {
-            // Для страницы - просто навигация, без ShowDialog и Owner
             NavigationService.Navigate(new AddEditAssessmentPage(animalId, null));
         }
 
         private void AddHealthEventButton_Click(object sender, RoutedEventArgs e)
         {
-            // Для страницы - просто навигация, без ShowDialog и Owner
             NavigationService.Navigate(new AddEditHealthEventPage(animalId, null));
         }
 

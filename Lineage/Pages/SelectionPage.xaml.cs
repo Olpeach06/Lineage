@@ -22,6 +22,12 @@ namespace Lineage.Pages
         private int _currentUserId;
         private int? _lastMode;
 
+        // Конструктор без параметров
+        public SelectionPage() : this(0, null)
+        {
+        }
+
+        // Основной конструктор
         public SelectionPage(int userId, int? lastMode)
         {
             InitializeComponent();
@@ -33,7 +39,6 @@ namespace Lineage.Pages
 
         private void SelectionPage_Loaded(object sender, RoutedEventArgs e)
         {
-            // Подсветка последнего выбранного режима
             if (_lastMode == 1)
             {
                 FamilyCard.BorderBrush = new SolidColorBrush(System.Windows.Media.Colors.Orange);
@@ -58,17 +63,55 @@ namespace Lineage.Pages
 
         private void SelectMode(int modeType)
         {
-            if (_currentUserId > 0)
+            try
             {
-                SaveLastUsedMode(modeType);
+                if (_currentUserId > 0)
+                {
+                    SaveLastUsedMode(modeType);
+                }
+
+                Session.CurrentMode = modeType;
+                AppSettings.CurrentMode = modeType;
+
+                // Сбрасываем текущий проект
+                Session.CurrentTreeId = 0;
+
+                // Загружаем первый доступный проект нового типа
+                using (var context = new GenealogyUnifiedDBEntities1())
+                {
+                    var tree = context.FamilyTrees
+                        .FirstOrDefault(t => t.ProjectTypeId == modeType);
+
+                    if (tree != null)
+                    {
+                        Session.CurrentTreeId = tree.Id;
+                    }
+                }
+
+                // Проверяем NavigationService перед навигацией
+                if (NavigationService != null)
+                {
+                    NavigationService.Navigate(new MainPage());
+                }
+                else
+                {
+                    // Если NavigationService недоступен, используем Application.Current.MainWindow
+                    var mainWindow = Application.Current.MainWindow as MainWindow;
+                    if (mainWindow != null)
+                    {
+                        NavigationService.Navigate(new MainPage());
+                    }
+                    else
+                    {
+                        MessageBox.Show("Ошибка навигации", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
             }
-
-            // Устанавливаем режим в Session и AppSettings
-            Session.CurrentMode = modeType;
-            AppSettings.CurrentMode = modeType;
-
-            // Переход на главную страницу
-            NavigationService.Navigate(new MainPage());
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка переключения режима: {ex.Message}", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void SaveLastUsedMode(int modeType)
@@ -98,7 +141,19 @@ namespace Lineage.Pages
             if (result == MessageBoxResult.Yes)
             {
                 Session.Clear();
-                NavigationService.Navigate(new LoginPage());
+
+                if (NavigationService != null)
+                {
+                    NavigationService.Navigate(new LoginPage());
+                }
+                else
+                {
+                    var mainWindow = Application.Current.MainWindow as MainWindow;
+                    if (mainWindow != null)
+                    {
+                        NavigationService.Navigate(new LoginPage());
+                    }
+                }
             }
         }
     }

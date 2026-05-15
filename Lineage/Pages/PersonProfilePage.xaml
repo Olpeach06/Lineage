@@ -353,15 +353,17 @@
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate>
                                                         <Border x:Name="photoBorder"
-                                                                Width="100" Height="100"
-                                                                Margin="5"
-                                                                BorderBrush="#B7A48B"
-                                                                BorderThickness="1"
-                                                                CornerRadius="5"
-                                                                Cursor="Hand"
-                                                                Tag="{Binding Id}"
-                                                                MouseLeftButtonDown="Photo_Click">
-                                                            <Image Source="{Binding ThumbPath}" Stretch="UniformToFill"/>
+                            Width="100" Height="100"
+                            Margin="5"
+                            BorderBrush="#B7A48B"
+                            BorderThickness="1"
+                            CornerRadius="5"
+                            Cursor="Hand"
+                            Tag="{Binding Id}"
+                            MouseLeftButtonDown="Photo_Click">
+                                                            <Image Stretch="UniformToFill"
+                               Loaded="Photo_Loaded"
+                               Tag="{Binding FilePath}"/>
                                                         </Border>
                                                     </DataTemplate>
                                                 </ItemsControl.ItemTemplate>

@@ -231,6 +231,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Pages\HealthEventDetailPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\LinkUserToPersonPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -315,6 +319,9 @@
     </Compile>
     <Compile Include="Pages\ExhibitionDetailPage.xaml.cs">
       <DependentUpon>ExhibitionDetailPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\HealthEventDetailPage.xaml.cs">
+      <DependentUpon>HealthEventDetailPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\LinkUserToPersonPage.xaml.cs">
       <DependentUpon>LinkUserToPersonPage.xaml</DependentUpon>

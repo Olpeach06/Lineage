@@ -74,7 +74,6 @@ namespace Lineage.Pages
                 btnSideStory.Visibility = Visibility.Collapsed;
                 btnUsers.Visibility = Visibility.Collapsed;
 
-                // Для гостя загружаем публичное дерево
                 LoadPublicTree();
                 return;
             }
@@ -198,6 +197,13 @@ namespace Lineage.Pages
             familyTreeStructure.Clear();
             generations.Clear();
 
+            // Проверяем, выбран ли проект
+            if (currentTreeId == 0)
+            {
+                ShowNoProjectMessage();
+                return;
+            }
+
             if (AppSettings.IsFamilyMode)
             {
                 LoadPersonsTree();
@@ -211,6 +217,24 @@ namespace Lineage.Pages
             {
                 ShowItemDetails(selectedItemId.Value);
             }
+        }
+
+        private void ShowNoProjectMessage()
+        {
+            var tb = new TextBlock
+            {
+                Text = AppSettings.IsFamilyMode
+                    ? "Нет выбранного семейного древа.\nПерейдите в раздел 'Мои проекты' и выберите или создайте проект."
+                    : "Нет выбранной племенной книги.\nПерейдите в раздел 'Мои проекты' и выберите или создайте проект.",
+                FontSize = 16,
+                Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#8B7E6B")),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                TextAlignment = TextAlignment.Center
+            };
+            Canvas.SetLeft(tb, 400);
+            Canvas.SetTop(tb, 300);
+            treeCanvas.Children.Add(tb);
         }
 
         // ==================== ЛЮДИ ====================
@@ -1473,82 +1497,163 @@ namespace Lineage.Pages
         {
             if (!selectedItemId.HasValue)
             {
-                MessageBox.Show("Выберите элемент");
+                MessageBox.Show("Выберите элемент", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            var result = MessageBox.Show("Удалить этот элемент? Все связанные данные также будут удалены!",
+            string itemType = AppSettings.IsFamilyMode ? "персону" : "животное";
+            var result = MessageBox.Show($"Вы уверены, что хотите удалить {itemType}?\n\n" +
+                "Вместе с ней будут удалены:\n" +
+                "- Все связанные записи\n" +
+                "- Все истории (для персоны)\n" +
+                "- Все медиафайлы\n" +
+                "- Все родственные связи\n\n" +
+                "Это действие НЕОБРАТИМО!",
                 "Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
-            if (result == MessageBoxResult.Yes)
+            if (result != MessageBoxResult.Yes) return;
+
+            try
             {
-                try
+                using (var context = new GenealogyUnifiedDBEntities1())
                 {
                     if (AppSettings.IsFamilyMode)
                     {
-                        using (var context = new GenealogyUnifiedDBEntities1())
+                        // ==================== УДАЛЕНИЕ ПЕРСОНЫ ====================
+                        var person = context.Persons.FirstOrDefault(p => p.Id == selectedItemId.Value);
+                        if (person == null)
                         {
-                            var person = context.Persons.Find(selectedItemId.Value);
-                            if (person != null)
+                            MessageBox.Show("Персона не найдена", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+
+                        // 1. Получаем все истории персоны
+                        var stories = context.Stories.Where(s => s.PersonId == selectedItemId.Value).ToList();
+                        var storyIds = stories.Select(s => s.Id).ToList();
+
+                        // 2. Получаем все медиафайлы, связанные с историями
+                        var mediaLinks = context.MediaLinks.Where(ml => ml.StoryId.HasValue && storyIds.Contains(ml.StoryId.Value)).ToList();
+                        var mediaFileIds = mediaLinks.Select(ml => ml.MediaFileId).ToList();
+                        var mediaFiles = context.MediaFiles.Where(mf => mediaFileIds.Contains(mf.Id)).ToList();
+
+                        // 3. Удаляем физические файлы с диска
+                        foreach (var file in mediaFiles)
+                        {
+                            string fullPath = PhotoHelper.GetProfilePhoto(file.FilePath);
+                            if (File.Exists(fullPath))
                             {
-                                var relationships = context.PersonRelationships
-                                    .Where(r => r.Person1Id == selectedItemId.Value || r.Person2Id == selectedItemId.Value)
-                                    .ToList();
-                                context.PersonRelationships.RemoveRange(relationships);
-
-                                var stories = context.Stories.Where(s => s.PersonId == selectedItemId.Value).ToList();
-                                context.Stories.RemoveRange(stories);
-
-                                context.Persons.Remove(person);
-                                context.SaveChanges();
-
-                                MessageBox.Show("Персона удалена!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                                LoadTree();
-                                selectedItemId = null;
-                                txtPersonName.Text = "Выберите элемент";
+                                try { File.Delete(fullPath); } catch { }
                             }
                         }
+
+                        // 4. Удаляем связи медиафайлов
+                        context.MediaLinks.RemoveRange(mediaLinks);
+
+                        // 5. Удаляем медиафайлы
+                        context.MediaFiles.RemoveRange(mediaFiles);
+
+                        // 6. Удаляем истории
+                        context.Stories.RemoveRange(stories);
+
+                        // 7. Удаляем родственные связи (где персона является Person1 или Person2)
+                        var relationships = context.PersonRelationships
+                            .Where(r => r.Person1Id == selectedItemId.Value || r.Person2Id == selectedItemId.Value)
+                            .ToList();
+                        context.PersonRelationships.RemoveRange(relationships);
+
+                        // 8. Если у пользователя есть ссылка на эту персону - обнуляем
+                        var usersWithThisPerson = context.Users.Where(u => u.PersonId == selectedItemId.Value).ToList();
+                        foreach (var user in usersWithThisPerson)
+                        {
+                            user.PersonId = null;
+                        }
+
+                        // 9. Удаляем саму персону
+                        context.Persons.Remove(person);
+
+                        context.SaveChanges();
+                        MessageBox.Show("Персона успешно удалена!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                     else
                     {
-                        using (var context = new GenealogyUnifiedDBEntities1())
+                        // ==================== УДАЛЕНИЕ ЖИВОТНОГО ====================
+                        var animal = context.Animals.FirstOrDefault(a => a.Id == selectedItemId.Value);
+                        if (animal == null)
                         {
-                            var animal = context.Animals.Find(selectedItemId.Value);
-                            if (animal != null)
+                            MessageBox.Show("Животное не найдено", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+
+                        // 1. Удаляем ветеринарные события
+                        var vetEvents = context.VeterinaryEvents.Where(v => v.AnimalId == selectedItemId.Value).ToList();
+                        context.VeterinaryEvents.RemoveRange(vetEvents);
+
+                        // 2. Удаляем записи продуктивности
+                        var productivityRecords = context.ProductivityRecords.Where(p => p.AnimalId == selectedItemId.Value).ToList();
+                        context.ProductivityRecords.RemoveRange(productivityRecords);
+
+                        // 3. Удаляем записи о вязках (где животное участвует как самец или самка)
+                        var breedings = context.Breedings
+                            .Where(b => b.MaleId == selectedItemId.Value || b.FemaleId == selectedItemId.Value)
+                            .ToList();
+                        context.Breedings.RemoveRange(breedings);
+
+                        // 4. Удаляем записи о выставках
+                        var exhibitions = context.Exhibitions.Where(ex => ex.AnimalId == selectedItemId.Value).ToList();
+                        context.Exhibitions.RemoveRange(exhibitions);
+
+                        // 5. Удаляем племенные оценки
+                        var assessments = context.AnimalAssessments.Where(a => a.AnimalId == selectedItemId.Value).ToList();
+                        context.AnimalAssessments.RemoveRange(assessments);
+
+                        // 6. Удаляем записи родословной (где животное является родителем или потомком)
+                        var pedigreeAsParent = context.AnimalPedigree
+                            .Where(p => p.FatherId == selectedItemId.Value || p.MotherId == selectedItemId.Value)
+                            .ToList();
+                        var pedigreeAsChild = context.AnimalPedigree
+                            .Where(p => p.AnimalId == selectedItemId.Value)
+                            .ToList();
+                        context.AnimalPedigree.RemoveRange(pedigreeAsParent);
+                        context.AnimalPedigree.RemoveRange(pedigreeAsChild);
+
+                        // 7. Удаляем медиафайлы, связанные с животным
+                        var mediaLinks = context.MediaLinks.Where(ml => ml.AnimalId == selectedItemId.Value).ToList();
+                        var mediaFileIds = mediaLinks.Select(ml => ml.MediaFileId).ToList();
+                        var mediaFiles = context.MediaFiles.Where(mf => mediaFileIds.Contains(mf.Id)).ToList();
+
+                        // Удаляем физические файлы
+                        foreach (var file in mediaFiles)
+                        {
+                            string fullPath = PhotoHelper.GetProfilePhoto(file.FilePath);
+                            if (File.Exists(fullPath))
                             {
-                                var pedigree = context.AnimalPedigree.Where(p => p.AnimalId == selectedItemId.Value).ToList();
-                                context.AnimalPedigree.RemoveRange(pedigree);
-
-                                var breedings = context.Breedings
-                                    .Where(b => b.MaleId == selectedItemId.Value || b.FemaleId == selectedItemId.Value)
-                                    .ToList();
-                                context.Breedings.RemoveRange(breedings);
-
-                                var exhibitions = context.Exhibitions
-                                    .Where(ex => ex.AnimalId == selectedItemId.Value)
-                                    .ToList();
-                                context.Exhibitions.RemoveRange(exhibitions);
-
-                                var assessments = context.AnimalAssessments
-                                    .Where(a => a.AnimalId == selectedItemId.Value)
-                                    .ToList();
-                                context.AnimalAssessments.RemoveRange(assessments);
-
-                                context.Animals.Remove(animal);
-                                context.SaveChanges();
-
-                                MessageBox.Show("Животное удалено!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                                LoadTree();
-                                selectedItemId = null;
-                                txtPersonName.Text = "Выберите элемент";
+                                try { File.Delete(fullPath); } catch { }
                             }
                         }
+
+                        context.MediaLinks.RemoveRange(mediaLinks);
+                        context.MediaFiles.RemoveRange(mediaFiles);
+
+                        // 8. Удаляем само животное
+                        context.Animals.Remove(animal);
+
+                        context.SaveChanges();
+                        MessageBox.Show("Животное успешно удалено!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
+
+                    // Перезагружаем дерево
+                    LoadTree();
+                    selectedItemId = null;
+                    txtPersonName.Text = "Выберите элемент";
+                    imgProfile.Source = null;
+                    imgProfile.Visibility = Visibility.Collapsed;
+                    txtNoPhoto.Visibility = Visibility.Visible;
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Ошибка удаления: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка удаления: {ex.Message}\n\n{ex.InnerException?.Message}",
+                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -1603,16 +1708,20 @@ namespace Lineage.Pages
         }
         private void SwitchModeButton_Click(object sender, RoutedEventArgs e)
         {
-            var result = MessageBox.Show("Переключить режим работы?\nНесохранённые изменения будут потеряны.",
-                "Смена режима", MessageBoxButton.YesNo, MessageBoxImage.Question);
-
-            if (result == MessageBoxResult.Yes)
+            try
             {
                 // Сохраняем последний использованный режим
                 Session.LastUsedMode = Session.CurrentMode;
 
-                // Переходим на страницу выбора режима
-                NavigationService.Navigate(new SelectionPage(Session.UserId, Session.LastUsedMode));
+                // Для гостя используем userId = 0
+                int userId = Session.IsGuest ? 0 : Session.UserId;
+
+                NavigationService.Navigate(new SelectionPage(userId, Session.LastUsedMode));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка переключения режима: {ex.Message}", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
