@@ -79,8 +79,26 @@ namespace Lineage.Pages
                 // Загружаем первый доступный проект нового типа
                 using (var context = new GenealogyUnifiedDBEntities1())
                 {
-                    var tree = context.FamilyTrees
-                        .FirstOrDefault(t => t.ProjectTypeId == modeType);
+                    FamilyTrees tree = null;
+
+                    if (_currentUserId == 0)
+                    {
+                        // Гость: ищем публичный проект
+                        tree = context.FamilyTrees
+                            .FirstOrDefault(t => t.ProjectTypeId == modeType && t.IsPublic == true);
+                    }
+                    else
+                    {
+                        // Авторизованный пользователь: ищем любой проект (сначала свой, потом публичный)
+                        tree = context.FamilyTrees
+                            .FirstOrDefault(t => t.ProjectTypeId == modeType && t.CreatedByUserId == _currentUserId);
+
+                        if (tree == null)
+                        {
+                            tree = context.FamilyTrees
+                                .FirstOrDefault(t => t.ProjectTypeId == modeType && t.IsPublic == true);
+                        }
+                    }
 
                     if (tree != null)
                     {
@@ -88,23 +106,17 @@ namespace Lineage.Pages
                     }
                 }
 
-                // Проверяем NavigationService перед навигацией
-                if (NavigationService != null)
+                // Используем главное окно для навигации
+                var mainWindow = Application.Current.MainWindow as MainWindow;
+                if (mainWindow != null)
                 {
-                    NavigationService.Navigate(new MainPage());
+                    // Обновляем заголовок окна
+                    mainWindow.SetModeAndLoadMainPage(modeType);
                 }
                 else
                 {
-                    // Если NavigationService недоступен, используем Application.Current.MainWindow
-                    var mainWindow = Application.Current.MainWindow as MainWindow;
-                    if (mainWindow != null)
-                    {
-                        NavigationService.Navigate(new MainPage());
-                    }
-                    else
-                    {
-                        MessageBox.Show("Ошибка навигации", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
+                    MessageBox.Show("Ошибка: главное окно не найдено", "Ошибка",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             catch (Exception ex)
@@ -142,17 +154,10 @@ namespace Lineage.Pages
             {
                 Session.Clear();
 
-                if (NavigationService != null)
+                var mainWindow = Application.Current.MainWindow as MainWindow;
+                if (mainWindow != null)
                 {
-                    NavigationService.Navigate(new LoginPage());
-                }
-                else
-                {
-                    var mainWindow = Application.Current.MainWindow as MainWindow;
-                    if (mainWindow != null)
-                    {
-                        NavigationService.Navigate(new LoginPage());
-                    }
+                    mainWindow.mainFrame.Navigate(new LoginPage());
                 }
             }
         }

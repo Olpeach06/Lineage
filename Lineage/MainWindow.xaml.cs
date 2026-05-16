@@ -19,9 +19,6 @@ using static System.Collections.Specialized.BitVector32;
 
 namespace Lineage
 {
-    /// <summary>
-    /// Логика взаимодействия для MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         public MainWindow()
@@ -30,8 +27,11 @@ namespace Lineage
             AppConnect.modeldb = new GenealogyUnifiedDBEntities1();
             AppFrame.frameMain = mainFrame;
             mainFrame.Navigate(new LoginPage());
-
         }
+
+        // Публичное свойство для доступа к Frame из других страниц
+        public Frame MainFrame => mainFrame;
+
         // Метод для установки режима и загрузки главной страницы
         public void SetModeAndLoadMainPage(int mode)
         {

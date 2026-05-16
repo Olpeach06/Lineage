@@ -29,6 +29,7 @@ namespace Lineage.Pages
             public DateTime BirthDate { get; set; }
             public int Month { get; set; }
             public int Day { get; set; }
+            public bool IsAlive { get; set; }
         }
 
         public CalendarWindow(int treeId, string treeName)
@@ -41,7 +42,6 @@ namespace Lineage.Pages
 
         private void CalendarWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            // Календарь доступен только в режиме семейного древа
             if (!Session.IsFamilyMode)
             {
                 MessageBox.Show("Календарь дней рождения доступен только в режиме семейного древа!", "Ошибка",
@@ -76,21 +76,50 @@ namespace Lineage.Pages
                     {
                         var birthDate = person.BirthDate.Value;
                         string dayMonth = birthDate.ToString("dd.MM");
-                        int age = today.Year - birthDate.Year;
-                        if (today < birthDate.AddYears(age)) age--;
+                        bool isAlive = !person.DeathDate.HasValue;
+
+                        string ageText;
+                        if (isAlive)
+                        {
+                            int age = today.Year - birthDate.Year;
+                            if (today < birthDate.AddYears(age)) age--;
+                            ageText = $"{age} лет";
+                        }
+                        else
+                        {
+                            int ageAtDeath = person.DeathDate.Value.Year - birthDate.Year;
+                            if (person.DeathDate.Value < birthDate.AddYears(ageAtDeath)) ageAtDeath--;
+                            ageText = $"{ageAtDeath} лет (умер)";
+                        }
 
                         bool isToday = birthDate.Month == today.Month && birthDate.Day == today.Day;
-                        string bgColor = isToday ? "#FFE4B5" : "#FDF8F0";
+                        string bgColor;
+
+                        if (isAlive)
+                        {
+                            if (isToday)
+                                bgColor = "#FFE4B5";
+                            else
+                                bgColor = "#FDF8F0";
+                        }
+                        else
+                        {
+                            if (isToday)
+                                bgColor = "#D3D3D3";
+                            else
+                                bgColor = "#E8E8E8";
+                        }
 
                         birthdays.Add(new BirthdayItem
                         {
                             FullName = $"{person.LastName} {person.FirstName} {person.Patronymic}".Trim(),
                             DayMonth = dayMonth,
-                            AgeText = $"{age} лет",
+                            AgeText = ageText,
                             BackgroundColor = bgColor,
                             BirthDate = birthDate,
                             Month = birthDate.Month,
-                            Day = birthDate.Day
+                            Day = birthDate.Day,
+                            IsAlive = isAlive
                         });
                     }
 

@@ -217,6 +217,7 @@ namespace Lineage.Pages
             {
                 ShowItemDetails(selectedItemId.Value);
             }
+            SetCardsZIndex();
         }
 
         private void ShowNoProjectMessage()
@@ -699,6 +700,87 @@ namespace Lineage.Pages
             else
             {
                 DrawAnimalPedigreeLines();
+            }
+
+            // После перерисовки линий обновляем их видимость и ZIndex
+            UpdateLinesVisibility();
+            SetCardsZIndex();
+        }
+
+        private void UpdateLinesVisibility()
+        {
+            foreach (var line in relationshipLines)
+            {
+                if (line != null)
+                {
+                    // Проверяем, связаны ли оба конца линии с видимыми карточками
+                    string tag = line.Tag?.ToString() ?? "";
+                    bool shouldBeVisible = false;
+
+                    if (tag.StartsWith("line_"))
+                    {
+                        var parts = tag.Split('_');
+                        if (parts.Length >= 3)
+                        {
+                            if (int.TryParse(parts[1], out int id1) && int.TryParse(parts[2], out int id2))
+                            {
+                                if (itemCards.ContainsKey(id1) && itemCards[id1] != null &&
+                                    itemCards.ContainsKey(id2) && itemCards[id2] != null)
+                                {
+                                    shouldBeVisible = itemCards[id1].Visibility == Visibility.Visible &&
+                                                      itemCards[id2].Visibility == Visibility.Visible;
+                                }
+                            }
+                        }
+                    }
+                    else if (tag.StartsWith("spouse_"))
+                    {
+                        var parts = tag.Split('_');
+                        if (parts.Length >= 3)
+                        {
+                            if (int.TryParse(parts[1], out int id1) && int.TryParse(parts[2], out int id2))
+                            {
+                                if (itemCards.ContainsKey(id1) && itemCards[id1] != null &&
+                                    itemCards.ContainsKey(id2) && itemCards[id2] != null)
+                                {
+                                    shouldBeVisible = itemCards[id1].Visibility == Visibility.Visible &&
+                                                      itemCards[id2].Visibility == Visibility.Visible;
+                                }
+                            }
+                        }
+                    }
+                    else if (tag.StartsWith("pedigree_"))
+                    {
+                        var parts = tag.Split('_');
+                        if (parts.Length >= 3)
+                        {
+                            if (int.TryParse(parts[1], out int id1) && int.TryParse(parts[2], out int id2))
+                            {
+                                if (itemCards.ContainsKey(id1) && itemCards[id1] != null &&
+                                    itemCards.ContainsKey(id2) && itemCards[id2] != null)
+                                {
+                                    shouldBeVisible = itemCards[id1].Visibility == Visibility.Visible &&
+                                                      itemCards[id2].Visibility == Visibility.Visible;
+                                }
+                            }
+                        }
+                    }
+
+                    line.Visibility = shouldBeVisible ? Visibility.Visible : Visibility.Collapsed;
+
+                    // Устанавливаем низкий ZIndex, чтобы линия была под карточками
+                    Canvas.SetZIndex(line, 0);
+                }
+            }
+        }
+        private void SetCardsZIndex()
+        {
+            foreach (var card in itemCards.Values)
+            {
+                if (card != null)
+                {
+                    Canvas.SetZIndex(card, 1);
+                }
             }
         }
 
@@ -1411,6 +1493,9 @@ namespace Lineage.Pages
                     }
                 }
             }
+
+            // ← НОВОЕ: обновляем видимость линий после фильтрации
+            UpdateLinesVisibility();
         }
 
         // ==================== ПЕРЕТАСКИВАНИЕ КАНВАСА ====================
