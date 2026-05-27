@@ -8,6 +8,7 @@
         Title="История"
         Background="#F5F0E6"
         WindowStartupLocation="CenterOwner"
+        Icon="/Images/icon.ico"
         ResizeMode="CanResize"
         MinHeight="500" MinWidth="600">
 

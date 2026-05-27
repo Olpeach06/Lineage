@@ -4,6 +4,7 @@
         Title="Редактирование проекта"
         Height="550" Width="450"
         WindowStartupLocation="CenterOwner"
+        Icon="/Images/icon.ico"
         Background="#F5F0E6"
         ResizeMode="NoResize">
 
