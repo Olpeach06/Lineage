@@ -48,7 +48,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var classes = context.PedigreeClasses.OrderBy(c => c.Code).ToList();
                     cmbClass.ItemsSource = classes;
@@ -67,7 +67,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var assessment = context.AnimalAssessments.Find(assessmentId.Value);
                     if (assessment == null)
@@ -112,7 +112,7 @@ namespace Lineage.Pages
                     return;
                 }
 
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     AnimalAssessments assessment;
 

@@ -119,13 +119,14 @@ namespace Lineage.Pages
             txtBiography.Text = "";
             txtGender.Text = "";
             txtGenderSymbol.Text = "";
+            txtProfession.Text = "";
         }
 
         private void LoadPersonData()
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var person = context.Persons.FirstOrDefault(p => p.Id == personId);
                     if (person == null)
@@ -145,6 +146,9 @@ namespace Lineage.Pages
                     txtBirthPlace.Text = string.IsNullOrEmpty(person.BirthPlace) ? "Место рождения: не указано" : $"Место рождения: {person.BirthPlace}";
                     txtDeathPlace.Text = string.IsNullOrEmpty(person.DeathPlace) ? "Место смерти: не указано" : $"Место смерти: {person.DeathPlace}";
                     txtBiography.Text = string.IsNullOrEmpty(person.Biography) ? "Биография не добавлена" : person.Biography;
+
+                    // Загрузка профессии
+                    txtProfession.Text = string.IsNullOrEmpty(person.Profession) ? "Профессия не указана" : person.Profession;
 
                     var gender = context.Genders.FirstOrDefault(g => g.Id == person.GenderId);
                     if (gender != null)
@@ -310,7 +314,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var storyList = context.Stories
                         .Where(s => s.PersonId == personId)
@@ -340,7 +344,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var stories = context.Stories.Where(s => s.PersonId == personId).Select(s => s.Id).ToList();
                     var mediaLinks = context.MediaLinks.Where(ml => ml.StoryId.HasValue && stories.Contains(ml.StoryId.Value))
@@ -398,6 +402,7 @@ namespace Lineage.Pages
                 MessageBox.Show($"Ошибка загрузки медиафайлов: {ex.Message}");
             }
         }
+
         private void Photo_Loaded(object sender, RoutedEventArgs e)
         {
             var image = sender as Image;
@@ -458,7 +463,7 @@ namespace Lineage.Pages
         }
 
         // ============================================
-        // МЕТОДЫ ДЛЯ ПОИСКА И ОТКРЫТИЯ ФАЙЛОВ (как в StoryDetailWindow)
+        // МЕТОДЫ ДЛЯ ПОИСКА И ОТКРЫТИЯ ФАЙЛОВ
         // ============================================
 
         private string FindFile(string storedPath, string fileName)
@@ -543,7 +548,7 @@ namespace Lineage.Pages
         }
 
         // ============================================
-        // МЕТОДЫ ДЛЯ ОТКРЫТИЯ МЕДИАФАЙЛОВ (исправленные)
+        // МЕТОДЫ ДЛЯ ОТКРЫТИЯ МЕДИАФАЙЛОВ
         // ============================================
 
         private void Photo_Click(object sender, MouseButtonEventArgs e)
@@ -604,7 +609,7 @@ namespace Lineage.Pages
             if (button?.Tag == null) return;
 
             int storyId = (int)button.Tag;
-            using (var context = new GenealogyUnifiedDBEntities1())
+            using (var context = new GenealogyUnifiedDBEntities2())
             {
                 var story = context.Stories.FirstOrDefault(s => s.Id == storyId);
                 if (story != null)
@@ -650,7 +655,7 @@ namespace Lineage.Pages
                 "Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (result == MessageBoxResult.Yes)
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var storiesToDelete = context.Stories.Where(s => s.PersonId == personId).ToList();
                     context.Stories.RemoveRange(storiesToDelete);
@@ -667,7 +672,7 @@ namespace Lineage.Pages
                 "Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (result == MessageBoxResult.Yes)
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var stories = context.Stories.Where(s => s.PersonId == personId).Select(s => s.Id).ToList();
                     var mediaLinks = context.MediaLinks.Where(ml => ml.StoryId.HasValue && stories.Contains(ml.StoryId.Value)).ToList();

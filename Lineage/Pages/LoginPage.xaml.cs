@@ -78,7 +78,7 @@ namespace Lineage.Pages
                     return;
                 }
 
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     Users user = null;
 

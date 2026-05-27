@@ -59,7 +59,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var story = context.Stories.FirstOrDefault(s => s.Id == storyId);
                     if (story == null)

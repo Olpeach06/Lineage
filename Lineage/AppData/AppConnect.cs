@@ -8,6 +8,6 @@ namespace Lineage.AppData
 {
     internal class AppConnect
     {
-        public static GenealogyUnifiedDBEntities1 modeldb;
+        public static GenealogyUnifiedDBEntities2 modeldb;
     }
 }

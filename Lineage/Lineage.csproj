@@ -155,9 +155,6 @@
     <Compile Include="AppData\Stories.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
-    <Compile Include="AppData\sysdiagrams.cs">
-      <DependentUpon>Model1.tt</DependentUpon>
-    </Compile>
     <Compile Include="AppData\UserRoles.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>

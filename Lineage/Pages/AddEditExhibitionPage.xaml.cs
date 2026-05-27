@@ -49,7 +49,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var animal = context.Animals.Find(animalId);
                     if (animal == null)
@@ -72,7 +72,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var exhibition = context.Exhibitions.Find(exhibitionId.Value);
                     if (exhibition == null)
@@ -130,7 +130,7 @@ namespace Lineage.Pages
                     }
                 }
 
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     Exhibitions exhibition;
 

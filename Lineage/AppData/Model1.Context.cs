@@ -13,13 +13,12 @@ namespace Lineage.AppData
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class GenealogyUnifiedDBEntities1 : DbContext
+    public partial class GenealogyUnifiedDBEntities2 : DbContext
     {
-        public GenealogyUnifiedDBEntities1()
-            : base("name=GenealogyUnifiedDBEntities1")
+        public GenealogyUnifiedDBEntities2()
+            : base("name=GenealogyUnifiedDBEntities2")
         {
         }
-
     
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -46,7 +45,6 @@ namespace Lineage.AppData
         public virtual DbSet<ProjectTypes> ProjectTypes { get; set; }
         public virtual DbSet<Species> Species { get; set; }
         public virtual DbSet<Stories> Stories { get; set; }
-        public virtual DbSet<sysdiagrams> sysdiagrams { get; set; }
         public virtual DbSet<UserRoles> UserRoles { get; set; }
         public virtual DbSet<Users> Users { get; set; }
         public virtual DbSet<VeterinaryEvents> VeterinaryEvents { get; set; }

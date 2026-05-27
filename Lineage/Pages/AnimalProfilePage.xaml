@@ -3,7 +3,6 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:sys="clr-namespace:System;assembly=mscorlib"
       mc:Ignorable="d"
       d:DesignHeight="850" d:DesignWidth="1000"
       Title="Профиль животного"
@@ -11,29 +10,222 @@
       Loaded="Page_Loaded">
 
     <Page.Resources>
+        <DropShadowEffect x:Key="ShadowEffect"
+                          BlurRadius="10"
+                          Opacity="0.1"
+                          ShadowDepth="2"
+                          Color="#5C4E3D"/>
+
         <Style x:Key="BlockStyle" TargetType="Border">
             <Setter Property="Background" Value="#FDF8F0"/>
             <Setter Property="CornerRadius" Value="15"/>
             <Setter Property="Padding" Value="20"/>
             <Setter Property="BorderBrush" Value="#B7A48B"/>
             <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Effect" Value="{StaticResource ShadowEffect}"/>
         </Style>
 
-        <Style x:Key="AddButtonStyle" TargetType="Button">
+        <!-- Стиль для кнопки "Назад" -->
+        <Style x:Key="BackButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="#B7A48B"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#5C4E3D"/>
+            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#F0E9DE"/>
+                                <Setter Property="Foreground" Value="#8FAA7A"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="#8FAA7A"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для зелёной кнопки (Редактировать) -->
+        <Style x:Key="GreenButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Background" Value="#8FAA7A"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="12,6"/>
-            <Setter Property="FontSize" Value="12"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Margin" Value="10,0,0,0"/>
-        </Style>
-
-        <Style x:Key="ActionButtonStyle" TargetType="Button">
             <Setter Property="Width" Value="140"/>
             <Setter Property="Height" Value="35"/>
-            <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Margin" Value="0,0,0,10"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#7A9A66"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#6B8A58"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для прозрачной кнопки с границей -->
+        <Style x:Key="TransparentButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="#B7A48B"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#5C4E3D"/>
+            <Setter Property="Width" Value="140"/>
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#F0E9DE"/>
+                                <Setter Property="Foreground" Value="#8FAA7A"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="#8FAA7A"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#E0D5C4"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для кнопки "Подробнее" внутри вкладок -->
+        <Style x:Key="TabDetailsButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="#8FAA7A"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Margin" Value="5,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#7A9A66"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#6B8A58"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для кнопки "Удалить" внутри вкладок -->
+        <Style x:Key="TabDeleteButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="#E57373"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Margin" Value="5,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#D32F2F"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#B71C1C"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для TabControl -->
+        <Style TargetType="TabControl">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+
+        <!-- Стиль для TabItem -->
+        <Style TargetType="TabItem">
+            <Setter Property="Background" Value="#F5F0E6"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="#D6C9B8"
+                                BorderThickness="1,1,1,0"
+                                CornerRadius="8,8,0,0"
+                                Margin="0,0,2,0"
+                                Padding="15,8">
+                            <ContentPresenter x:Name="contentPresenter"
+                                              ContentSource="Header"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#FDF8F0"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="#B7A48B"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#F0E9DE"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Page.Resources>
 
@@ -48,16 +240,12 @@
                 Background="#FDF8F0"
                 BorderBrush="#D6C9B8"
                 BorderThickness="0,0,0,1"
-                Padding="15,10">
+                Padding="15,10"
+                Effect="{StaticResource ShadowEffect}">
             <StackPanel Orientation="Horizontal">
                 <Button Content="← Назад к дереву"
-                        Click="BackButton_Click"
-                        Background="Transparent"
-                        BorderBrush="#B7A48B"
-                        Foreground="#5C4E3D"
-                        Padding="15,8"
-                        BorderThickness="1"
-                        Cursor="Hand"/>
+                        Style="{StaticResource BackButtonStyle}"
+                        Click="BackButton_Click"/>
                 <TextBlock x:Name="txtPageTitle"
                            Text="Профиль животного"
                            FontSize="18" FontWeight="SemiBold"
@@ -138,42 +326,23 @@
                         <StackPanel Grid.Column="2" VerticalAlignment="Top">
                             <Button x:Name="btnEdit"
                                     Content="✎ Редактировать"
-                                    Style="{StaticResource ActionButtonStyle}"
-                                    Background="#8FAA7A"
-                                    Foreground="White"
-                                    BorderThickness="0"
+                                    Style="{StaticResource GreenButtonStyle}"
                                     Click="EditButton_Click"/>
                             <Button x:Name="btnAddBreeding"
                                     Content="🔗 Добавить вязку"
-                                    Style="{StaticResource ActionButtonStyle}"
-                                    Background="Transparent"
-                                    BorderBrush="#B7A48B"
-                                    Foreground="#5C4E3D"
-                                    BorderThickness="1"
+                                    Style="{StaticResource TransparentButtonStyle}"
                                     Click="AddBreedingButton_Click"/>
                             <Button x:Name="btnAddExhibition"
                                     Content="🏆 Добавить выставку"
-                                    Style="{StaticResource ActionButtonStyle}"
-                                    Background="Transparent"
-                                    BorderBrush="#B7A48B"
-                                    Foreground="#5C4E3D"
-                                    BorderThickness="1"
+                                    Style="{StaticResource TransparentButtonStyle}"
                                     Click="AddExhibitionButton_Click"/>
                             <Button x:Name="btnAddAssessment"
                                     Content="⭐ Добавить оценку"
-                                    Style="{StaticResource ActionButtonStyle}"
-                                    Background="Transparent"
-                                    BorderBrush="#B7A48B"
-                                    Foreground="#5C4E3D"
-                                    BorderThickness="1"
+                                    Style="{StaticResource TransparentButtonStyle}"
                                     Click="AddAssessmentButton_Click"/>
                             <Button x:Name="btnAddHealthEvent"
                                     Content="💊 Добавить событие здоровья"
-                                    Style="{StaticResource ActionButtonStyle}"
-                                    Background="Transparent"
-                                    BorderBrush="#B7A48B"
-                                    Foreground="#5C4E3D"
-                                    BorderThickness="1"
+                                    Style="{StaticResource TransparentButtonStyle}"
                                     Click="AddHealthEventButton_Click"/>
                         </StackPanel>
                     </Grid>
@@ -309,17 +478,12 @@
                                                         <TextBlock Grid.Column="1" Text="{Binding Info}" Foreground="#6B5E4A" Margin="10,0"/>
                                                         <Button x:Name="btnDetails" Grid.Column="2" 
                                                                 Content="Подробнее" 
-                                                                Background="#8FAA7A" Foreground="White" 
-                                                                BorderThickness="0" Padding="10,5" 
-                                                                FontSize="11" Cursor="Hand" 
-                                                                Margin="5,0"
+                                                                Style="{StaticResource TabDetailsButtonStyle}"
                                                                 Click="BreedingDetails_Click" 
                                                                 Tag="{Binding Id}"/>
                                                         <Button x:Name="btnDelete" Grid.Column="3"
                                                                 Content="🗑" 
-                                                                Background="#E57373" Foreground="White" 
-                                                                BorderThickness="0" Padding="10,5" 
-                                                                FontSize="11" Cursor="Hand" 
+                                                                Style="{StaticResource TabDeleteButtonStyle}"
                                                                 Click="BreedingDelete_Click" 
                                                                 Tag="{Binding Id}"/>
                                                     </Grid>
@@ -354,17 +518,12 @@
                                                         <TextBlock Grid.Column="1" Text="{Binding Name}" Foreground="#6B5E4A" Margin="10,0"/>
                                                         <Button x:Name="btnDetails" Grid.Column="2" 
                                                                 Content="Подробнее" 
-                                                                Background="#8FAA7A" Foreground="White" 
-                                                                BorderThickness="0" Padding="10,5" 
-                                                                FontSize="11" Cursor="Hand" 
-                                                                Margin="5,0"
+                                                                Style="{StaticResource TabDetailsButtonStyle}"
                                                                 Click="ExhibitionDetails_Click" 
                                                                 Tag="{Binding Id}"/>
                                                         <Button x:Name="btnDelete" Grid.Column="3"
                                                                 Content="🗑" 
-                                                                Background="#E57373" Foreground="White" 
-                                                                BorderThickness="0" Padding="10,5" 
-                                                                FontSize="11" Cursor="Hand" 
+                                                                Style="{StaticResource TabDeleteButtonStyle}"
                                                                 Click="ExhibitionDelete_Click" 
                                                                 Tag="{Binding Id}"/>
                                                     </Grid>
@@ -399,17 +558,12 @@
                                                         <TextBlock Grid.Column="1" Text="{Binding ClassName}" Foreground="#6B5E4A" Margin="10,0"/>
                                                         <Button x:Name="btnDetails" Grid.Column="2" 
                                                                 Content="Подробнее" 
-                                                                Background="#8FAA7A" Foreground="White" 
-                                                                BorderThickness="0" Padding="10,5" 
-                                                                FontSize="11" Cursor="Hand" 
-                                                                Margin="5,0"
+                                                                Style="{StaticResource TabDetailsButtonStyle}"
                                                                 Click="AssessmentDetails_Click" 
                                                                 Tag="{Binding Id}"/>
                                                         <Button x:Name="btnDelete" Grid.Column="3"
                                                                 Content="🗑" 
-                                                                Background="#E57373" Foreground="White" 
-                                                                BorderThickness="0" Padding="10,5" 
-                                                                FontSize="11" Cursor="Hand" 
+                                                                Style="{StaticResource TabDeleteButtonStyle}"
                                                                 Click="AssessmentDelete_Click" 
                                                                 Tag="{Binding Id}"/>
                                                     </Grid>
@@ -446,17 +600,12 @@
                                                         <TextBlock Grid.Column="2" Text="{Binding MedicineName}" Foreground="#6B5E4A" Margin="5,0" TextTrimming="CharacterEllipsis"/>
                                                         <Button x:Name="btnDetails" Grid.Column="3" 
                                                                 Content="Подробнее" 
-                                                                Background="#8FAA7A" Foreground="White" 
-                                                                BorderThickness="0" Padding="10,5" 
-                                                                FontSize="11" Cursor="Hand" 
-                                                                Margin="5,0"
+                                                                Style="{StaticResource TabDetailsButtonStyle}"
                                                                 Click="HealthEventDetails_Click" 
                                                                 Tag="{Binding Id}"/>
                                                         <Button x:Name="btnDelete" Grid.Column="4"
                                                                 Content="🗑" 
-                                                                Background="#E57373" Foreground="White" 
-                                                                BorderThickness="0" Padding="10,5" 
-                                                                FontSize="11" Cursor="Hand" 
+                                                                Style="{StaticResource TabDeleteButtonStyle}"
                                                                 Click="HealthEventDelete_Click" 
                                                                 Tag="{Binding Id}"/>
                                                     </Grid>

@@ -73,7 +73,7 @@ namespace Lineage.Classes
 
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var tree = context.FamilyTrees.Find(treeId);
                     if (tree != null)

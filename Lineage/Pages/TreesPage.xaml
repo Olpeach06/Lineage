@@ -16,6 +16,7 @@
                           ShadowDepth="2"
                           Color="#5C4E3D"/>
 
+        <!-- Стиль для кнопок в карточках -->
         <Style x:Key="CardButtonStyle" TargetType="Button">
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="FontSize" Value="12"/>
@@ -24,6 +25,101 @@
             <Setter Property="Width" Value="80"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#F0E9DE"/>
+                                <Setter Property="Foreground" Value="#8FAA7A"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="#8FAA7A"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#E0D5C4"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для зелёной кнопки (ВЫБРАТЬ/СОЗДАТЬ) -->
+        <Style x:Key="GreenButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Background" Value="#8FAA7A"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#7A9A66"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#6B8A58"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Background" Value="#B7C8A8"/>
+                                <Setter Property="Foreground" Value="#E8F0E0"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для кнопки-иконки -->
+        <Style x:Key="IconButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Width" Value="30"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="#D6C9B8"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#6B5E4A"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Padding="0">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#F0E9DE"/>
+                                <Setter Property="Foreground" Value="#8FAA7A"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="#8FAA7A"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#E0D5C4"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Page.Resources>
 
@@ -53,7 +149,7 @@
                 <!-- Логотип -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="0,0,40,0">
                     <Image Source="/Images/icon-tree.png" Width="32" Height="32" Margin="0,0,8,0"/>
-                    <TextBlock Text="Genealogy" FontSize="20" FontWeight="SemiBold"
+                    <TextBlock Text="Родословная" FontSize="20" FontWeight="SemiBold"
                                Foreground="#5C4E3D" VerticalAlignment="Center"/>
                 </StackPanel>
 
@@ -171,8 +267,8 @@
                                             <ControlTemplate.Triggers>
                                                 <Trigger Property="IsMouseOver" Value="True">
                                                     <Setter TargetName="border" Property="Background" Value="#F0E9DE"/>
-                                                    <Setter Property="Foreground" Value="#8FAA7A"/>
-                                                    <Setter TargetName="border" Property="BorderBrush" Value="#8FAA7A"/>
+                                                    <Setter Property="Foreground" Value="#D4A574"/>
+                                                    <Setter TargetName="border" Property="BorderBrush" Value="#D4A574"/>
                                                 </Trigger>
                                             </ControlTemplate.Triggers>
                                         </ControlTemplate>
@@ -203,10 +299,7 @@
                     <Button Grid.Column="1" x:Name="btnCreateTree"
                             Content="➕ СОЗДАТЬ"
                             Width="120" Height="40"
-                            Background="#8FAA7A"
-                            Foreground="White"
-                            BorderThickness="0"
-                            Cursor="Hand"
+                            Style="{StaticResource GreenButtonStyle}"
                             Click="CreateTreeButton_Click"/>
                 </Grid>
 
@@ -270,28 +363,20 @@
                                             VerticalAlignment="Center">
                                     <Button Content="ВЫБРАНО"
                                             Width="80" Height="30"
-                                            Background="#8FAA7A"
-                                            Foreground="White"
-                                            BorderThickness="0"
+                                            Style="{StaticResource GreenButtonStyle}"
                                             IsEnabled="False"
                                             Margin="0,0,5,0"/>
                                     <Button x:Name="btnEditCurrent"
-                                            Content="✎"
-                                            Width="30" Height="30"
-                                            Background="Transparent"
-                                            BorderBrush="#D6C9B8"
-                                            Foreground="#6B5E4A"
-                                            BorderThickness="1"
+                                            Style="{StaticResource IconButtonStyle}"
                                             Margin="0,0,5,0"
-                                            Click="EditTreeButton_Click"/>
+                                            Click="EditTreeButton_Click">
+                                        <Button.Content>✎</Button.Content>
+                                    </Button>
                                     <Button x:Name="btnDeleteCurrent"
-                                            Content="🗑"
-                                            Width="30" Height="30"
-                                            Background="Transparent"
-                                            BorderBrush="#D6C9B8"
-                                            Foreground="#6B5E4A"
-                                            BorderThickness="1"
-                                            Click="DeleteTreeButton_Click"/>
+                                            Style="{StaticResource IconButtonStyle}"
+                                            Click="DeleteTreeButton_Click">
+                                        <Button.Content>🗑</Button.Content>
+                                    </Button>
                                 </StackPanel>
                             </Grid>
                         </Border>
@@ -364,30 +449,22 @@
                                                         HorizontalAlignment="Right">
                                                 <Button Content="ВЫБРАТЬ"
                                                         Width="80" Height="30"
-                                                        Background="#8FAA7A"
-                                                        Foreground="White"
-                                                        BorderThickness="0"
+                                                        Style="{StaticResource GreenButtonStyle}"
                                                         Margin="0,0,5,0"
                                                         Tag="{Binding Id}"
                                                         Click="SelectTreeButton_Click"/>
-                                                <Button Content="✎"
-                                                        Width="30" Height="30"
-                                                        Background="Transparent"
-                                                        BorderBrush="#D6C9B8"
-                                                        Foreground="#6B5E4A"
-                                                        BorderThickness="1"
+                                                <Button Style="{StaticResource IconButtonStyle}"
                                                         Margin="0,0,5,0"
                                                         Tag="{Binding Id}"
-                                                        Click="EditTreeButton_Click"/>
-                                                <Button Content="🗑"
-                                                        Width="30" Height="30"
-                                                        Background="Transparent"
-                                                        BorderBrush="#D6C9B8"
-                                                        Foreground="#6B5E4A"
-                                                        BorderThickness="1"
+                                                        Click="EditTreeButton_Click">
+                                                    <Button.Content>✎</Button.Content>
+                                                </Button>
+                                                <Button Style="{StaticResource IconButtonStyle}"
                                                         Tag="{Binding Id}"
                                                         Click="DeleteTreeButton_Click"
-                                                        Visibility="{Binding ShowDeleteButton}"/>
+                                                        Visibility="{Binding ShowDeleteButton}">
+                                                    <Button.Content>🗑</Button.Content>
+                                                </Button>
                                             </StackPanel>
                                         </Grid>
                                     </Border>

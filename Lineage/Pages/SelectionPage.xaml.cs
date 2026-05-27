@@ -77,7 +77,7 @@ namespace Lineage.Pages
                 Session.CurrentTreeId = 0;
 
                 // Загружаем первый доступный проект нового типа
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     FamilyTrees tree = null;
 
@@ -130,7 +130,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var user = context.Users.Find(_currentUserId);
                     if (user != null)

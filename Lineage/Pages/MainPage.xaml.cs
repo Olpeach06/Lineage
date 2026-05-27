@@ -99,7 +99,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     int projectTypeId = Session.IsFamilyMode ? 1 : 2;
 
@@ -168,7 +168,7 @@ namespace Lineage.Pages
             {
                 cmbFilter.Items.Add("Все породы");
                 cmbFilter.Items.Add("Все виды");
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var animals = context.Animals.Where(a => a.TreeId == currentTreeId).ToList();
                     var breedIds = animals.Where(a => a.BreedId.HasValue).Select(a => a.BreedId.Value).Distinct().ToList();
@@ -244,7 +244,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var persons = context.Persons
                         .Where(p => p.TreeId == currentTreeId)
@@ -476,7 +476,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var animals = context.Animals
                         .Where(a => a.TreeId == currentTreeId)
@@ -806,7 +806,7 @@ namespace Lineage.Pages
             if (breedId == null) return "без породы";
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var breed = context.Breeds.Find(breedId);
                     return breed?.Name ?? "неизвестно";
@@ -821,7 +821,7 @@ namespace Lineage.Pages
         private string GetPedigreeClassName(int? classId)
         {
             if (classId == null) return "не указан";
-            using (var context = new GenealogyUnifiedDBEntities1())
+            using (var context = new GenealogyUnifiedDBEntities2())
             {
                 var pc = context.PedigreeClasses.Find(classId);
                 return pc?.Name ?? "не указан";
@@ -830,7 +830,7 @@ namespace Lineage.Pages
 
         private string GetSpeciesName(int speciesId)
         {
-            using (var context = new GenealogyUnifiedDBEntities1())
+            using (var context = new GenealogyUnifiedDBEntities2())
             {
                 var species = context.Species.Find(speciesId);
                 return species?.Name ?? "неизвестно";
@@ -1029,7 +1029,7 @@ namespace Lineage.Pages
 
         private int GetSpeciesIdFromAnimal(int animalId)
         {
-            using (var context = new GenealogyUnifiedDBEntities1())
+            using (var context = new GenealogyUnifiedDBEntities2())
             {
                 var animal = context.Animals.Find(animalId);
                 return animal?.SpeciesId ?? 1;
@@ -1096,7 +1096,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var person = context.Persons.FirstOrDefault(p => p.Id == personId);
                     if (person == null) return;
@@ -1145,7 +1145,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var animal = context.Animals.FirstOrDefault(a => a.Id == animalId);
                     if (animal == null) return;
@@ -1312,7 +1312,7 @@ namespace Lineage.Pages
 
             if (AppSettings.IsFamilyMode)
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var matchingPersons = context.Persons
                         .Where(p => p.TreeId == currentTreeId &&
@@ -1344,7 +1344,7 @@ namespace Lineage.Pages
             }
             else
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var matchingAnimals = context.Animals
                         .Where(a => a.TreeId == currentTreeId &&
@@ -1430,7 +1430,7 @@ namespace Lineage.Pages
 
                 if (generation.HasValue)
                 {
-                    using (var context = new GenealogyUnifiedDBEntities1())
+                    using (var context = new GenealogyUnifiedDBEntities2())
                     {
                         var persons = context.Persons.Where(p => p.TreeId == currentTreeId).ToList();
                         var filteredPersons = persons.Where(p =>
@@ -1463,7 +1463,7 @@ namespace Lineage.Pages
             {
                 if (selectedFilter != "Все породы" && selectedFilter != "Все виды")
                 {
-                    using (var context = new GenealogyUnifiedDBEntities1())
+                    using (var context = new GenealogyUnifiedDBEntities2())
                     {
                         var breed = context.Breeds.FirstOrDefault(b => b.Name == selectedFilter);
                         if (breed != null)
@@ -1608,7 +1608,7 @@ namespace Lineage.Pages
 
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     if (AppSettings.IsFamilyMode)
                     {

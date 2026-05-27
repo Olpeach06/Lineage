@@ -75,7 +75,43 @@
                             <TextBlock Text="Семейное древо" FontSize="18" FontWeight="Bold" Foreground="#5C4E3D" HorizontalAlignment="Center"/>
                             <TextBlock Text="Для родословной семьи" FontSize="12" TextWrapping="Wrap" TextAlignment="Center" Margin="0,10,0,0" Foreground="#6B5E4A"/>
                             <TextBlock Text="Истории, воспоминания, биографии" FontSize="11" TextWrapping="Wrap" TextAlignment="Center" Margin="0,10,0,0" Foreground="#8B7E6B"/>
-                            <Button Content="Выбрать" Background="#3498DB" Foreground="White" Margin="0,20,0,0" Padding="10,5" BorderThickness="0" Cursor="Hand" FontSize="12" FontWeight="SemiBold"/>
+
+                            <!-- Кнопка со скруглёнными углами -->
+                            <Button Content="Выбрать" 
+                                    Background="#3498DB" 
+                                    Foreground="White" 
+                                    Margin="0,20,0,0" 
+                                    Padding="10,5" 
+                                    BorderThickness="0" 
+                                    Cursor="Hand" 
+                                    FontSize="12" 
+                                    FontWeight="SemiBold">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border x:Name="border"
+                                                            Background="{TemplateBinding Background}"
+                                                            CornerRadius="8"
+                                                            Padding="{TemplateBinding Padding}">
+                                                        <ContentPresenter HorizontalAlignment="Center"
+                                                                          VerticalAlignment="Center"/>
+                                                    </Border>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter TargetName="border" Property="Background" Value="#2980B9"/>
+                                                        </Trigger>
+                                                        <Trigger Property="IsPressed" Value="True">
+                                                            <Setter TargetName="border" Property="Background" Value="#1A5276"/>
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
                         </StackPanel>
                     </Border>
 
@@ -97,20 +133,48 @@
                             <TextBlock Text="Племенная книга" FontSize="18" FontWeight="Bold" Foreground="#5C4E3D" HorizontalAlignment="Center"/>
                             <TextBlock Text="Для селекции животных" FontSize="12" TextWrapping="Wrap" TextAlignment="Center" Margin="0,10,0,0" Foreground="#6B5E4A"/>
                             <TextBlock Text="Скрещивания, продуктивность, класс" FontSize="11" TextWrapping="Wrap" TextAlignment="Center" Margin="0,10,0,0" Foreground="#8B7E6B"/>
+
+                            <!-- Кнопка со скруглёнными углами -->
                             <Button Content="Выбрать" 
                                     Background="#27AE60" 
                                     Foreground="White" 
                                     Margin="0,20,0,0" 
                                     Padding="10,5" 
                                     BorderThickness="0" 
-                                    Cursor="Hand"
-                                    FontSize="12"
-                                    FontWeight="SemiBold"/>
+                                    Cursor="Hand" 
+                                    FontSize="12" 
+                                    FontWeight="SemiBold">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border x:Name="border"
+                                                            Background="{TemplateBinding Background}"
+                                                            CornerRadius="8"
+                                                            Padding="{TemplateBinding Padding}">
+                                                        <ContentPresenter HorizontalAlignment="Center"
+                                                                          VerticalAlignment="Center"/>
+                                                    </Border>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter TargetName="border" Property="Background" Value="#1E8449"/>
+                                                        </Trigger>
+                                                        <Trigger Property="IsPressed" Value="True">
+                                                            <Setter TargetName="border" Property="Background" Value="#145A32"/>
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
                         </StackPanel>
                     </Border>
                 </StackPanel>
 
-                <!-- Кнопка выхода -->
+                <!-- Кнопка выхода со скруглёнными углами -->
                 <Button Content="Выйти" 
                         Click="LogoutButton_Click"
                         Background="Transparent" 
@@ -141,6 +205,10 @@
                                             <Trigger Property="IsMouseOver" Value="True">
                                                 <Setter TargetName="border" Property="Background" Value="#FCE4E4"/>
                                                 <Setter TargetName="border" Property="BorderBrush" Value="#C0392B"/>
+                                                <Setter Property="Foreground" Value="#C0392B"/>
+                                            </Trigger>
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Setter TargetName="border" Property="Background" Value="#FADBD8"/>
                                             </Trigger>
                                         </ControlTemplate.Triggers>
                                     </ControlTemplate>

@@ -49,7 +49,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     // Получаем текущее животное
                     var currentAnimal = context.Animals.Find(animalId);
@@ -104,7 +104,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var breeding = context.Breedings.Find(breedingId.Value);
                     if (breeding == null)
@@ -191,7 +191,7 @@ namespace Lineage.Pages
                     }
                 }
 
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     Breedings breeding;
 

@@ -48,7 +48,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var eventTypes = context.VeterinaryEventTypes.OrderBy(t => t.Id).ToList();
                     cmbEventType.ItemsSource = eventTypes;
@@ -67,7 +67,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var vetEvent = context.VeterinaryEvents.Find(eventId.Value);
                     if (vetEvent == null)
@@ -111,7 +111,7 @@ namespace Lineage.Pages
                     return;
                 }
 
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     VeterinaryEvents vetEvent;
 

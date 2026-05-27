@@ -103,7 +103,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var species = context.Species
                         .Select(s => new SpeciesItem { Id = s.Id, Name = s.Name })
@@ -125,7 +125,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var breeds = context.Breeds
                         .Where(b => b.SpeciesId == speciesId || b.SpeciesId == null)
@@ -150,7 +150,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var colors = context.Colors
                         .Where(c => c.SpeciesId == speciesId || c.SpeciesId == null)
@@ -175,7 +175,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var genders = context.AnimalGenders
                         .Select(g => new GenderItem { Id = g.Id, Name = g.Name })
@@ -197,7 +197,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var classes = context.PedigreeClasses
                         .Select(pc => new PedigreeClassItem { Id = pc.Id, Name = pc.Name })
@@ -221,7 +221,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var animals = context.Animals
                         .Where(a => a.TreeId == currentTreeId)
@@ -259,7 +259,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var animal = context.Animals.FirstOrDefault(a => a.Id == animalId);
                     if (animal == null)
@@ -388,7 +388,7 @@ namespace Lineage.Pages
                     return;
                 }
 
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     Animals animal;
 
@@ -478,7 +478,7 @@ namespace Lineage.Pages
             }
         }
 
-        private void SavePedigree(GenealogyUnifiedDBEntities1 context, int animalId)
+        private void SavePedigree(GenealogyUnifiedDBEntities2 context, int animalId)
         {
             int fatherId = cmbFather.SelectedValue != null ? (int)cmbFather.SelectedValue : 0;
             int motherId = cmbMother.SelectedValue != null ? (int)cmbMother.SelectedValue : 0;

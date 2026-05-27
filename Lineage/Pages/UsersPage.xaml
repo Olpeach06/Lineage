@@ -15,6 +15,127 @@
                           Opacity="0.1"
                           ShadowDepth="2"
                           Color="#5C4E3D"/>
+
+        <!-- Стиль для кнопки "Добавить" -->
+        <Style x:Key="AddButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="#8FAA7A"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#7A9A66"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#6B8A58"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для кнопки поиска -->
+        <Style x:Key="SearchButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="#8B7E6B"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="0">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="#8FAA7A"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для кнопки очистки поиска -->
+        <Style x:Key="ClearSearchButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="#8B7E6B"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="0">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="#8FAA7A"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для кнопки привязки персоны (🔗) -->
+        <Style x:Key="LinkButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Width" Value="20"/>
+            <Setter Property="Height" Value="20"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="#D6C9B8"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#6B5E4A"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Padding="0">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#F0E9DE"/>
+                                <Setter Property="Foreground" Value="#8FAA7A"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="#8FAA7A"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#E0D5C4"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Page.Resources>
 
     <Grid>
@@ -42,7 +163,7 @@
 
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="0,0,40,0">
                     <Image Source="/Images/icon-tree.png" Width="32" Height="32" Margin="0,0,8,0"/>
-                    <TextBlock Text="Genealogy" FontSize="20" FontWeight="SemiBold"
+                    <TextBlock Text="Родословная" FontSize="20" FontWeight="SemiBold"
                                Foreground="#5C4E3D" VerticalAlignment="Center"/>
                 </StackPanel>
 
@@ -157,8 +278,8 @@
                                             <ControlTemplate.Triggers>
                                                 <Trigger Property="IsMouseOver" Value="True">
                                                     <Setter TargetName="border" Property="Background" Value="#F0E9DE"/>
-                                                    <Setter Property="Foreground" Value="#8FAA7A"/>
-                                                    <Setter TargetName="border" Property="BorderBrush" Value="#8FAA7A"/>
+                                                    <Setter Property="Foreground" Value="#D4A574"/>
+                                                    <Setter TargetName="border" Property="BorderBrush" Value="#D4A574"/>
                                                 </Trigger>
                                             </ControlTemplate.Triggers>
                                         </ControlTemplate>
@@ -205,18 +326,16 @@
                                      GotFocus="txtSearch_GotFocus" LostFocus="txtSearch_LostFocus"
                                      KeyDown="txtSearch_KeyDown" TextChanged="txtSearch_TextChanged"/>
                             <Button Grid.Column="1" x:Name="btnClearSearch" Content="✕"
-                                    Background="Transparent" BorderThickness="0" Cursor="Hand"
-                                    Width="30" Visibility="Collapsed" Click="ClearSearch_Click"
-                                    Foreground="#8B7E6B" FontSize="14" FontWeight="Bold"/>
-                            <Button Grid.Column="2" Content="🔍" Background="Transparent"
-                                    BorderThickness="0" Cursor="Hand" Click="SearchButton_Click"/>
+                                    Style="{StaticResource ClearSearchButtonStyle}"
+                                    Width="30" Visibility="Collapsed" Click="ClearSearch_Click"/>
+                            <Button Grid.Column="2" Content="🔍" Style="{StaticResource SearchButtonStyle}"
+                                    Click="SearchButton_Click"/>
                         </Grid>
                     </Border>
                     <Button x:Name="btnAddUser"
                             Content="➕ Добавить"
-                            Width="100" Height="35"
-                            Background="#8FAA7A" Foreground="White"
-                            BorderThickness="0" Margin="10,0,0,0"
+                            Style="{StaticResource AddButtonStyle}"
+                            Margin="10,0,0,0"
                             Click="AddUserButton_Click"/>
                 </StackPanel>
             </Grid>
@@ -308,9 +427,9 @@
                                             <TextBlock x:Name="txtPerson" Text="{Binding PersonName}" 
                                                        Foreground="#6B5E4A" FontSize="11"
                                                        TextDecorations="{Binding PersonUnderline}"/>
-                                            <Button x:Name="btnLinkPerson" Content="🔗" Width="20" Height="20"
-                                                    Background="Transparent" BorderBrush="#D6C9B8" BorderThickness="1"
-                                                    Margin="5,0,0,0" Cursor="Hand" Click="LinkPerson_Click" Tag="{Binding Id}"
+                                            <Button x:Name="btnLinkPerson" Content="🔗" 
+                                                    Style="{StaticResource LinkButtonStyle}"
+                                                    Margin="5,0,0,0" Click="LinkPerson_Click" Tag="{Binding Id}"
                                                     ToolTip="Привязать к персоне" Visibility="{Binding CanEdit}"/>
                                         </StackPanel>
 

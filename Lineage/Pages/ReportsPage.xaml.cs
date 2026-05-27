@@ -192,7 +192,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var userTrees = context.FamilyTrees
                         .Where(t => t.CreatedByUserId == Session.UserId)
@@ -230,7 +230,7 @@ namespace Lineage.Pages
             {
                 try
                 {
-                    using (var context = new GenealogyUnifiedDBEntities1())
+                    using (var context = new GenealogyUnifiedDBEntities2())
                     {
                         // Виды
                         var species = context.Species
@@ -262,7 +262,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var breeds = context.Breeds
                         .Where(b => speciesId == 0 || b.SpeciesId == speciesId)
@@ -291,7 +291,7 @@ namespace Lineage.Pages
                 int treeId = (int)cmbFilterTree.SelectedValue;
                 allPersons.Clear();
 
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var persons = context.Persons
                         .Where(p => p.TreeId == treeId)
@@ -345,7 +345,7 @@ namespace Lineage.Pages
                 int treeId = (int)cmbFilterTree.SelectedValue;
                 allAnimals.Clear();
 
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var animals = context.Animals
                         .Where(a => a.TreeId == treeId)
@@ -559,7 +559,7 @@ namespace Lineage.Pages
             int marriages = 0;
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     // Получаем ID персон из отфильтрованного списка
                     var personIds = persons.Select(p => p.Id).ToList();
@@ -582,7 +582,7 @@ namespace Lineage.Pages
             int generations = 0;
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var personIds = persons.Select(p => p.Id).ToList();
                     var allRelationships = context.PersonRelationships
@@ -813,7 +813,7 @@ namespace Lineage.Pages
 
                 int treeId = (int)cmbFilterTree.SelectedValue;
 
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var breedings = context.Breedings
                         .Where(b => b.TreeId == treeId)
@@ -846,7 +846,7 @@ namespace Lineage.Pages
 
                 int treeId = (int)cmbFilterTree.SelectedValue;
 
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var animalIds = context.Animals
                         .Where(a => a.TreeId == treeId)

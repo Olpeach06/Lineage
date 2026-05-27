@@ -40,6 +40,7 @@ namespace Lineage.AppData
         public int CreatedByUserId { get; set; }
         public System.DateTime CreatedAt { get; set; }
         public Nullable<System.DateTime> UpdatedAt { get; set; }
+        public string Profession { get; set; }
     
         public virtual FamilyTrees FamilyTrees { get; set; }
         public virtual Genders Genders { get; set; }

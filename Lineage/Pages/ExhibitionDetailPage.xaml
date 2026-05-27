@@ -9,6 +9,40 @@
       Background="#F5F0E6"
       Loaded="Page_Loaded">
 
+    <Page.Resources>
+        <!-- Стиль для кнопки "ЗАКРЫТЬ" -->
+        <Style x:Key="CloseButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="#8FAA7A"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Width" Value="120"/>
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#7A9A66"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#6B8A58"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+
     <Grid>
         <Border Width="500"
                 Background="#FDF8F0"
@@ -82,9 +116,8 @@
                 </Grid>
 
                 <Button Content="ЗАКРЫТЬ"
-                        Width="120" Height="35"
-                        Background="#8FAA7A" Foreground="White"
-                        BorderThickness="0" Margin="0,20,0,0"
+                        Style="{StaticResource CloseButtonStyle}"
+                        Margin="0,20,0,0"
                         HorizontalAlignment="Center"
                         Click="CloseButton_Click"/>
             </StackPanel>

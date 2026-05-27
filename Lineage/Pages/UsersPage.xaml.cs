@@ -106,7 +106,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     roles = context.UserRoles
                         .Select(r => new RoleItem { Id = r.Id, Name = r.Name })
@@ -124,7 +124,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var users = context.Users.OrderBy(u => u.Id).ToList();
                     var personIds = users.Where(u => u.PersonId.HasValue).Select(u => u.PersonId.Value).ToList();
@@ -292,7 +292,7 @@ namespace Lineage.Pages
             {
                 try
                 {
-                    using (var context = new GenealogyUnifiedDBEntities1())
+                    using (var context = new GenealogyUnifiedDBEntities2())
                     {
                         var userTrees = context.FamilyTrees.Where(t => t.CreatedByUserId == userId).ToList();
                         foreach (var tree in userTrees)

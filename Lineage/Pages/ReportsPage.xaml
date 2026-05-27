@@ -15,6 +15,235 @@
                           Opacity="0.1"
                           ShadowDepth="2"
                           Color="#5C4E3D"/>
+
+        <!-- Стиль для ComboBox -->
+        <Style TargetType="ComboBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#D6C9B8"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#5C4E3D"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <ToggleButton x:Name="ToggleButton"
+                                          Grid.ColumnSpan="2"
+                                          Background="{TemplateBinding Background}"
+                                          BorderBrush="{TemplateBinding BorderBrush}"
+                                          BorderThickness="{TemplateBinding BorderThickness}"
+                                          Focusable="False"
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          ClickMode="Press">
+                                <ToggleButton.Style>
+                                    <Style TargetType="ToggleButton">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="ToggleButton">
+                                                    <Border x:Name="border"
+                                                            Background="{TemplateBinding Background}"
+                                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                                            CornerRadius="8">
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="30"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBlock x:Name="selectedText"
+                                                                       Grid.Column="0"
+                                                                       Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=ComboBox}, Path=Text}"
+                                                                       HorizontalAlignment="Left"
+                                                                       VerticalAlignment="Center"
+                                                                       Margin="10,0,5,0"
+                                                                       Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=ComboBox}, Path=Foreground}"
+                                                                       FontSize="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=ComboBox}, Path=FontSize}"
+                                                                       FontWeight="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=ComboBox}, Path=FontWeight}"/>
+                                                            <Path x:Name="arrow"
+                                                                  Grid.Column="1"
+                                                                  Data="M0,0 L8,0 L4,6 Z"
+                                                                  Fill="#8B7E6B"
+                                                                  HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center"
+                                                                  Margin="0,2,0,0"/>
+                                                        </Grid>
+                                                    </Border>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter TargetName="border" Property="Background" Value="#F5F0E6"/>
+                                                            <Setter TargetName="arrow" Property="Fill" Value="#8FAA7A"/>
+                                                        </Trigger>
+                                                        <Trigger Property="IsChecked" Value="True">
+                                                            <Setter TargetName="border" Property="Background" Value="#F0E9DE"/>
+                                                            <Setter TargetName="arrow" Property="Fill" Value="#8FAA7A"/>
+                                                            <Setter TargetName="arrow" Property="RenderTransform">
+                                                                <Setter.Value>
+                                                                    <RotateTransform Angle="180"/>
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </ToggleButton.Style>
+                            </ToggleButton>
+                            <Popup x:Name="Popup"
+                                   Placement="Bottom"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   AllowsTransparency="True"
+                                   Focusable="False"
+                                   PopupAnimation="Slide">
+                                <Grid x:Name="DropDown"
+                                      SnapsToDevicePixels="True"
+                                      MinWidth="{TemplateBinding ActualWidth}"
+                                      MaxHeight="300">
+                                    <Border x:Name="DropDownBorder"
+                                            Background="#FDF8F0"
+                                            BorderBrush="#D6C9B8"
+                                            BorderThickness="1"
+                                            CornerRadius="8"
+                                            Effect="{StaticResource ShadowEffect}">
+                                        <ScrollViewer x:Name="ScrollViewer"
+                                                      Margin="4"
+                                                      SnapsToDevicePixels="True"
+                                                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                                      ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                            <ItemsPresenter x:Name="ItemsPresenter"
+                                                            KeyboardNavigation.DirectionalNavigation="Contained"
+                                                            SnapsToDevicePixels="True"/>
+                                        </ScrollViewer>
+                                    </Border>
+                                </Grid>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#5C4E3D"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#F0E9DE"/>
+                    <Setter Property="Foreground" Value="#8FAA7A"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#E8DFD0"/>
+                    <Setter Property="Foreground" Value="#5C4E3D"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Стиль для кнопки "Применить" -->
+        <Style x:Key="ApplyButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="#8FAA7A"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#7A9A66"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#6B8A58"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для кнопки "Сбросить" -->
+        <Style x:Key="ResetButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="#D6C9B8"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#6B5E4A"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#F0E9DE"/>
+                                <Setter Property="Foreground" Value="#8FAA7A"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="#8FAA7A"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#E0D5C4"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для зелёных кнопок действий (Экспорт, Календарь) -->
+        <Style x:Key="ActionButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="#8FAA7A"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#7A9A66"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#6B8A58"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Page.Resources>
 
     <Grid>
@@ -42,7 +271,7 @@
 
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="0,0,40,0">
                     <Image Source="/Images/icon-tree.png" Width="32" Height="32" Margin="0,0,8,0"/>
-                    <TextBlock Text="Genealogy" FontSize="20" FontWeight="SemiBold"
+                    <TextBlock Text="Родословная" FontSize="20" FontWeight="SemiBold"
                                Foreground="#5C4E3D" VerticalAlignment="Center"/>
                 </StackPanel>
 
@@ -158,8 +387,8 @@
                                             <ControlTemplate.Triggers>
                                                 <Trigger Property="IsMouseOver" Value="True">
                                                     <Setter TargetName="border" Property="Background" Value="#F0E9DE"/>
-                                                    <Setter Property="Foreground" Value="#8FAA7A"/>
-                                                    <Setter TargetName="border" Property="BorderBrush" Value="#8FAA7A"/>
+                                                    <Setter Property="Foreground" Value="#D4A574"/>
+                                                    <Setter TargetName="border" Property="BorderBrush" Value="#D4A574"/>
                                                 </Trigger>
                                             </ControlTemplate.Triggers>
                                         </ControlTemplate>
@@ -264,12 +493,8 @@
                             <!-- Кнопки -->
                             <Border HorizontalAlignment="Right">
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                    <Button Content="Применить" Width="100" Height="32"
-                            Background="#8FAA7A" Foreground="White" BorderThickness="0"
-                            Margin="0,0,10,0" Click="ApplyFilters_Click"/>
-                                    <Button Content="Сбросить" Width="100" Height="32"
-                            Background="Transparent" BorderBrush="#D6C9B8" Foreground="#6B5E4A"
-                            BorderThickness="1" Click="ResetFilters_Click"/>
+                                    <Button Content="Применить" Style="{StaticResource ApplyButtonStyle}" Margin="0,0,10,0" Click="ApplyFilters_Click"/>
+                                    <Button Content="Сбросить" Style="{StaticResource ResetButtonStyle}" Click="ResetFilters_Click"/>
                                 </StackPanel>
                             </Border>
                         </UniformGrid>
@@ -351,9 +576,8 @@
                        Foreground="#5C4E3D" FontSize="16" FontWeight="Bold"
                        Margin="0,0,0,15"/>
                                 <Button x:Name="btnCalendar" Grid.Column="1" Content="📅 КАЛЕНДАРЬ"
-                    Width="110" Height="32" Background="#8FAA7A" Foreground="White"
-                    BorderThickness="0" Cursor="Hand" Click="CalendarButton_Click"
-                    Visibility="Collapsed"/>
+                    Width="110" Height="32" Style="{StaticResource ActionButtonStyle}"
+                    Click="CalendarButton_Click" Visibility="Collapsed"/>
                             </Grid>
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -428,9 +652,8 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="📋 СПИСОК ПЕРСОН"
                                            Foreground="#5C4E3D" FontSize="16" FontWeight="Bold"/>
-                                <Button Grid.Column="1" Content="📊 Экспорт в Excel" Width="130" Height="30"
-                                        Background="#8FAA7A" Foreground="White" BorderThickness="0"
-                                        Cursor="Hand" Click="ExportToExcel_Click"/>
+                                <Button Grid.Column="1" Content="📊 Экспорт в Excel" Width="130" 
+                                        Style="{StaticResource ActionButtonStyle}" Click="ExportToExcel_Click"/>
                             </Grid>
                             <ListView x:Name="lvPersons" BorderThickness="0" Background="Transparent"
                                       ScrollViewer.VerticalScrollBarVisibility="Auto" MaxHeight="400">
@@ -641,9 +864,8 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="📋 СПИСОК ЖИВОТНЫХ"
                                            Foreground="#5C4E3D" FontSize="16" FontWeight="Bold"/>
-                                <Button Grid.Column="1" Content="📊 Экспорт в Excel" Width="130" Height="30"
-                                        Background="#8FAA7A" Foreground="White" BorderThickness="0"
-                                        Cursor="Hand" Click="ExportToExcel_Click"/>
+                                <Button Grid.Column="1" Content="📊 Экспорт в Excel" Width="130" 
+                                        Style="{StaticResource ActionButtonStyle}" Click="ExportToExcel_Click"/>
                             </Grid>
                             <ListView x:Name="lvAnimals" BorderThickness="0" Background="Transparent"
                                       ScrollViewer.VerticalScrollBarVisibility="Auto" MaxHeight="400">

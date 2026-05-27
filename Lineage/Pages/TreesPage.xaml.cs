@@ -67,7 +67,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     // Получаем тип текущего режима (1 - семейный, 2 - животноводство)
                     int currentProjectTypeId = Session.IsFamilyMode ? 1 : 2;
@@ -195,7 +195,7 @@ namespace Lineage.Pages
             {
                 try
                 {
-                    using (var context = new GenealogyUnifiedDBEntities1())
+                    using (var context = new GenealogyUnifiedDBEntities2())
                     {
                         int projectTypeId = Session.IsFamilyMode ? 1 : 2;
 
@@ -237,7 +237,7 @@ namespace Lineage.Pages
             int treeId = (int)button.Tag;
 
             // Проверяем, имеет ли пользователь доступ к этому дереву
-            using (var context = new GenealogyUnifiedDBEntities1())
+            using (var context = new GenealogyUnifiedDBEntities2())
             {
                 var tree = context.FamilyTrees.Find(treeId);
                 if (tree == null) return;
@@ -276,7 +276,7 @@ namespace Lineage.Pages
 
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var tree = context.FamilyTrees.FirstOrDefault(t => t.Id == treeId);
                     if (tree == null) return;
@@ -316,7 +316,7 @@ namespace Lineage.Pages
             int treeId = (int)button.Tag;
 
             // Проверяем права на удаление
-            using (var checkContext = new GenealogyUnifiedDBEntities1())
+            using (var checkContext = new GenealogyUnifiedDBEntities2())
             {
                 var tree = checkContext.FamilyTrees.Find(treeId);
                 if (tree == null) return;
@@ -337,7 +337,7 @@ namespace Lineage.Pages
             {
                 try
                 {
-                    using (var context = new GenealogyUnifiedDBEntities1())
+                    using (var context = new GenealogyUnifiedDBEntities2())
                     {
                         var tree = context.FamilyTrees.FirstOrDefault(t => t.Id == treeId);
                         if (tree == null) return;

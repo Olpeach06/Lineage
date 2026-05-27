@@ -35,11 +35,13 @@ namespace Lineage.Pages
         private const int MAX_BIRTHPLACE_LENGTH = 200;
         private const int MAX_DEATHPLACE_LENGTH = 200;
         private const int MAX_BIOGRAPHY_LENGTH = 5000;
+        private const int MAX_PROFESSION_LENGTH = 100;
 
         public class PersonComboItem
         {
             public int Id { get; set; }
             public string DisplayName { get; set; }
+            public int GenderId { get; set; }
         }
 
         public EditPersonPage()
@@ -64,6 +66,7 @@ namespace Lineage.Pages
             txtBirthPlace.MaxLength = MAX_BIRTHPLACE_LENGTH;
             txtDeathPlace.MaxLength = MAX_DEATHPLACE_LENGTH;
             txtBiography.MaxLength = MAX_BIOGRAPHY_LENGTH;
+            txtProfession.MaxLength = MAX_PROFESSION_LENGTH;
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -81,7 +84,7 @@ namespace Lineage.Pages
                 currentTreeId = Session.CurrentTreeId;
             else
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var firstTree = context.FamilyTrees.Where(t => t.CreatedByUserId == Session.UserId).FirstOrDefault();
                     if (firstTree != null)
@@ -111,20 +114,20 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var persons = context.Persons.Where(p => p.TreeId == currentTreeId).ToList();
                     allPersons = persons.Select(p => new PersonComboItem
                     {
                         Id = p.Id,
-                        DisplayName = $"{p.LastName} {p.FirstName} ({p.BirthDate?.Year})".Trim()
+                        DisplayName = $"{p.LastName} {p.FirstName} {p.Patronymic}".Trim().Replace("  ", " "),
+                        GenderId = p.GenderId
                     }).ToList();
 
-                    allPersons.Insert(0, new PersonComboItem { Id = 0, DisplayName = "--- Не выбрано ---" });
+                    allPersons.Insert(0, new PersonComboItem { Id = 0, DisplayName = "--- Не выбрано ---", GenderId = 0 });
 
-                    cmbFather.ItemsSource = allPersons;
-                    cmbMother.ItemsSource = allPersons;
-                    cmbSpouse.ItemsSource = allPersons;
+                    // Фильтрация ComboBox по полу
+                    FilterComboBoxByGender();
                 }
             }
             catch (Exception ex)
@@ -133,11 +136,33 @@ namespace Lineage.Pages
             }
         }
 
+        private void FilterComboBoxByGender()
+        {
+            // Для отца - только мужчины (GenderId = 1)
+            var malePersons = allPersons.Where(p => p.Id == 0 || p.GenderId == 1).ToList();
+            cmbFather.ItemsSource = malePersons;
+
+            // Для матери - только женщины (GenderId = 2)
+            var femalePersons = allPersons.Where(p => p.Id == 0 || p.GenderId == 2).ToList();
+            cmbMother.ItemsSource = femalePersons;
+
+            // Для супруга - все, кроме текущей персоны
+            if (editPersonId.HasValue)
+            {
+                var allExceptCurrent = allPersons.Where(p => p.Id == 0 || p.Id != editPersonId.Value).ToList();
+                cmbSpouse.ItemsSource = allExceptCurrent;
+            }
+            else
+            {
+                cmbSpouse.ItemsSource = allPersons;
+            }
+        }
+
         private void LoadPersonData(int personId)
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var person = context.Persons.FirstOrDefault(p => p.Id == personId);
                     if (person == null)
@@ -152,6 +177,9 @@ namespace Lineage.Pages
                     txtPatronymic.Text = person.Patronymic;
                     txtMaidenName.Text = person.MaidenName;
 
+                    // Загрузка профессии
+                    txtProfession.Text = person.Profession;
+
                     cmbGender.SelectedIndex = person.GenderId == 1 ? 0 : (person.GenderId == 2 ? 1 : 2);
 
                     if (person.BirthDate.HasValue) dpBirthDate.SelectedDate = person.BirthDate.Value;
@@ -160,6 +188,10 @@ namespace Lineage.Pages
                     txtBirthPlace.Text = person.BirthPlace;
                     txtDeathPlace.Text = person.DeathPlace;
                     txtBiography.Text = person.Biography;
+
+                    // Обновляем фильтрацию ComboBox с учётом текущей персоны
+                    var allExceptCurrent = allPersons.Where(p => p.Id == 0 || p.Id != personId).ToList();
+                    cmbSpouse.ItemsSource = allExceptCurrent;
 
                     LoadPersonRelationships(personId, context);
 
@@ -177,7 +209,7 @@ namespace Lineage.Pages
             }
         }
 
-        private void LoadPersonRelationships(int personId, GenealogyUnifiedDBEntities1 context)
+        private void LoadPersonRelationships(int personId, GenealogyUnifiedDBEntities2 context)
         {
             try
             {
@@ -193,7 +225,7 @@ namespace Lineage.Pages
                     {
                         if (parent.GenderId == 2)
                             cmbMother.SelectedValue = parent.Id;
-                        else if (parent.GenderId == 1 && (cmbFather.SelectedValue == null || (int)cmbFather.SelectedValue == 0))
+                        else if (parent.GenderId == 1)
                             cmbFather.SelectedValue = parent.Id;
                     }
                 }
@@ -329,7 +361,7 @@ namespace Lineage.Pages
                 if (!ValidateRelationships())
                     return;
 
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     Persons person;
 
@@ -357,6 +389,10 @@ namespace Lineage.Pages
                     person.FirstName = txtFirstName.Text.Trim();
                     person.Patronymic = string.IsNullOrWhiteSpace(txtPatronymic.Text) ? null : txtPatronymic.Text.Trim();
                     person.MaidenName = string.IsNullOrWhiteSpace(txtMaidenName.Text) ? null : txtMaidenName.Text.Trim();
+
+                    // Сохранение профессии
+                    person.Profession = string.IsNullOrWhiteSpace(txtProfession.Text) ? null : txtProfession.Text.Trim();
+
                     person.GenderId = cmbGender.SelectedIndex == 0 ? 1 : (cmbGender.SelectedIndex == 1 ? 2 : 3);
                     person.BirthDate = dpBirthDate.SelectedDate;
                     person.DeathDate = dpDeathDate.SelectedDate;
@@ -400,7 +436,7 @@ namespace Lineage.Pages
             }
         }
 
-        private void SaveRelationships(GenealogyUnifiedDBEntities1 context, int personId)
+        private void SaveRelationships(GenealogyUnifiedDBEntities2 context, int personId)
         {
             try
             {

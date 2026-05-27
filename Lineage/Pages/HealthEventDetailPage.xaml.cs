@@ -35,7 +35,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var vetEvent = context.VeterinaryEvents.FirstOrDefault(v => v.Id == eventId);
                     if (vetEvent == null)

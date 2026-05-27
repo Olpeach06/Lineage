@@ -91,7 +91,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var animal = context.Animals.Find(animalId);
                     if (animal == null) return false;
@@ -112,7 +112,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var animal = context.Animals.FirstOrDefault(a => a.Id == animalId);
                     if (animal == null)
@@ -319,7 +319,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var breedingsAsMaleRaw = context.Breedings
                         .Where(b => b.MaleId == animalId)
@@ -363,7 +363,7 @@ namespace Lineage.Pages
             }
         }
 
-        private string GetAnimalNickname(int animalId, GenealogyUnifiedDBEntities1 context)
+        private string GetAnimalNickname(int animalId, GenealogyUnifiedDBEntities2 context)
         {
             var animal = context.Animals.Find(animalId);
             return animal?.Nickname ?? $"ID:{animalId}";
@@ -373,7 +373,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var exhibitionsRaw = context.Exhibitions
                         .Where(e => e.AnimalId == animalId)
@@ -407,7 +407,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var assessmentsRaw = context.AnimalAssessments
                         .Where(a => a.AnimalId == animalId)
@@ -447,7 +447,7 @@ namespace Lineage.Pages
         {
             try
             {
-                using (var context = new GenealogyUnifiedDBEntities1())
+                using (var context = new GenealogyUnifiedDBEntities2())
                 {
                     var vetEvents = context.VeterinaryEvents
                         .Where(v => v.AnimalId == animalId)
@@ -583,7 +583,7 @@ namespace Lineage.Pages
             {
                 try
                 {
-                    using (var context = new GenealogyUnifiedDBEntities1())
+                    using (var context = new GenealogyUnifiedDBEntities2())
                     {
                         var breeding = context.Breedings.Find(breedingId);
                         if (breeding != null)
@@ -622,7 +622,7 @@ namespace Lineage.Pages
             {
                 try
                 {
-                    using (var context = new GenealogyUnifiedDBEntities1())
+                    using (var context = new GenealogyUnifiedDBEntities2())
                     {
                         var exhibition = context.Exhibitions.Find(exhibitionId);
                         if (exhibition != null)
@@ -661,7 +661,7 @@ namespace Lineage.Pages
             {
                 try
                 {
-                    using (var context = new GenealogyUnifiedDBEntities1())
+                    using (var context = new GenealogyUnifiedDBEntities2())
                     {
                         var assessment = context.AnimalAssessments.Find(assessmentId);
                         if (assessment != null)
@@ -700,7 +700,7 @@ namespace Lineage.Pages
             {
                 try
                 {
-                    using (var context = new GenealogyUnifiedDBEntities1())
+                    using (var context = new GenealogyUnifiedDBEntities2())
                     {
                         var vetEvent = context.VeterinaryEvents.Find(eventId);
                         if (vetEvent != null)
