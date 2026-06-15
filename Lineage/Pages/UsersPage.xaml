@@ -136,6 +136,43 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- Стиль для кнопки удаления пользователя -->
+        <Style x:Key="DeleteUserButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Width" Value="20"/>
+            <Setter Property="Height" Value="20"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="#D6C9B8"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#E74C3C"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Margin" Value="5,0,0,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Padding="0">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#FCE4E4"/>
+                                <Setter Property="Foreground" Value="#C0392B"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="#C0392B"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#FADBD8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Page.Resources>
 
     <Grid>
@@ -420,7 +457,7 @@
                                                        TextWrapping="Wrap"/>
                                         </StackPanel>
 
-                                        <!-- Связанная персона -->
+                                        <!-- Связанная персона и кнопки -->
                                         <StackPanel Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
                                                     Orientation="Horizontal" Margin="5,5,0,0">
                                             <TextBlock Text="👤 " Foreground="#8FAA7A" FontSize="11"/>
@@ -431,6 +468,15 @@
                                                     Style="{StaticResource LinkButtonStyle}"
                                                     Margin="5,0,0,0" Click="LinkPerson_Click" Tag="{Binding Id}"
                                                     ToolTip="Привязать к персоне" Visibility="{Binding CanEdit}"/>
+
+                                            <!-- Кнопка удаления (только для администратора) -->
+                                            <Button x:Name="btnDeleteUser" 
+                                                    Content="🗑" 
+                                                    Style="{StaticResource DeleteUserButtonStyle}"
+                                                    Click="DeleteUser_Click" 
+                                                    Tag="{Binding Id}"
+                                                    ToolTip="Удалить пользователя"
+                                                    Visibility="{Binding IsAdmin}"/>
                                         </StackPanel>
 
                                         <!-- Статус и дата регистрации -->

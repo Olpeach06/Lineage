@@ -15,19 +15,25 @@ using System.Windows.Shapes;
 using Lineage.AppData;
 using Lineage.Classes;
 using System.IO;
+using System.Diagnostics;
 
 namespace Lineage.Pages
 {
     public partial class AnimalProfilePage : Page
     {
         private int animalId;
-        private bool canDelete;
+        private int currentTreeId;
+        private bool canEdit;     // Может ли пользователь редактировать
+        private bool isAdmin;     // Является ли администратором
+        private bool canDelete;   // Может ли удалять
 
         public class BreedingItem
         {
             public int Id { get; set; }
             public string BreedingDate { get; set; }
             public string Info { get; set; }
+            public Visibility EditButtonVisibility { get; set; }
+            public Visibility DeleteButtonVisibility { get; set; }
         }
 
         public class ExhibitionItem
@@ -35,6 +41,8 @@ namespace Lineage.Pages
             public int Id { get; set; }
             public string ExhibitionDate { get; set; }
             public string Name { get; set; }
+            public Visibility EditButtonVisibility { get; set; }
+            public Visibility DeleteButtonVisibility { get; set; }
         }
 
         public class AssessmentItem
@@ -43,6 +51,8 @@ namespace Lineage.Pages
             public string AssessmentDate { get; set; }
             public string ClassName { get; set; }
             public int ClassId { get; set; }
+            public Visibility EditButtonVisibility { get; set; }
+            public Visibility DeleteButtonVisibility { get; set; }
         }
 
         public class HealthEventItem
@@ -52,6 +62,8 @@ namespace Lineage.Pages
             public string EventType { get; set; }
             public string MedicineName { get; set; }
             public string Notes { get; set; }
+            public Visibility EditButtonVisibility { get; set; }
+            public Visibility DeleteButtonVisibility { get; set; }
         }
 
         public AnimalProfilePage(int id)
@@ -70,16 +82,31 @@ namespace Lineage.Pages
                 return;
             }
 
+            // Определяем права пользователя
+            isAdmin = Session.IsAdmin;
+            canEdit = Session.IsAdmin || Session.IsEditor;
+
+            // Получаем TreeId животного
+            using (var context = new GenealogyUnifiedDBEntities2())
+            {
+                var animal = context.Animals.Find(animalId);
+                if (animal != null)
+                {
+                    currentTreeId = animal.TreeId;
+                    var tree = context.FamilyTrees.Find(currentTreeId);
+                    // Право на редактирование: админ ИЛИ создатель дерева
+                    canEdit = Session.IsAdmin || (tree != null && tree.CreatedByUserId == Session.UserId);
+                    canDelete = canEdit; // Для удаления тоже нужны права
+                }
+            }
+
             LoadAnimalData();
             LoadBreedings();
             LoadExhibitions();
             LoadAssessments();
             LoadHealthEvents();
 
-            // Определяем права доступа
-            bool canEdit = Session.IsAdmin || Session.IsEditor;
-            canDelete = Session.IsAdmin || IsAnimalOwner();
-
+            // Показываем кнопки действий только если есть права
             btnEdit.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
             btnAddBreeding.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
             btnAddExhibition.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
@@ -330,6 +357,7 @@ namespace Lineage.Pages
                         .ToList();
 
                     var allBreedings = new List<BreedingItem>();
+                    Visibility buttonVisibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
 
                     foreach (var b in breedingsAsMaleRaw)
                     {
@@ -337,7 +365,9 @@ namespace Lineage.Pages
                         {
                             Id = b.Id,
                             BreedingDate = b.BreedingDate.ToString("dd.MM.yyyy"),
-                            Info = $"Вязка с самкой: {GetAnimalNickname(b.FemaleId, context)}"
+                            Info = $"Вязка с самкой: {GetAnimalNickname(b.FemaleId, context)}",
+                            EditButtonVisibility = buttonVisibility,
+                            DeleteButtonVisibility = buttonVisibility
                         });
                     }
 
@@ -347,7 +377,9 @@ namespace Lineage.Pages
                         {
                             Id = b.Id,
                             BreedingDate = b.BreedingDate.ToString("dd.MM.yyyy"),
-                            Info = $"Вязка с самцом: {GetAnimalNickname(b.MaleId, context)}"
+                            Info = $"Вязка с самцом: {GetAnimalNickname(b.MaleId, context)}",
+                            EditButtonVisibility = buttonVisibility,
+                            DeleteButtonVisibility = buttonVisibility
                         });
                     }
 
@@ -359,7 +391,7 @@ namespace Lineage.Pages
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Ошибка загрузки вязок: {ex.Message}");
+                Debug.WriteLine($"Ошибка загрузки вязок: {ex.Message}");
             }
         }
 
@@ -380,6 +412,7 @@ namespace Lineage.Pages
                         .ToList();
 
                     var exhibitions = new List<ExhibitionItem>();
+                    Visibility buttonVisibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
 
                     foreach (var e in exhibitionsRaw)
                     {
@@ -387,7 +420,9 @@ namespace Lineage.Pages
                         {
                             Id = e.Id,
                             ExhibitionDate = e.ExhibitionDate.ToString("dd.MM.yyyy"),
-                            Name = e.ExhibitionName
+                            Name = e.ExhibitionName,
+                            EditButtonVisibility = buttonVisibility,
+                            DeleteButtonVisibility = buttonVisibility
                         });
                     }
 
@@ -399,7 +434,7 @@ namespace Lineage.Pages
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Ошибка загрузки выставок: {ex.Message}");
+                Debug.WriteLine($"Ошибка загрузки выставок: {ex.Message}");
             }
         }
 
@@ -414,8 +449,8 @@ namespace Lineage.Pages
                         .ToList();
 
                     var classNames = context.PedigreeClasses.ToDictionary(c => c.Id, c => c.Name);
-
                     var assessments = new List<AssessmentItem>();
+                    Visibility buttonVisibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
 
                     foreach (var a in assessmentsRaw)
                     {
@@ -424,7 +459,9 @@ namespace Lineage.Pages
                             Id = a.Id,
                             AssessmentDate = a.AssessmentDate.ToString("dd.MM.yyyy"),
                             ClassId = a.ClassId,
-                            ClassName = classNames.ContainsKey(a.ClassId) ? classNames[a.ClassId] : $"Класс {a.ClassId}"
+                            ClassName = classNames.ContainsKey(a.ClassId) ? classNames[a.ClassId] : $"Класс {a.ClassId}",
+                            EditButtonVisibility = buttonVisibility,
+                            DeleteButtonVisibility = buttonVisibility
                         });
                     }
 
@@ -432,14 +469,11 @@ namespace Lineage.Pages
 
                     icAssessments.ItemsSource = assessments;
                     txtAssessmentsCount.Text = $" ({assessments.Count})";
-
-                    // Управление видимостью кнопок удаления в оценках
-                    UpdateDeleteButtonsVisibility(icAssessments);
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Ошибка загрузки оценок: {ex.Message}");
+                Debug.WriteLine($"Ошибка загрузки оценок: {ex.Message}");
             }
         }
 
@@ -455,8 +489,8 @@ namespace Lineage.Pages
                         .ToList();
 
                     var eventTypes = context.VeterinaryEventTypes.ToDictionary(t => t.Id, t => t.Name);
-
                     var healthItems = new List<HealthEventItem>();
+                    Visibility buttonVisibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
 
                     foreach (var ev in vetEvents)
                     {
@@ -466,108 +500,133 @@ namespace Lineage.Pages
                             EventDate = ev.EventDate.ToString("dd.MM.yyyy"),
                             EventType = eventTypes.ContainsKey(ev.EventTypeId) ? eventTypes[ev.EventTypeId] : "—",
                             MedicineName = ev.MedicineName ?? "—",
-                            Notes = ev.Notes ?? "—"
+                            Notes = ev.Notes ?? "—",
+                            EditButtonVisibility = buttonVisibility,
+                            DeleteButtonVisibility = buttonVisibility
                         });
                     }
 
                     icHealthEvents.ItemsSource = healthItems;
                     txtHealthCount.Text = $" ({healthItems.Count})";
-
-                    // Управление видимостью кнопок удаления в здоровье
-                    UpdateDeleteButtonsVisibility(icHealthEvents);
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Ошибка загрузки ветеринарных событий: {ex.Message}");
+                Debug.WriteLine($"Ошибка загрузки ветеринарных событий: {ex.Message}");
             }
         }
 
-        // Метод для управления видимостью кнопок удаления в ItemsControl
-        private void UpdateDeleteButtonsVisibility(ItemsControl itemsControl)
-        {
-            if (itemsControl?.ItemsSource == null) return;
-
-            // Ждём, пока элементы отрисуются
-            Dispatcher.BeginInvoke(new Action(() =>
-            {
-                foreach (var item in itemsControl.Items)
-                {
-                    var container = itemsControl.ItemContainerGenerator.ContainerFromItem(item) as Border;
-                    if (container != null)
-                    {
-                        // Ищем кнопку удаления внутри контейнера
-                        var deleteButton = FindVisualChild<Button>(container, "btnDelete");
-                        if (deleteButton != null)
-                        {
-                            deleteButton.Visibility = canDelete ? Visibility.Visible : Visibility.Collapsed;
-                        }
-                    }
-                }
-            }), System.Windows.Threading.DispatcherPriority.Loaded);
-        }
-
-        // Вспомогательный метод для поиска элемента по имени
-        private T FindVisualChild<T>(DependencyObject parent, string name) where T : FrameworkElement
-        {
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
-            {
-                var child = VisualTreeHelper.GetChild(parent, i);
-                if (child is T element && element.Name == name)
-                    return element;
-
-                var result = FindVisualChild<T>(child, name);
-                if (result != null)
-                    return result;
-            }
-            return null;
-        }
-
-        // ============================================
-        // ДЕТАЛИ (открытие страниц с подробной информацией)
-        // ============================================
+        // ==================== ДЕТАЛИ (открытие страниц с подробной информацией) ====================
 
         private void BreedingDetails_Click(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
             if (button?.Tag == null) return;
+
             int breedingId = (int)button.Tag;
-            NavigationService.Navigate(new BreedingDetailPage(breedingId));
+            NavigationService.Navigate(new DetailPage(DetailType.Breeding, breedingId));
         }
 
         private void ExhibitionDetails_Click(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
             if (button?.Tag == null) return;
+
             int exhibitionId = (int)button.Tag;
-            NavigationService.Navigate(new ExhibitionDetailPage(exhibitionId));
+            NavigationService.Navigate(new DetailPage(DetailType.Exhibition, exhibitionId));
         }
 
         private void AssessmentDetails_Click(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
             if (button?.Tag == null) return;
+
             int assessmentId = (int)button.Tag;
-            NavigationService.Navigate(new AssessmentDetailPage(assessmentId));
+            NavigationService.Navigate(new DetailPage(DetailType.Assessment, assessmentId));
         }
 
         private void HealthEventDetails_Click(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
             if (button?.Tag == null) return;
+
             int eventId = (int)button.Tag;
-            NavigationService.Navigate(new HealthEventDetailPage(eventId));
+            NavigationService.Navigate(new DetailPage(DetailType.HealthEvent, eventId));
+        }
+
+        // ============================================
+        // РЕДАКТИРОВАНИЕ
+        // ============================================
+
+        private void EditBreeding_Click(object sender, RoutedEventArgs e)
+        {
+            if (!canEdit)
+            {
+                MessageBox.Show("У вас нет прав на редактирование этой записи!", "Доступ запрещён",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var button = sender as Button;
+            if (button?.Tag == null) return;
+            int breedingId = (int)button.Tag;
+            NavigationService.Navigate(new AddEditDetailPage(EditDetailType.Breeding, animalId, breedingId));
+        }
+
+        private void EditExhibition_Click(object sender, RoutedEventArgs e)
+        {
+            if (!canEdit)
+            {
+                MessageBox.Show("У вас нет прав на редактирование этой записи!", "Доступ запрещён",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var button = sender as Button;
+            if (button?.Tag == null) return;
+            int exhibitionId = (int)button.Tag;
+            NavigationService.Navigate(new AddEditDetailPage(EditDetailType.Exhibition, animalId, exhibitionId));
+        }
+
+        private void EditAssessment_Click(object sender, RoutedEventArgs e)
+        {
+            if (!canEdit)
+            {
+                MessageBox.Show("У вас нет прав на редактирование этой записи!", "Доступ запрещён",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var button = sender as Button;
+            if (button?.Tag == null) return;
+            int assessmentId = (int)button.Tag;
+            NavigationService.Navigate(new AddEditDetailPage(EditDetailType.Assessment, animalId, assessmentId));
+        }
+
+        private void EditHealthEvent_Click(object sender, RoutedEventArgs e)
+        {
+            if (!canEdit)
+            {
+                MessageBox.Show("У вас нет прав на редактирование этой записи!", "Доступ запрещён",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var button = sender as Button;
+            if (button?.Tag == null) return;
+            int eventId = (int)button.Tag;
+            NavigationService.Navigate(new AddEditDetailPage(EditDetailType.HealthEvent, animalId, eventId));
         }
 
         // ============================================
         // УДАЛЕНИЕ
         // ============================================
 
-        private void BreedingDelete_Click(object sender, RoutedEventArgs e)
+        private async void BreedingDelete_Click(object sender, RoutedEventArgs e)
         {
-            if (!canDelete)
+            if (!canEdit)
             {
-                MessageBox.Show("У вас нет прав на удаление этой записи", "Доступ запрещён",
+                MessageBox.Show("У вас нет прав на удаление этой записи!", "Доступ запрещён",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
@@ -589,8 +648,9 @@ namespace Lineage.Pages
                         if (breeding != null)
                         {
                             context.Breedings.Remove(breeding);
-                            context.SaveChanges();
+                            await context.SaveChangesAsync();
                             LoadBreedings();
+                            MessageBox.Show("Вязка удалена!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                         }
                     }
                 }
@@ -602,11 +662,11 @@ namespace Lineage.Pages
             }
         }
 
-        private void ExhibitionDelete_Click(object sender, RoutedEventArgs e)
+        private async void ExhibitionDelete_Click(object sender, RoutedEventArgs e)
         {
-            if (!canDelete)
+            if (!canEdit)
             {
-                MessageBox.Show("У вас нет прав на удаление этой записи", "Доступ запрещён",
+                MessageBox.Show("У вас нет прав на удаление этой записи!", "Доступ запрещён",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
@@ -628,8 +688,9 @@ namespace Lineage.Pages
                         if (exhibition != null)
                         {
                             context.Exhibitions.Remove(exhibition);
-                            context.SaveChanges();
+                            await context.SaveChangesAsync();
                             LoadExhibitions();
+                            MessageBox.Show("Выставка удалена!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                         }
                     }
                 }
@@ -641,11 +702,11 @@ namespace Lineage.Pages
             }
         }
 
-        private void AssessmentDelete_Click(object sender, RoutedEventArgs e)
+        private async void AssessmentDelete_Click(object sender, RoutedEventArgs e)
         {
-            if (!canDelete)
+            if (!canEdit)
             {
-                MessageBox.Show("У вас нет прав на удаление этой записи", "Доступ запрещён",
+                MessageBox.Show("У вас нет прав на удаление этой записи!", "Доступ запрещён",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
@@ -667,8 +728,9 @@ namespace Lineage.Pages
                         if (assessment != null)
                         {
                             context.AnimalAssessments.Remove(assessment);
-                            context.SaveChanges();
+                            await context.SaveChangesAsync();
                             LoadAssessments();
+                            MessageBox.Show("Оценка удалена!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                         }
                     }
                 }
@@ -680,11 +742,11 @@ namespace Lineage.Pages
             }
         }
 
-        private void HealthEventDelete_Click(object sender, RoutedEventArgs e)
+        private async void HealthEventDelete_Click(object sender, RoutedEventArgs e)
         {
-            if (!canDelete)
+            if (!canEdit)
             {
-                MessageBox.Show("У вас нет прав на удаление этой записи", "Доступ запрещён",
+                MessageBox.Show("У вас нет прав на удаление этой записи!", "Доступ запрещён",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
@@ -706,8 +768,9 @@ namespace Lineage.Pages
                         if (vetEvent != null)
                         {
                             context.VeterinaryEvents.Remove(vetEvent);
-                            context.SaveChanges();
+                            await context.SaveChangesAsync();
                             LoadHealthEvents();
+                            MessageBox.Show("Ветеринарное событие удалено!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                         }
                     }
                 }
@@ -720,32 +783,62 @@ namespace Lineage.Pages
         }
 
         // ============================================
-        // РЕДАКТИРОВАНИЕ (через навигацию)
+        // ДОБАВЛЕНИЕ
         // ============================================
 
         private void EditButton_Click(object sender, RoutedEventArgs e)
         {
+            if (!canEdit)
+            {
+                MessageBox.Show("У вас нет прав на редактирование!", "Доступ запрещён",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
             NavigationService.Navigate(new EditAnimalPage(animalId));
         }
 
         private void AddBreedingButton_Click(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(new AddEditBreedingPage(animalId, null));
+            if (!canEdit)
+            {
+                MessageBox.Show("У вас нет прав на добавление!", "Доступ запрещён",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            NavigationService.Navigate(new AddEditDetailPage(EditDetailType.Breeding, animalId, null));
         }
 
         private void AddExhibitionButton_Click(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(new AddEditExhibitionPage(animalId, null));
+            if (!canEdit)
+            {
+                MessageBox.Show("У вас нет прав на добавление!", "Доступ запрещён",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            NavigationService.Navigate(new AddEditDetailPage(EditDetailType.Exhibition, animalId, null));
         }
 
         private void AddAssessmentButton_Click(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(new AddEditAssessmentPage(animalId, null));
+            if (!canEdit)
+            {
+                MessageBox.Show("У вас нет прав на добавление!", "Доступ запрещён",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            NavigationService.Navigate(new AddEditDetailPage(EditDetailType.Assessment, animalId, null));
         }
 
         private void AddHealthEventButton_Click(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(new AddEditHealthEventPage(animalId, null));
+            if (!canEdit)
+            {
+                MessageBox.Show("У вас нет прав на добавление!", "Доступ запрещён",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            NavigationService.Navigate(new AddEditDetailPage(EditDetailType.HealthEvent, animalId, null));
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)

@@ -1,0 +1,90 @@
+﻿<Page x:Class="Lineage.Pages.DetailPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      mc:Ignorable="d"
+      d:DesignHeight="600" d:DesignWidth="800"
+      Title="Детали"
+      Background="#F5F0E6"
+      Loaded="Page_Loaded">
+
+    <Page.Resources>
+        <!-- Стиль для кнопки "НАЗАД" -->
+        <Style x:Key="BackButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="#8FAA7A"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Width" Value="120"/>
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#7A9A66"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#6B8A58"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Верхняя панель -->
+        <Border Grid.Row="0"
+                Background="#FDF8F0"
+                BorderBrush="#D6C9B8"
+                BorderThickness="0,0,0,1"
+                Padding="15,10">
+            <StackPanel Orientation="Horizontal">
+                <Button Content="← НАЗАД" Style="{StaticResource BackButtonStyle}" Click="BackButton_Click"/>
+                <TextBlock x:Name="txtTitle"
+                           Text="Детали"
+                           FontSize="18" FontWeight="SemiBold"
+                           Foreground="#5C4E3D"
+                           VerticalAlignment="Center"
+                           Margin="20,0,0,0"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Основное содержимое - центрирование по вертикали и горизонтали -->
+        <ScrollViewer Grid.Row="1" 
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <!-- Этот Grid центрирует содержимое по вертикали -->
+            <Grid Height="{Binding RelativeSource={RelativeSource AncestorType=ScrollViewer}, Path=ActualHeight}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Контент по центру -->
+                <Border Grid.Row="1"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                    <ContentControl x:Name="DynamicContent" Width="600"/>
+                </Border>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</Page>

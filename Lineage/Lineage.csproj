@@ -176,19 +176,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Pages\AddEditAssessmentPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\AddEditBreedingPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\AddEditExhibitionPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\AddEditHealthEventPage.xaml">
+    <Page Include="Pages\AddEditDetailPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -196,15 +184,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\AssessmentDetailPage.xaml">
+    <Page Include="Pages\CalendarPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\BreedingDetailPage.xaml">
+    <Page Include="Pages\DetailPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\CalendarWindow.xaml">
+    <Page Include="Pages\DictionaryEditDialogPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\DictionaryPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -224,14 +216,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\ExhibitionDetailPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\HealthEventDetailPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Pages\LinkUserToPersonPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -241,6 +225,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\MainPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\NotificationWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -260,11 +248,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\StoryDetailWindow.xaml">
+    <Page Include="Pages\StoryDetailPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\TreeEditDialog.xaml">
+    <Page Include="Pages\TreeEditPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -278,29 +266,23 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Pages\AddEditAssessmentPage.xaml.cs">
-      <DependentUpon>AddEditAssessmentPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\AddEditBreedingPage.xaml.cs">
-      <DependentUpon>AddEditBreedingPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\AddEditExhibitionPage.xaml.cs">
-      <DependentUpon>AddEditExhibitionPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\AddEditHealthEventPage.xaml.cs">
-      <DependentUpon>AddEditHealthEventPage.xaml</DependentUpon>
+    <Compile Include="Pages\AddEditDetailPage.xaml.cs">
+      <DependentUpon>AddEditDetailPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\AnimalProfilePage.xaml.cs">
       <DependentUpon>AnimalProfilePage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\AssessmentDetailPage.xaml.cs">
-      <DependentUpon>AssessmentDetailPage.xaml</DependentUpon>
+    <Compile Include="Pages\CalendarPage.xaml.cs">
+      <DependentUpon>CalendarPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\BreedingDetailPage.xaml.cs">
-      <DependentUpon>BreedingDetailPage.xaml</DependentUpon>
+    <Compile Include="Pages\DetailPage.xaml.cs">
+      <DependentUpon>DetailPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\CalendarWindow.xaml.cs">
-      <DependentUpon>CalendarWindow.xaml</DependentUpon>
+    <Compile Include="Pages\DictionaryEditDialogPage.xaml.cs">
+      <DependentUpon>DictionaryEditDialogPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\DictionaryPage.xaml.cs">
+      <DependentUpon>DictionaryPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\EditAnimalPage.xaml.cs">
       <DependentUpon>EditAnimalPage.xaml</DependentUpon>
@@ -314,12 +296,6 @@
     <Compile Include="Pages\EditUserPage.xaml.cs">
       <DependentUpon>EditUserPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\ExhibitionDetailPage.xaml.cs">
-      <DependentUpon>ExhibitionDetailPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\HealthEventDetailPage.xaml.cs">
-      <DependentUpon>HealthEventDetailPage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Pages\LinkUserToPersonPage.xaml.cs">
       <DependentUpon>LinkUserToPersonPage.xaml</DependentUpon>
     </Compile>
@@ -328,6 +304,9 @@
     </Compile>
     <Compile Include="Pages\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\NotificationWindow.xaml.cs">
+      <DependentUpon>NotificationWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\PersonProfilePage.xaml.cs">
       <DependentUpon>PersonProfilePage.xaml</DependentUpon>
@@ -341,11 +320,11 @@
     <Compile Include="Pages\SelectionPage.xaml.cs">
       <DependentUpon>SelectionPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\StoryDetailWindow.xaml.cs">
-      <DependentUpon>StoryDetailWindow.xaml</DependentUpon>
+    <Compile Include="Pages\StoryDetailPage.xaml.cs">
+      <DependentUpon>StoryDetailPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\TreeEditDialog.xaml.cs">
-      <DependentUpon>TreeEditDialog.xaml</DependentUpon>
+    <Compile Include="Pages\TreeEditPage.xaml.cs">
+      <DependentUpon>TreeEditPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\TreesPage.xaml.cs">
       <DependentUpon>TreesPage.xaml</DependentUpon>

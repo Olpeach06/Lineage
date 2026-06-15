@@ -1,0 +1,309 @@
+﻿<Window x:Class="Lineage.Pages.NotificationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Уведомление"
+        Width="380"
+        Height="300"
+        WindowStartupLocation="CenterOwner"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        ResizeMode="NoResize"
+        Background="Transparent"
+        ShowInTaskbar="False">
+
+    <Window.Resources>
+        <!-- Кастомная тень для окна -->
+        <DropShadowEffect x:Key="WindowShadowEffect"
+                          BlurRadius="20"
+                          Opacity="0.35"
+                          ShadowDepth="6"
+                          Color="#2C2C2C"/>
+
+        <!-- Стиль для затемнённого фона с тенью -->
+        <Style x:Key="DimmedBorderStyle" TargetType="Border">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <RadialGradientBrush Center="0.5,0.5" RadiusX="0.8" RadiusY="0.8">
+                        <RadialGradientBrush.GradientStops>
+                            <GradientStop Color="#00FFFFFF" Offset="0.85"/>
+                            <GradientStop Color="#40000000" Offset="1.0"/>
+                        </RadialGradientBrush.GradientStops>
+                    </RadialGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="CornerRadius" Value="16"/>
+        </Style>
+
+        <!-- Стиль для кнопки "ОК" -->
+        <Style x:Key="OkButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="#8FAA7A"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Width" Value="90"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#7A9A66"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#6B8A58"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для кнопок "ДА"/"НЕТ" -->
+        <Style x:Key="ConfirmYesButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="#8FAA7A"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Width" Value="80"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#7A9A66"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#6B8A58"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ConfirmNoButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#6B5E4A"/>
+            <Setter Property="BorderBrush" Value="#D6C9B8"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Width" Value="80"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#F0E9DE"/>
+                                <Setter Property="Foreground" Value="#8FAA7A"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="#8FAA7A"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для кнопки закрытия (наш кастомный крестик) -->
+        <Style x:Key="CloseWindowButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Width" Value="28"/>
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="#8B7E6B"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="14"
+                                Padding="0">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#F0E9DE"/>
+                                <Setter Property="Foreground" Value="#8FAA7A"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Шаблон для ОШИБКИ -->
+        <DataTemplate x:Key="ErrorTemplate">
+            <Border CornerRadius="16" Margin="8">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="18" Opacity="0.3" ShadowDepth="4" Color="#2C2C2C"/>
+                </Border.Effect>
+                <Border Style="{StaticResource DimmedBorderStyle}">
+                    <Border Background="#FDF8F0" CornerRadius="12" Margin="3">
+                        <StackPanel Margin="20">
+                            <!-- Кастомный крестик для закрытия -->
+                            <Button Content="✕" Style="{StaticResource CloseWindowButtonStyle}" 
+                                    HorizontalAlignment="Right" Margin="0,-8,-8,0"
+                                    Click="CloseWindowButton_Click"/>
+
+                            <TextBlock Text="❌" FontSize="40" Foreground="#E74C3C" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                            <TextBlock Text="ОШИБКА" FontSize="18" FontWeight="Bold" Foreground="#5C4E3D" HorizontalAlignment="Center" Margin="0,0,0,12"/>
+                            <TextBlock Text="{Binding Message}" FontSize="13" Foreground="#6B5E4A" TextWrapping="Wrap" Margin="0,0,0,5" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding Details}" FontSize="11" Foreground="#8B7E6B" TextWrapping="Wrap" Margin="0,0,0,15" HorizontalAlignment="Center" Visibility="{Binding HasDetails}"/>
+                            <Button Content="OK" Style="{StaticResource OkButtonStyle}" HorizontalAlignment="Center" Click="CloseButton_Click"/>
+                        </StackPanel>
+                    </Border>
+                </Border>
+            </Border>
+        </DataTemplate>
+
+        <!-- Шаблон для УСПЕХА -->
+        <DataTemplate x:Key="SuccessTemplate">
+            <Border CornerRadius="16" Margin="8">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="18" Opacity="0.3" ShadowDepth="4" Color="#2C2C2C"/>
+                </Border.Effect>
+                <Border Style="{StaticResource DimmedBorderStyle}">
+                    <Border Background="#FDF8F0" CornerRadius="12" Margin="3">
+                        <StackPanel Margin="20">
+                            <Button Content="✕" Style="{StaticResource CloseWindowButtonStyle}" 
+                                    HorizontalAlignment="Right" Margin="0,-8,-8,0"
+                                    Click="CloseWindowButton_Click"/>
+
+                            <TextBlock Text="✅" FontSize="40" Foreground="#27AE60" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                            <TextBlock Text="УСПЕХ" FontSize="18" FontWeight="Bold" Foreground="#5C4E3D" HorizontalAlignment="Center" Margin="0,0,0,12"/>
+                            <TextBlock Text="{Binding Message}" FontSize="13" Foreground="#6B5E4A" TextWrapping="Wrap" Margin="0,0,0,15" HorizontalAlignment="Center"/>
+                            <Button Content="OK" Style="{StaticResource OkButtonStyle}" HorizontalAlignment="Center" Click="CloseButton_Click"/>
+                        </StackPanel>
+                    </Border>
+                </Border>
+            </Border>
+        </DataTemplate>
+
+        <!-- Шаблон для ИНФОРМАЦИИ -->
+        <DataTemplate x:Key="InfoTemplate">
+            <Border CornerRadius="16" Margin="8">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="18" Opacity="0.3" ShadowDepth="4" Color="#2C2C2C"/>
+                </Border.Effect>
+                <Border Style="{StaticResource DimmedBorderStyle}">
+                    <Border Background="#FDF8F0" CornerRadius="12" Margin="3">
+                        <StackPanel Margin="20">
+                            <Button Content="✕" Style="{StaticResource CloseWindowButtonStyle}" 
+                                    HorizontalAlignment="Right" Margin="0,-8,-8,0"
+                                    Click="CloseWindowButton_Click"/>
+
+                            <TextBlock Text="ℹ️" FontSize="40" Foreground="#3498DB" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                            <TextBlock Text="ИНФОРМАЦИЯ" FontSize="18" FontWeight="Bold" Foreground="#5C4E3D" HorizontalAlignment="Center" Margin="0,0,0,12"/>
+                            <TextBlock Text="{Binding Message}" FontSize="13" Foreground="#6B5E4A" TextWrapping="Wrap" Margin="0,0,0,15" HorizontalAlignment="Center"/>
+                            <Button Content="OK" Style="{StaticResource OkButtonStyle}" HorizontalAlignment="Center" Click="CloseButton_Click"/>
+                        </StackPanel>
+                    </Border>
+                </Border>
+            </Border>
+        </DataTemplate>
+
+        <!-- Шаблон для ПРЕДУПРЕЖДЕНИЯ -->
+        <DataTemplate x:Key="WarningTemplate">
+            <Border CornerRadius="16" Margin="8">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="18" Opacity="0.3" ShadowDepth="4" Color="#2C2C2C"/>
+                </Border.Effect>
+                <Border Style="{StaticResource DimmedBorderStyle}">
+                    <Border Background="#FDF8F0" CornerRadius="12" Margin="3">
+                        <StackPanel Margin="20">
+                            <Button Content="✕" Style="{StaticResource CloseWindowButtonStyle}" 
+                                    HorizontalAlignment="Right" Margin="0,-8,-8,0"
+                                    Click="CloseWindowButton_Click"/>
+
+                            <TextBlock Text="⚠️" FontSize="40" Foreground="#F39C12" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                            <TextBlock Text="ВНИМАНИЕ" FontSize="18" FontWeight="Bold" Foreground="#5C4E3D" HorizontalAlignment="Center" Margin="0,0,0,12"/>
+                            <TextBlock Text="{Binding Message}" FontSize="13" Foreground="#6B5E4A" TextWrapping="Wrap" Margin="0,0,0,15" HorizontalAlignment="Center"/>
+                            <Button Content="OK" Style="{StaticResource OkButtonStyle}" HorizontalAlignment="Center" Click="CloseButton_Click"/>
+                        </StackPanel>
+                    </Border>
+                </Border>
+            </Border>
+        </DataTemplate>
+
+        <!-- Шаблон для ПОДТВЕРЖДЕНИЯ -->
+        <DataTemplate x:Key="ConfirmTemplate">
+            <Border CornerRadius="16" Margin="8">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="18" Opacity="0.3" ShadowDepth="4" Color="#2C2C2C"/>
+                </Border.Effect>
+                <Border Style="{StaticResource DimmedBorderStyle}">
+                    <Border Background="#FDF8F0" CornerRadius="12" Margin="3">
+                        <StackPanel Margin="20">
+                            <Button Content="✕" Style="{StaticResource CloseWindowButtonStyle}" 
+                                    HorizontalAlignment="Right" Margin="0,-8,-8,0"
+                                    Click="CloseWindowButton_Click"/>
+
+                            <TextBlock Text="❓" FontSize="40" Foreground="#8FAA7A" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                            <TextBlock Text="ПОДТВЕРЖДЕНИЕ" FontSize="18" FontWeight="Bold" Foreground="#5C4E3D" HorizontalAlignment="Center" Margin="0,0,0,12"/>
+                            <TextBlock Text="{Binding Question}" FontSize="13" Foreground="#6B5E4A" TextWrapping="Wrap" Margin="0,0,0,15" HorizontalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button Content="Да" Style="{StaticResource ConfirmYesButtonStyle}" Margin="0,0,10,0" Click="ConfirmYes_Click"/>
+                                <Button Content="Нет" Style="{StaticResource ConfirmNoButtonStyle}" Click="ConfirmNo_Click"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </Border>
+            </Border>
+        </DataTemplate>
+
+        <!-- Стиль для ContentControl с анимацией -->
+        <Style TargetType="ContentControl">
+            <Setter Property="Opacity" Value="0"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="0.95" ScaleY="0.95"/>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsVisible" Value="True">
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.15"/>
+                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX" To="1" Duration="0:0:0.15"/>
+                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY" To="1" Duration="0:0:0.15"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <!-- Основная обёртка -->
+    <ContentControl x:Name="NotificationContent"/>
+</Window>

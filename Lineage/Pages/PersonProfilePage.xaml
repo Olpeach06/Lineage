@@ -147,7 +147,7 @@
             </Setter>
         </Style>
 
-        <!-- Стиль для кнопки удаления -->
+        <!-- Стиль для кнопки удаления (большая) -->
         <Style x:Key="DeleteButtonStyle" TargetType="Button">
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Background" Value="#E57373"/>
@@ -156,6 +156,68 @@
             <Setter Property="Width" Value="100"/>
             <Setter Property="Height" Value="28"/>
             <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#D32F2F"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#B71C1C"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для маленькой кнопки редактирования -->
+        <Style x:Key="SmallEditButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="#3498DB"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Margin" Value="3,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#2980B9"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#1A5276"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для маленькой кнопки удаления -->
+        <Style x:Key="SmallDeleteButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="#E57373"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Margin" Value="3,0"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -388,7 +450,7 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Биография и Профессия -->
+                <!-- Биография -->
                 <Border Style="{StaticResource BlockStyle}" Margin="0,0,0,20" Height="180">
                     <StackPanel>
                         <TextBlock Text="📖 Биография"
@@ -444,44 +506,55 @@
                                     <ListView.ItemTemplate>
                                         <DataTemplate>
                                             <Border x:Name="storyBorder"
-                                                    Background="#F5F0E6"
-                                                    CornerRadius="8"
-                                                    Padding="15"
-                                                    Margin="0,0,0,10"
-                                                    HorizontalAlignment="Stretch"
-                                                    Tag="{Binding Id}">
+                Background="#F5F0E6"
+                CornerRadius="8"
+                Padding="15"
+                Margin="0,0,0,10"
+                HorizontalAlignment="Stretch"
+                Tag="{Binding Id}">
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="Auto"/>
                                                         <ColumnDefinition Width="*"/>
                                                         <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="Auto"/>
                                                     </Grid.ColumnDefinitions>
 
                                                     <TextBlock Grid.Column="0"
-                                                               Text="📖"
-                                                               FontSize="20"
-                                                               Foreground="#8FAA7A"
-                                                               Margin="0,0,10,0"/>
+                           Text="📖"
+                           FontSize="20"
+                           Foreground="#8FAA7A"
+                           Margin="0,0,10,0"/>
 
                                                     <StackPanel Grid.Column="1">
                                                         <TextBlock Text="{Binding Title}"
-                                                                   FontWeight="Bold"
-                                                                   Foreground="#5C4E3D"
-                                                                   TextWrapping="Wrap"/>
+                               FontWeight="Bold"
+                               Foreground="#5C4E3D"
+                               TextWrapping="Wrap"/>
                                                         <TextBlock Text="{Binding EventDateString}"
-                                                                   Foreground="#8B7E6B"
-                                                                   FontSize="12"/>
+                               Foreground="#8B7E6B"
+                               FontSize="12"/>
                                                         <TextBlock Text="{Binding ShortContent}"
-                                                                   Foreground="#6B5E4A"
-                                                                   TextWrapping="Wrap"
-                                                                   MaxHeight="40"/>
+                               Foreground="#6B5E4A"
+                               TextWrapping="Wrap"
+                               MaxHeight="40"/>
                                                     </StackPanel>
 
+                                                    <!-- Кнопка Редактировать (видна только если есть права) -->
                                                     <Button Grid.Column="2"
-                                                            Content="Читать"
-                                                            Style="{StaticResource ReadButtonStyle}"
-                                                            Tag="{Binding Id}"
-                                                            Click="ReadStory_Click"/>
+                        Content="✎"
+                        Style="{StaticResource SmallEditButtonStyle}"
+                        Tag="{Binding Id}"
+                        Click="EditStory_Click"
+                        ToolTip="Редактировать историю"
+                        Visibility="{Binding EditButtonVisibility}"/>
+
+                                                    <!-- Кнопка Читать (всегда видна) -->
+                                                    <Button Grid.Column="3"
+                        Content="📖 Читать"
+                        Style="{StaticResource ReadButtonStyle}"
+                        Tag="{Binding Id}"
+                        Click="ReadStory_Click"/>
                                                 </Grid>
                                             </Border>
                                         </DataTemplate>
@@ -523,6 +596,7 @@
 
                             <ScrollViewer VerticalScrollBarVisibility="Auto" Height="280">
                                 <TabControl BorderThickness="0" Background="Transparent">
+                                    <!-- Вкладка: Фотографии -->
                                     <TabItem x:Name="tabPhotos" Header="Фотографии" Background="#F5F0E6">
                                         <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="250">
                                             <ItemsControl x:Name="icPhotos" Margin="5">
@@ -534,17 +608,48 @@
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate>
                                                         <Border x:Name="photoBorder"
-                                                                Width="100" Height="100"
-                                                                Margin="5"
-                                                                BorderBrush="#B7A48B"
-                                                                BorderThickness="1"
-                                                                CornerRadius="8"
-                                                                Cursor="Hand"
-                                                                Tag="{Binding Id}"
-                                                                MouseLeftButtonDown="Photo_Click">
-                                                            <Image Stretch="UniformToFill"
-                                                                   Loaded="Photo_Loaded"
-                                                                   Tag="{Binding FilePath}"/>
+                Width="100" Height="100"
+                Margin="5"
+                BorderBrush="#B7A48B"
+                BorderThickness="1"
+                CornerRadius="8"
+                Background="#F5F0E6"
+                Cursor="Hand">
+                                                            <Grid>
+                                                                <Grid.RowDefinitions>
+                                                                    <RowDefinition Height="*"/>
+                                                                    <RowDefinition Height="Auto"/>
+                                                                </Grid.RowDefinitions>
+
+                                                                <Image Grid.Row="0"
+                       Stretch="UniformToFill"
+                       Loaded="Photo_Loaded"
+                       Tag="{Binding Id}"
+                       MouseLeftButtonDown="Photo_Click"
+                       Cursor="Hand"/>
+
+                                                                <StackPanel Grid.Row="1" 
+                            Orientation="Horizontal" 
+                            HorizontalAlignment="Center"
+                            Background="#80000000">
+                                                                    <Button Content="✎"
+                            Style="{StaticResource SmallEditButtonStyle}"
+                            Tag="{Binding Id}"
+                            Click="EditPhoto_Click"
+                            ToolTip="Редактировать историю"
+                            Background="#3498DB"
+                            Height="22" Padding="5,2"
+                            Visibility="{Binding EditButtonVisibility}"/>
+                                                                    <Button Content="🗑"
+                            Style="{StaticResource SmallDeleteButtonStyle}"
+                            Tag="{Binding Id}"
+                            Click="DeletePhoto_Click"
+                            ToolTip="Удалить фото"
+                            Background="#E57373"
+                            Height="22" Padding="5,2"
+                            Visibility="{Binding DeleteButtonVisibility}"/>
+                                                                </StackPanel>
+                                                            </Grid>
                                                         </Border>
                                                     </DataTemplate>
                                                 </ItemsControl.ItemTemplate>
@@ -552,6 +657,7 @@
                                         </ScrollViewer>
                                     </TabItem>
 
+                                    <!-- Вкладка: Видео -->
                                     <TabItem x:Name="tabVideos" Header="Видео" Background="#F5F0E6">
                                         <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="250">
                                             <ItemsControl x:Name="icVideos" Margin="5">
@@ -563,19 +669,52 @@
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate>
                                                         <Border x:Name="videoBorder"
-                                                                Width="100" Height="100"
-                                                                Margin="5"
-                                                                BorderBrush="#B7A48B"
-                                                                BorderThickness="1"
-                                                                CornerRadius="8"
-                                                                Background="#F5F0E6"
-                                                                Cursor="Hand"
-                                                                Tag="{Binding Id}"
-                                                                MouseLeftButtonDown="Video_Click">
-                                                            <StackPanel>
-                                                                <TextBlock Text="🎥" FontSize="35" Foreground="#8FAA7A" HorizontalAlignment="Center"/>
-                                                                <TextBlock Text="{Binding FileName}" Foreground="#6B5E4A" FontSize="9" TextAlignment="Center" TextWrapping="Wrap" MaxHeight="30"/>
-                                                            </StackPanel>
+                            Width="120" Height="100"
+                            Margin="5"
+                            BorderBrush="#B7A48B"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Background="#F5F0E6"
+                            Cursor="Hand"
+                            MouseLeftButtonDown="Video_Click"
+                            Tag="{Binding Id}">
+                                                            <Grid>
+                                                                <Grid.RowDefinitions>
+                                                                    <RowDefinition Height="*"/>
+                                                                    <RowDefinition Height="Auto"/>
+                                                                </Grid.RowDefinitions>
+
+                                                                <StackPanel Grid.Row="0" VerticalAlignment="Center">
+                                                                    <TextBlock Text="🎥" FontSize="35" Foreground="#8FAA7A" HorizontalAlignment="Center"/>
+                                                                    <TextBlock Text="{Binding FileName}" 
+                                           Foreground="#6B5E4A" FontSize="9" 
+                                           TextAlignment="Center" 
+                                           TextWrapping="Wrap" 
+                                           MaxHeight="30"/>
+                                                                </StackPanel>
+
+                                                                <StackPanel Grid.Row="1" 
+                                        Orientation="Horizontal" 
+                                        HorizontalAlignment="Center"
+                                        Background="#80000000">
+                                                                    <Button Content="✎"
+                                        Style="{StaticResource SmallEditButtonStyle}"
+                                        Tag="{Binding Id}"
+                                        Click="EditVideo_Click"
+                                        ToolTip="Редактировать историю"
+                                        Background="#3498DB"
+                                        Height="22" Padding="5,2"
+                                        Visibility="{Binding EditButtonVisibility}"/>
+                                                                    <Button Content="🗑"
+                                        Style="{StaticResource SmallDeleteButtonStyle}"
+                                        Tag="{Binding Id}"
+                                        Click="DeleteVideo_Click"
+                                        ToolTip="Удалить видео"
+                                        Background="#E57373"
+                                        Height="22" Padding="5,2"
+                                        Visibility="{Binding DeleteButtonVisibility}"/>
+                                                                </StackPanel>
+                                                            </Grid>
                                                         </Border>
                                                     </DataTemplate>
                                                 </ItemsControl.ItemTemplate>
@@ -583,29 +722,58 @@
                                         </ScrollViewer>
                                     </TabItem>
 
+                                    <!-- Вкладка: Аудио -->
                                     <TabItem x:Name="tabAudios" Header="Аудио" Background="#F5F0E6">
                                         <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="250">
                                             <ItemsControl x:Name="icAudios" Margin="5">
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate>
                                                         <Border x:Name="audioBorder"
-                                                                Margin="5"
-                                                                Padding="10"
-                                                                BorderBrush="#B7A48B"
-                                                                BorderThickness="1"
-                                                                CornerRadius="8"
-                                                                HorizontalAlignment="Stretch"
-                                                                Background="#F5F0E6"
-                                                                Cursor="Hand"
-                                                                Tag="{Binding Id}"
-                                                                MouseLeftButtonDown="PlayAudio_Click">
+                            Margin="5"
+                            Padding="10"
+                            BorderBrush="#B7A48B"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            HorizontalAlignment="Stretch"
+                            Background="#F5F0E6"
+                            Cursor="Hand"
+                            MouseLeftButtonDown="PlayAudio_Click"
+                            Tag="{Binding Id}">
                                                             <Grid>
                                                                 <Grid.ColumnDefinitions>
                                                                     <ColumnDefinition Width="Auto"/>
                                                                     <ColumnDefinition Width="*"/>
+                                                                    <ColumnDefinition Width="Auto"/>
+                                                                    <ColumnDefinition Width="Auto"/>
                                                                 </Grid.ColumnDefinitions>
-                                                                <TextBlock Grid.Column="0" Text="🎵" FontSize="20" Foreground="#8FAA7A" Margin="0,0,10,0"/>
-                                                                <TextBlock Grid.Column="1" Text="{Binding FileName}" Foreground="#5C4E3D" FontWeight="SemiBold" TextWrapping="Wrap"/>
+
+                                                                <TextBlock Grid.Column="0" 
+                                       Text="🎵" FontSize="20" 
+                                       Foreground="#8FAA7A" 
+                                       Margin="0,0,10,0"/>
+
+                                                                <TextBlock Grid.Column="1" 
+                                       Text="{Binding FileName}" 
+                                       Foreground="#5C4E3D" 
+                                       FontWeight="SemiBold" 
+                                       TextWrapping="Wrap"
+                                       VerticalAlignment="Center"/>
+
+                                                                <Button Grid.Column="2"
+                                    Content="✎"
+                                    Style="{StaticResource SmallEditButtonStyle}"
+                                    Tag="{Binding Id}"
+                                    Click="EditAudio_Click"
+                                    ToolTip="Редактировать историю"
+                                    Visibility="{Binding EditButtonVisibility}"/>
+
+                                                                <Button Grid.Column="3"
+                                    Content="🗑"
+                                    Style="{StaticResource SmallDeleteButtonStyle}"
+                                    Tag="{Binding Id}"
+                                    Click="DeleteAudio_Click"
+                                    ToolTip="Удалить аудио"
+                                    Visibility="{Binding DeleteButtonVisibility}"/>
                                                             </Grid>
                                                         </Border>
                                                     </DataTemplate>

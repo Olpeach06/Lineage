@@ -1,0 +1,258 @@
+﻿<Page x:Class="Lineage.Pages.DictionaryPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      mc:Ignorable="d"
+      d:DesignHeight="600" d:DesignWidth="800"
+      Title="Справочник"
+      Background="#F5F0E6">
+
+    <Page.Resources>
+        <DropShadowEffect x:Key="ShadowEffect"
+                          BlurRadius="20"
+                          Opacity="0.15"
+                          ShadowDepth="5"
+                          Color="#5C4E3D"/>
+
+        <Style x:Key="BackButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="#8FAA7A"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Width" Value="120"/>
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#7A9A66"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#6B8A58"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="AddButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="#8FAA7A"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#7A9A66"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#6B8A58"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="EditButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="#D6C9B8"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#6B5E4A"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Width" Value="65"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#F0E9DE"/>
+                                <Setter Property="Foreground" Value="#8FAA7A"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="#8FAA7A"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="DeleteButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="#D6C9B8"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#E74C3C"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Width" Value="65"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#FCE4E4"/>
+                                <Setter Property="Foreground" Value="#C0392B"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="#C0392B"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Увеличенный стиль для карточки -->
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="#F5F0E6"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="15"/>
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Width" Value="360"/>
+            <Setter Property="MinHeight" Value="90"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderBrush" Value="#D6C9B8"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="6" Opacity="0.1" ShadowDepth="2"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Верхняя панель -->
+        <Border Grid.Row="0"
+                Background="#FDF8F0"
+                BorderBrush="#D6C9B8"
+                BorderThickness="0,0,0,1"
+                Padding="15,10"
+                Effect="{StaticResource ShadowEffect}">
+            <StackPanel Orientation="Horizontal">
+                <Button Content="← НАЗАД" Style="{StaticResource BackButtonStyle}" Click="BackButton_Click"/>
+                <TextBlock x:Name="txtTitle"
+                           Text="Справочник"
+                           FontSize="18" FontWeight="SemiBold"
+                           Foreground="#5C4E3D"
+                           VerticalAlignment="Center"
+                           Margin="20,0,0,0"/>
+                <Button x:Name="btnAdd" Content="➕ ДОБАВИТЬ" Style="{StaticResource AddButtonStyle}"
+                        Margin="20,0,0,0" Click="AddButton_Click"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Список элементов в виде карточек (по 2 в ряд) -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="20">
+            <Border Background="#FDF8F0"
+                    CornerRadius="15"
+                    BorderBrush="#B7A48B"
+                    BorderThickness="1"
+                    Padding="15"
+                    Effect="{StaticResource ShadowEffect}">
+
+                <StackPanel>
+                    <!-- WrapPanel для горизонтального расположения по 2 карточки -->
+                    <ItemsControl x:Name="lvItems" BorderThickness="0" Background="Transparent">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource CardStyle}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Информация о элементе -->
+                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding DisplayName}" 
+                                                       FontSize="15" FontWeight="SemiBold"
+                                                       Foreground="#5C4E3D"
+                                                       TextWrapping="Wrap"
+                                                       Margin="0,0,0,5"/>
+                                            <TextBlock Text="{Binding Description}" 
+                                                       FontSize="12" Foreground="#8B7E6B"
+                                                       TextWrapping="Wrap"
+                                                       Visibility="{Binding HasDescription}"
+                                                       MaxHeight="50"/>
+                                        </StackPanel>
+
+                                        <!-- Кнопки действий -->
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" 
+                                                    VerticalAlignment="Center" Margin="15,0,0,0">
+                                            <Button Content="✎"
+                                                    Style="{StaticResource EditButtonStyle}"
+                                                    Margin="3,0" Click="EditItem_Click"
+                                                    Tag="{Binding Id}"
+                                                    ToolTip="Редактировать"/>
+
+                                            <Button Content="🗑"
+                                                    Style="{StaticResource DeleteButtonStyle}"
+                                                    Margin="3,0" Click="DeleteItem_Click"
+                                                    Tag="{Binding Id}"
+                                                    ToolTip="Удалить"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <TextBlock x:Name="txtEmpty" Text="Нет данных" 
+                               Foreground="#8B7E6B" HorizontalAlignment="Center" 
+                               Margin="20" Visibility="Collapsed"/>
+                </StackPanel>
+            </Border>
+        </ScrollViewer>
+    </Grid>
+</Page>

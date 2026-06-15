@@ -1,15 +1,21 @@
-﻿<Page x:Class="Lineage.Pages.AddEditExhibitionPage"
+﻿<Page x:Class="Lineage.Pages.TreeEditPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       mc:Ignorable="d"
-      d:DesignHeight="800" d:DesignWidth="800"
-      Title="Выставка"
+      d:DesignHeight="550" d:DesignWidth="450"
+      Title="Редактирование проекта"
       Background="#F5F0E6"
       Loaded="Page_Loaded">
 
     <Page.Resources>
+        <DropShadowEffect x:Key="ShadowEffect"
+                          BlurRadius="20"
+                          Opacity="0.15"
+                          ShadowDepth="5"
+                          Color="#5C4E3D"/>
+
         <!-- Стиль для кнопки "ОТМЕНА" -->
         <Style x:Key="CancelButtonStyle" TargetType="Button">
             <Setter Property="Cursor" Value="Hand"/>
@@ -19,8 +25,8 @@
             <Setter Property="Foreground" Value="#6B5E4A"/>
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="FontWeight" Value="Medium"/>
-            <Setter Property="Width" Value="120"/>
-            <Setter Property="Height" Value="40"/>
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="Height" Value="35"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -55,8 +61,8 @@
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Width" Value="120"/>
-            <Setter Property="Height" Value="40"/>
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="Height" Value="35"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -73,21 +79,14 @@
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter TargetName="border" Property="Background" Value="#6B8A58"/>
                             </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Background" Value="#B7C8A8"/>
+                                <Setter Property="Foreground" Value="#E8F0E0"/>
+                            </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-        </Style>
-
-        <!-- Стиль для DatePicker -->
-        <Style TargetType="DatePicker">
-            <Setter Property="Height" Value="35"/>
-            <Setter Property="BorderBrush" Value="#B7A48B"/>
-            <Setter Property="BorderThickness" Value="0,0,0,1"/>
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="#5C4E3D"/>
-            <Setter Property="FontSize" Value="13"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
 
         <!-- Стиль для TextBox -->
@@ -100,84 +99,77 @@
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="Foreground" Value="#5C4E3D"/>
         </Style>
+
+        <!-- Стиль для CheckBox -->
+        <Style TargetType="CheckBox">
+            <Setter Property="Foreground" Value="#6B5E4A"/>
+            <Setter Property="Margin" Value="0,0,0,20"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
     </Page.Resources>
 
     <Grid>
-        <Border Width="500"
-                Background="#FDF8F0"
-                CornerRadius="20"
-                Padding="30"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                BorderBrush="#B7A48B"
-                BorderThickness="1">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-            <Border.Effect>
-                <DropShadowEffect BlurRadius="20"
-                                  Opacity="0.15"
-                                  ShadowDepth="5"
-                                  Color="#5C4E3D"/>
-            </Border.Effect>
+            <Border Grid.Row="1" Grid.Column="1" Width="400"
+                    Background="#FDF8F0"
+                    CornerRadius="20"
+                    Padding="30"
+                    BorderBrush="#B7A48B"
+                    BorderThickness="1"
+                    Effect="{StaticResource ShadowEffect}">
 
-            <StackPanel>
-                <Image Source="/Images/icon-tree.png" Width="50" Height="50" 
-                       HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                <StackPanel>
+                    <Image Source="/Images/icon-tree.png" Width="60" Height="60"
+                           HorizontalAlignment="Center" Margin="0,0,0,10"/>
 
-                <TextBlock x:Name="txtTitle"
-                           Text="ДОБАВЛЕНИЕ ВЫСТАВКИ"
-                           FontSize="22" FontWeight="SemiBold"
-                           Foreground="#5C4E3D"
-                           HorizontalAlignment="Center"
-                           Margin="0,0,0,20"/>
+                    <TextBlock x:Name="txtTitle"
+                               Text="СОЗДАНИЕ ПРОЕКТА"
+                               FontSize="18" FontWeight="Bold"
+                               Foreground="#5C4E3D"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,20"/>
 
-                <!-- Название выставки -->
-                <TextBlock Text="Название выставки *" Foreground="#6B5E4A" Margin="0,5,0,2"/>
-                <TextBox x:Name="txtExhibitionName"/>
+                    <TextBlock Text="Название *" Foreground="#6B5E4A" Margin="0,5,0,2"/>
+                    <TextBox x:Name="txtName" TextChanged="ValidateFields"/>
 
-                <!-- Дата проведения -->
-                <TextBlock Text="Дата проведения *" Foreground="#6B5E4A" Margin="0,5,0,2"/>
-                <DatePicker x:Name="dpExhibitionDate"/>
+                    <TextBlock Text="Описание" Foreground="#6B5E4A" Margin="0,5,0,2"/>
+                    <TextBox x:Name="txtDescription" 
+                             TextWrapping="Wrap" 
+                             AcceptsReturn="True" 
+                             Height="80"/>
 
-                <!-- Место проведения -->
-                <TextBlock Text="Место проведения" Foreground="#6B5E4A" Margin="0,5,0,2"/>
-                <TextBox x:Name="txtLocation"/>
+                    <CheckBox x:Name="chkIsPublic" 
+                              Content="Публичный проект (доступен для просмотра всем)"/>
 
-                <!-- Результат -->
-                <TextBlock Text="Результат" Foreground="#6B5E4A" Margin="0,5,0,2"/>
-                <TextBox x:Name="txtResult"/>
-
-                <!-- Судья -->
-                <TextBlock Text="Судья" Foreground="#6B5E4A" Margin="0,5,0,2"/>
-                <TextBox x:Name="txtJudgeName"/>
-
-                <!-- Оценка -->
-                <TextBlock Text="Оценка (баллы)" Foreground="#6B5E4A" Margin="0,5,0,2"/>
-                <TextBox x:Name="txtRating"/>
-
-                <!-- Номер сертификата -->
-                <TextBlock Text="Номер сертификата" Foreground="#6B5E4A" Margin="0,5,0,2"/>
-                <TextBox x:Name="txtCertificateNumber"/>
-
-                <!-- Примечания -->
-                <TextBlock Text="Примечания" Foreground="#6B5E4A" Margin="0,5,0,2"/>
-                <TextBox x:Name="txtNotes" Height="60" TextWrapping="Wrap" AcceptsReturn="True"/>
-
-                <!-- Кнопки -->
-                <Grid Margin="0,10,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0" Content="ОТМЕНА"
-                            Style="{StaticResource CancelButtonStyle}"
-                            Margin="0,0,10,0" HorizontalAlignment="Right"
-                            Click="CancelButton_Click"/>
-                    <Button Grid.Column="1" Content="СОХРАНИТЬ"
-                            Style="{StaticResource SaveButtonStyle}"
-                            Margin="10,0,0,0" HorizontalAlignment="Left"
-                            Click="SaveButton_Click"/>
-                </Grid>
-            </StackPanel>
-        </Border>
+                    <Grid Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Content="ОТМЕНА"
+                                Style="{StaticResource CancelButtonStyle}"
+                                Margin="0,0,10,0" HorizontalAlignment="Right"
+                                Click="CancelButton_Click"/>
+                        <Button Grid.Column="1" x:Name="btnSave" Content="СОХРАНИТЬ"
+                                Style="{StaticResource SaveButtonStyle}"
+                                Margin="10,0,0,0" HorizontalAlignment="Left"
+                                IsEnabled="False"
+                                Click="SaveButton_Click"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </Grid>
     </Grid>
 </Page>

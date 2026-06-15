@@ -218,6 +218,7 @@
                     <ColumnDefinition Width="250"/>
                     <ColumnDefinition Width="150"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
@@ -263,7 +264,7 @@
                     </Grid>
                 </Border>
 
-                <!-- Фильтр (универсальный) -->
+                <!-- Фильтр -->
                 <ComboBox Grid.Column="1" x:Name="cmbFilter" Margin="10,0,0,0" Height="35"
                           Background="White" BorderBrush="#D6C9B8" SelectedIndex="0"
                           SelectionChanged="Filter_Changed">
@@ -484,6 +485,121 @@
                         </Button.Style>
                     </Button>
                 </StackPanel>
+
+                <!-- Админ панель -->
+                <StackPanel x:Name="panelAdminButtons" Grid.Column="3" Orientation="Horizontal" Margin="20,0" Visibility="Collapsed">
+                    <Button x:Name="btnSpecies" Content="🐾 Виды" Width="80" Height="35"
+                            Background="Transparent" BorderBrush="#D6C9B8" BorderThickness="1"
+                            Margin="2" Cursor="Hand" FontSize="12" Click="BtnSpecies_Click">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="border" Background="{TemplateBinding Background}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                                    CornerRadius="8">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="border" Property="Background" Value="#F0E9DE"/>
+                                                    <Setter Property="Foreground" Value="#8FAA7A"/>
+                                                    <Setter TargetName="border" Property="BorderBrush" Value="#8FAA7A"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+                    <Button x:Name="btnBreeds" Content="🐄 Породы" Width="80" Height="35"
+                            Background="Transparent" BorderBrush="#D6C9B8" BorderThickness="1"
+                            Margin="2" Cursor="Hand" FontSize="12" Click="BtnBreeds_Click">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="border" Background="{TemplateBinding Background}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                                    CornerRadius="8">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="border" Property="Background" Value="#F0E9DE"/>
+                                                    <Setter Property="Foreground" Value="#8FAA7A"/>
+                                                    <Setter TargetName="border" Property="BorderBrush" Value="#8FAA7A"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+                    <Button x:Name="btnColors" Content="🎨 Окрасы" Width="80" Height="35"
+                            Background="Transparent" BorderBrush="#D6C9B8" BorderThickness="1"
+                            Margin="2" Cursor="Hand" FontSize="12" Click="BtnColors_Click">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="border" Background="{TemplateBinding Background}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                                    CornerRadius="8">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="border" Property="Background" Value="#F0E9DE"/>
+                                                    <Setter Property="Foreground" Value="#8FAA7A"/>
+                                                    <Setter TargetName="border" Property="BorderBrush" Value="#8FAA7A"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+                    <Button x:Name="btnPedigreeClasses" Content="🏅 Плем. классы" Width="100" Height="35"
+                            Background="Transparent" BorderBrush="#D6C9B8" BorderThickness="1"
+                            Margin="2" Cursor="Hand" FontSize="12" Click="BtnPedigreeClasses_Click">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="border" Background="{TemplateBinding Background}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                                    CornerRadius="8">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="border" Property="Background" Value="#F0E9DE"/>
+                                                    <Setter Property="Foreground" Value="#8FAA7A"/>
+                                                    <Setter TargetName="border" Property="BorderBrush" Value="#8FAA7A"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </StackPanel>
             </Grid>
         </Border>
 
@@ -493,14 +609,15 @@
             <ScrollViewer x:Name="mainScrollViewer"
                           HorizontalScrollBarVisibility="Auto"
                           VerticalScrollBarVisibility="Auto">
-                <Canvas x:Name="treeCanvas" Width="2000" Height="1500" Background="#FDF8F0"
+                <Canvas x:Name="treeCanvas" Background="#FDF8F0"
                         MouseLeftButtonDown="Canvas_MouseLeftButtonDown"
                         MouseMove="Canvas_MouseMove"
-                        MouseLeftButtonUp="Canvas_MouseLeftButtonUp"/>
+                        MouseLeftButtonUp="Canvas_MouseLeftButtonUp"
+                        SizeChanged="TreeCanvas_SizeChanged"/>
             </ScrollViewer>
         </Border>
 
-        <!-- БОКОВАЯ ПАНЕЛЬ (информация о выбранной персоне/животном) -->
+        <!-- БОКОВАЯ ПАНЕЛЬ -->
         <Border Grid.Row="3" Background="#FDF8F0" Margin="10" CornerRadius="8"
                 BorderBrush="#D6C9B8" BorderThickness="1" Padding="15">
             <Grid>

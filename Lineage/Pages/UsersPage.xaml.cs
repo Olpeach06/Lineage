@@ -49,29 +49,9 @@ namespace Lineage.Pages
                 }
             }
 
-            public SolidColorBrush StatusColor
-            {
-                get
-                {
-                    return IsActive ? new SolidColorBrush(System.Windows.Media.Colors.Green) : new SolidColorBrush(System.Windows.Media.Colors.Red);
-                }
-            }
-
-            public string StatusText
-            {
-                get
-                {
-                    return IsActive ? "Активен" : "Заблокирован";
-                }
-            }
-
-            public TextDecorationCollection PersonUnderline
-            {
-                get
-                {
-                    return PersonId.HasValue && PersonId > 0 ? TextDecorations.Underline : null;
-                }
-            }
+            public SolidColorBrush StatusColor => IsActive ? new SolidColorBrush(System.Windows.Media.Colors.Green) : new SolidColorBrush(System.Windows.Media.Colors.Red);
+            public string StatusText => IsActive ? "Активен" : "Заблокирован";
+            public TextDecorationCollection PersonUnderline => PersonId.HasValue && PersonId > 0 ? TextDecorations.Underline : null;
         }
 
         public class RoleItem
@@ -99,7 +79,7 @@ namespace Lineage.Pages
             btnAddUser.Visibility = Session.IsAdmin ? Visibility.Visible : Visibility.Collapsed;
 
             LoadRoles();
-            LoadUsers();  // Здесь данные загружаются и сразу отображаются
+            LoadUsers();
         }
 
         private void LoadRoles()
@@ -151,7 +131,6 @@ namespace Lineage.Pages
                         LastLoginDate = u.LastLoginAt?.ToString("dd.MM.yyyy HH:mm") ?? "---"
                     }).ToList();
 
-                    // Применяем фильтр и отображаем данные
                     DisplayUsers();
                 }
             }
@@ -179,11 +158,7 @@ namespace Lineage.Pages
             txtUsersCount.Text = $"Всего пользователей: {filtered.Count()}";
         }
 
-        private void ApplyFilter()
-        {
-            if (icUsers == null) return;
-            DisplayUsers();
-        }
+        private void ApplyFilter() => DisplayUsers();
 
         private void txtSearch_GotFocus(object sender, RoutedEventArgs e)
         {
@@ -229,10 +204,7 @@ namespace Lineage.Pages
                 btnClearSearch.Visibility = Visibility.Collapsed;
         }
 
-        private void SearchButton_Click(object sender, RoutedEventArgs e)
-        {
-            PerformSearch();
-        }
+        private void SearchButton_Click(object sender, RoutedEventArgs e) => PerformSearch();
 
         private void PerformSearch()
         {
@@ -273,20 +245,31 @@ namespace Lineage.Pages
 
             if (!Session.IsAdmin)
             {
-                MessageBox.Show("Только администратор может удалять пользователей!", "Доступ запрещен", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Только администратор может удалять пользователей!", "Доступ запрещен",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
             if (userId == Session.UserId)
             {
-                MessageBox.Show("Нельзя удалить свою учетную запись!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Нельзя удалить свою учетную запись!", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
             var targetUser = allUsers.FirstOrDefault(u => u.Id == userId);
             if (targetUser == null) return;
 
-            var result = MessageBox.Show($"Вы уверены, что хотите удалить пользователя {targetUser.Username}?", "Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            var result = MessageBox.Show(
+                $"Вы уверены, что хотите удалить пользователя {targetUser.Username}?\n\n" +
+                "Будут удалены:\n" +
+                "• Все проекты пользователя\n" +
+                "• Все персоны/животные\n" +
+                "• Все истории и медиафайлы\n\n" +
+                "Это действие НЕОБРАТИМО!",
+                "Подтверждение удаления",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
 
             if (result == MessageBoxResult.Yes)
             {
@@ -295,37 +278,74 @@ namespace Lineage.Pages
                     using (var context = new GenealogyUnifiedDBEntities2())
                     {
                         var userTrees = context.FamilyTrees.Where(t => t.CreatedByUserId == userId).ToList();
+
                         foreach (var tree in userTrees)
                         {
-                            var persons = context.Persons.Where(p => p.TreeId == tree.Id).ToList();
-                            var personIds = persons.Select(p => p.Id).ToList();
+                            if (tree.ProjectTypeId == 1) // Семейное древо
+                            {
+                                var persons = context.Persons.Where(p => p.TreeId == tree.Id).ToList();
+                                var personIds = persons.Select(p => p.Id).ToList();
 
-                            var mediaLinks = context.MediaLinks.Where(ml => personIds.Contains(ml.PersonId ?? 0)).ToList();
-                            context.MediaLinks.RemoveRange(mediaLinks);
+                                var mediaLinks = context.MediaLinks.Where(ml => personIds.Contains(ml.PersonId ?? 0)).ToList();
+                                context.MediaLinks.RemoveRange(mediaLinks);
 
-                            var stories = context.Stories.Where(s => personIds.Contains(s.PersonId)).ToList();
-                            context.Stories.RemoveRange(stories);
+                                var stories = context.Stories.Where(s => personIds.Contains(s.PersonId)).ToList();
+                                context.Stories.RemoveRange(stories);
 
-                            var relationships = context.PersonRelationships
-                                .Where(r => personIds.Contains(r.Person1Id) || personIds.Contains(r.Person2Id))
-                                .ToList();
-                            context.PersonRelationships.RemoveRange(relationships);
+                                var relationships = context.PersonRelationships
+                                    .Where(r => personIds.Contains(r.Person1Id) || personIds.Contains(r.Person2Id))
+                                    .ToList();
+                                context.PersonRelationships.RemoveRange(relationships);
 
-                            context.Persons.RemoveRange(persons);
+                                context.Persons.RemoveRange(persons);
+                            }
+                            else // Племенная книга
+                            {
+                                var animals = context.Animals.Where(a => a.TreeId == tree.Id).ToList();
+                                var animalIds = animals.Select(a => a.Id).ToList();
+
+                                var breedings = context.Breedings.Where(b => b.TreeId == tree.Id).ToList();
+                                context.Breedings.RemoveRange(breedings);
+
+                                var exhibitions = context.Exhibitions.Where(ex => animalIds.Contains(ex.AnimalId)).ToList();
+                                context.Exhibitions.RemoveRange(exhibitions);
+
+                                var assessments = context.AnimalAssessments.Where(a => animalIds.Contains(a.AnimalId)).ToList();
+                                context.AnimalAssessments.RemoveRange(assessments);
+
+                                var pedigrees = context.AnimalPedigree.Where(p => animalIds.Contains(p.AnimalId)).ToList();
+                                context.AnimalPedigree.RemoveRange(pedigrees);
+
+                                var vetEvents = context.VeterinaryEvents.Where(v => animalIds.Contains(v.AnimalId)).ToList();
+                                context.VeterinaryEvents.RemoveRange(vetEvents);
+
+                                var productivityRecords = context.ProductivityRecords.Where(p => animalIds.Contains(p.AnimalId)).ToList();
+                                context.ProductivityRecords.RemoveRange(productivityRecords);
+
+                                var mediaLinks = context.MediaLinks.Where(ml => animalIds.Contains(ml.AnimalId ?? 0)).ToList();
+                                context.MediaLinks.RemoveRange(mediaLinks);
+
+                                context.Animals.RemoveRange(animals);
+                            }
                         }
 
                         context.FamilyTrees.RemoveRange(userTrees);
+
                         var user = context.Users.Find(userId);
                         if (user != null) context.Users.Remove(user);
+
                         context.SaveChanges();
 
-                        MessageBox.Show("Пользователь удален!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                        LoadUsers(); // Перезагружаем список
+                        MessageBox.Show($"Пользователь {targetUser.Username} успешно удалён!", "Успех",
+                            MessageBoxButton.OK, MessageBoxImage.Information);
+
+                        LoadUsers();
                     }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Ошибка удаления пользователя: {ex.Message}");
+                    MessageBox.Show($"Ошибка при удалении пользователя: {ex.Message}", "Ошибка",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }

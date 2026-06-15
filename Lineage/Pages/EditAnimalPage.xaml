@@ -4,7 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       mc:Ignorable="d"
-      d:DesignHeight="800" d:DesignWidth="1100"
+      d:DesignHeight="900" d:DesignWidth="1100"
       Title="Редактирование животного"
       Background="#F5F0E6"
       Loaded="Page_Loaded">
@@ -288,7 +288,7 @@
             </Style.Triggers>
         </Style>
 
-        <!-- Стиль для DatePicker (упрощённый) -->
+        <!-- Стиль для DatePicker -->
         <Style TargetType="DatePicker">
             <Setter Property="Height" Value="35"/>
             <Setter Property="BorderBrush" Value="#B7A48B"/>
@@ -371,7 +371,7 @@
                 </StackPanel>
 
                 <!-- Основные поля в 3 колонки -->
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" MaxHeight="550">
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" MaxHeight="600">
                     <StackPanel>
                         <Grid Margin="0,0,0,15">
                             <Grid.ColumnDefinitions>
@@ -446,7 +446,7 @@
                         </Grid>
 
                         <!-- Родословная (родители) -->
-                        <GroupBox Header="Родословная (родители)" Style="{StaticResource ParentGroupBoxStyle}">
+                        <GroupBox Header="🌳 Родословная (родители)" Style="{StaticResource ParentGroupBoxStyle}">
                             <Grid Margin="10">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -465,21 +465,78 @@
                             </Grid>
                         </GroupBox>
 
-                        <!-- Продуктивность (JSON) -->
-                        <GroupBox Header="Продуктивность (JSON-формат)" BorderBrush="#B7A48B" Foreground="#5C4E3D" Margin="0,5,0,10">
-                            <TextBox x:Name="txtProductivityData" Height="80" TextWrapping="Wrap" AcceptsReturn="True"
-                                     Padding="8" BorderBrush="#B7A48B" Background="Transparent" Margin="10"
-                                     ToolTip='Пример: {"milkYield":9850, "fatContent":3.8, "proteinContent":3.2}'/>
+                        <!-- Продуктивность -->
+                        <GroupBox Header="🥛 ПРОДУКТИВНОСТЬ" BorderBrush="#B7A48B" Foreground="#5C4E3D" Margin="0,5,0,10">
+                            <StackPanel Margin="10">
+                                <!-- Список существующих записей -->
+                                <ListView x:Name="lvProductivity" BorderThickness="0" Background="Transparent" MaxHeight="150" Margin="0,0,0,10">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="#F5F0E6" CornerRadius="6" Padding="8" Margin="0,0,0,3">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="90"/>
+                                                        <ColumnDefinition Width="80"/>
+                                                        <ColumnDefinition Width="80"/>
+                                                        <ColumnDefinition Width="80"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Grid.Column="0" Text="{Binding RecordDate}" Foreground="#8FAA7A" FontWeight="Bold" FontSize="11"/>
+                                                    <TextBlock Grid.Column="1" Text="{Binding MilkYield}" Foreground="#6B5E4A" FontSize="11"/>
+                                                    <TextBlock Grid.Column="2" Text="{Binding FatContent}" Foreground="#6B5E4A" FontSize="11"/>
+                                                    <TextBlock Grid.Column="3" Text="{Binding ProteinContent}" Foreground="#6B5E4A" FontSize="11"/>
+                                                    <Button Grid.Column="4" Content="🗑" Width="25" Height="22" 
+                                                            Style="{StaticResource RemovePhotoButtonStyle}"
+                                                            Click="DeleteProductivityRecord_Click" Tag="{Binding Id}"
+                                                            ToolTip="Удалить запись"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+
+                                <!-- Форма добавления новой записи -->
+                                <Border Background="#F5F0E6" CornerRadius="8" Padding="10" Margin="0,0,0,5">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Дата" Foreground="#6B5E4A" FontSize="10" Margin="0,0,5,2"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="1" Text="Удой (кг)" Foreground="#6B5E4A" FontSize="10" Margin="0,0,5,2"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="2" Text="Жирность %" Foreground="#6B5E4A" FontSize="10" Margin="0,0,5,2"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="3" Text="Белок %" Foreground="#6B5E4A" FontSize="10" Margin="0,0,5,2"/>
+
+                                        <DatePicker x:Name="dpProductivityDate" Grid.Row="1" Grid.Column="0" Height="28" Margin="0,0,5,0" SelectedDateFormat="Short"/>
+                                        <TextBox x:Name="txtMilkYield" Grid.Row="1" Grid.Column="1" Height="28" Margin="0,0,5,0" TextAlignment="Center"/>
+                                        <TextBox x:Name="txtFatContent" Grid.Row="1" Grid.Column="2" Height="28" Margin="0,0,5,0" TextAlignment="Center"/>
+                                        <TextBox x:Name="txtProteinContent" Grid.Row="1" Grid.Column="3" Height="28" Margin="0,0,5,0" TextAlignment="Center"/>
+                                        <Button Grid.Row="1" Grid.Column="4" Content="➕" Width="28" Height="28"
+                                                Style="{StaticResource SelectPhotoButtonStyle}" Click="AddProductivityRecord_Click"
+                                                ToolTip="Добавить запись продуктивности"/>
+                                    </Grid>
+                                </Border>
+
+                                <TextBlock Text="* Для коров и коз" Foreground="#B7A48B" FontSize="10"/>
+                            </StackPanel>
                         </GroupBox>
 
                         <!-- Описание -->
-                        <GroupBox Header="Описание / Примечания" BorderBrush="#B7A48B" Foreground="#5C4E3D" Margin="0,5,0,10">
+                        <GroupBox Header="📝 Описание / Примечания" BorderBrush="#B7A48B" Foreground="#5C4E3D" Margin="0,5,0,10">
                             <TextBox x:Name="txtDescription" Height="60" TextWrapping="Wrap" AcceptsReturn="True"
                                      Padding="8" BorderBrush="#B7A48B" Background="Transparent" Margin="10"/>
                         </GroupBox>
 
                         <!-- Фото -->
-                        <GroupBox Header="Фотография" BorderBrush="#B7A48B" Foreground="#5C4E3D" Margin="0,5,0,10">
+                        <GroupBox Header="🖼️ Фотография" BorderBrush="#B7A48B" Foreground="#5C4E3D" Margin="0,5,0,10">
                             <StackPanel Orientation="Horizontal" Margin="10">
                                 <Border Width="80" Height="80" BorderBrush="#B7A48B" BorderThickness="1" CornerRadius="8" Background="#F5F0E6" Margin="0,0,10,0">
                                     <Grid>

@@ -156,6 +156,37 @@
             </Setter>
         </Style>
 
+        <!-- Стиль для кнопки "Редактировать" внутри вкладок -->
+        <Style x:Key="TabEditButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="#3498DB"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Margin" Value="3,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#2980B9"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#1A5276"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <!-- Стиль для кнопки "Удалить" внутри вкладок -->
         <Style x:Key="TabDeleteButtonStyle" TargetType="Button">
             <Setter Property="Cursor" Value="Hand"/>
@@ -265,7 +296,7 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="200"/>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="200"/>
                         </Grid.ColumnDefinitions>
 
                         <!-- Фото -->
@@ -326,24 +357,24 @@
                         <StackPanel Grid.Column="2" VerticalAlignment="Top">
                             <Button x:Name="btnEdit"
                                     Content="✎ Редактировать"
-                                    Style="{StaticResource GreenButtonStyle}"
+                                    Style="{StaticResource GreenButtonStyle}" Width="200"
                                     Click="EditButton_Click"/>
                             <Button x:Name="btnAddBreeding"
-                                    Content="🔗 Добавить вязку"
+                                    Content="🔗 Добавить вязку" Width="200"
                                     Style="{StaticResource TransparentButtonStyle}"
                                     Click="AddBreedingButton_Click"/>
                             <Button x:Name="btnAddExhibition"
-                                    Content="🏆 Добавить выставку"
+                                    Content="🏆 Добавить выставку" Width="200"
                                     Style="{StaticResource TransparentButtonStyle}"
                                     Click="AddExhibitionButton_Click"/>
-                            <Button x:Name="btnAddAssessment"
+                            <Button x:Name="btnAddAssessment" 
                                     Content="⭐ Добавить оценку"
                                     Style="{StaticResource TransparentButtonStyle}"
-                                    Click="AddAssessmentButton_Click"/>
+                                    Click="AddAssessmentButton_Click" Width="200"/>
                             <Button x:Name="btnAddHealthEvent"
                                     Content="💊 Добавить событие здоровья"
                                     Style="{StaticResource TransparentButtonStyle}"
-                                    Click="AddHealthEventButton_Click"/>
+                                    Click="AddHealthEventButton_Click" Width="200"/>
                         </StackPanel>
                     </Grid>
                 </Border>
@@ -473,19 +504,34 @@
                                                             <ColumnDefinition Width="*"/>
                                                             <ColumnDefinition Width="Auto"/>
                                                             <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="Auto"/>
                                                         </Grid.ColumnDefinitions>
                                                         <TextBlock Grid.Column="0" Text="{Binding BreedingDate}" Foreground="#8FAA7A" FontWeight="Bold"/>
                                                         <TextBlock Grid.Column="1" Text="{Binding Info}" Foreground="#6B5E4A" Margin="10,0"/>
-                                                        <Button x:Name="btnDetails" Grid.Column="2" 
+
+                                                        <!-- Кнопка Редактировать -->
+                                                        <Button x:Name="btnEdit" Grid.Column="2" 
+                                                                Content="✎" 
+                                                                Style="{StaticResource TabEditButtonStyle}"
+                                                                Click="EditBreeding_Click" 
+                                                                Tag="{Binding Id}"
+                                                                ToolTip="Редактировать вязку"
+                                                                Visibility="{Binding EditButtonVisibility}"/>
+
+                                                        <!-- Кнопка Подробнее -->
+                                                        <Button x:Name="btnDetails" Grid.Column="3" 
                                                                 Content="Подробнее" 
                                                                 Style="{StaticResource TabDetailsButtonStyle}"
                                                                 Click="BreedingDetails_Click" 
                                                                 Tag="{Binding Id}"/>
-                                                        <Button x:Name="btnDelete" Grid.Column="3"
+
+                                                        <!-- Кнопка Удалить -->
+                                                        <Button x:Name="btnDelete" Grid.Column="4"
                                                                 Content="🗑" 
                                                                 Style="{StaticResource TabDeleteButtonStyle}"
                                                                 Click="BreedingDelete_Click" 
-                                                                Tag="{Binding Id}"/>
+                                                                Tag="{Binding Id}"
+                                                                Visibility="{Binding DeleteButtonVisibility}"/>
                                                     </Grid>
                                                 </Border>
                                             </DataTemplate>
@@ -513,19 +559,34 @@
                                                             <ColumnDefinition Width="*"/>
                                                             <ColumnDefinition Width="Auto"/>
                                                             <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="Auto"/>
                                                         </Grid.ColumnDefinitions>
                                                         <TextBlock Grid.Column="0" Text="{Binding ExhibitionDate}" Foreground="#8FAA7A" FontWeight="Bold"/>
                                                         <TextBlock Grid.Column="1" Text="{Binding Name}" Foreground="#6B5E4A" Margin="10,0"/>
-                                                        <Button x:Name="btnDetails" Grid.Column="2" 
+
+                                                        <!-- Кнопка Редактировать -->
+                                                        <Button x:Name="btnEdit" Grid.Column="2" 
+                                                                Content="✎" 
+                                                                Style="{StaticResource TabEditButtonStyle}"
+                                                                Click="EditExhibition_Click" 
+                                                                Tag="{Binding Id}"
+                                                                ToolTip="Редактировать выставку"
+                                                                Visibility="{Binding EditButtonVisibility}"/>
+
+                                                        <!-- Кнопка Подробнее -->
+                                                        <Button x:Name="btnDetails" Grid.Column="3" 
                                                                 Content="Подробнее" 
                                                                 Style="{StaticResource TabDetailsButtonStyle}"
                                                                 Click="ExhibitionDetails_Click" 
                                                                 Tag="{Binding Id}"/>
-                                                        <Button x:Name="btnDelete" Grid.Column="3"
+
+                                                        <!-- Кнопка Удалить -->
+                                                        <Button x:Name="btnDelete" Grid.Column="4"
                                                                 Content="🗑" 
                                                                 Style="{StaticResource TabDeleteButtonStyle}"
                                                                 Click="ExhibitionDelete_Click" 
-                                                                Tag="{Binding Id}"/>
+                                                                Tag="{Binding Id}"
+                                                                Visibility="{Binding DeleteButtonVisibility}"/>
                                                     </Grid>
                                                 </Border>
                                             </DataTemplate>
@@ -553,19 +614,34 @@
                                                             <ColumnDefinition Width="*"/>
                                                             <ColumnDefinition Width="Auto"/>
                                                             <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="Auto"/>
                                                         </Grid.ColumnDefinitions>
                                                         <TextBlock Grid.Column="0" Text="{Binding AssessmentDate}" Foreground="#8FAA7A" FontWeight="Bold"/>
                                                         <TextBlock Grid.Column="1" Text="{Binding ClassName}" Foreground="#6B5E4A" Margin="10,0"/>
-                                                        <Button x:Name="btnDetails" Grid.Column="2" 
+
+                                                        <!-- Кнопка Редактировать -->
+                                                        <Button x:Name="btnEdit" Grid.Column="2" 
+                                                                Content="✎" 
+                                                                Style="{StaticResource TabEditButtonStyle}"
+                                                                Click="EditAssessment_Click" 
+                                                                Tag="{Binding Id}"
+                                                                ToolTip="Редактировать оценку"
+                                                                Visibility="{Binding EditButtonVisibility}"/>
+
+                                                        <!-- Кнопка Подробнее -->
+                                                        <Button x:Name="btnDetails" Grid.Column="3" 
                                                                 Content="Подробнее" 
                                                                 Style="{StaticResource TabDetailsButtonStyle}"
                                                                 Click="AssessmentDetails_Click" 
                                                                 Tag="{Binding Id}"/>
-                                                        <Button x:Name="btnDelete" Grid.Column="3"
+
+                                                        <!-- Кнопка Удалить -->
+                                                        <Button x:Name="btnDelete" Grid.Column="4"
                                                                 Content="🗑" 
                                                                 Style="{StaticResource TabDeleteButtonStyle}"
                                                                 Click="AssessmentDelete_Click" 
-                                                                Tag="{Binding Id}"/>
+                                                                Tag="{Binding Id}"
+                                                                Visibility="{Binding DeleteButtonVisibility}"/>
                                                     </Grid>
                                                 </Border>
                                             </DataTemplate>
@@ -594,20 +670,35 @@
                                                             <ColumnDefinition Width="*"/>
                                                             <ColumnDefinition Width="Auto"/>
                                                             <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="Auto"/>
                                                         </Grid.ColumnDefinitions>
                                                         <TextBlock Grid.Column="0" Text="{Binding EventDate}" Foreground="#8FAA7A" FontWeight="Bold"/>
                                                         <TextBlock Grid.Column="1" Text="{Binding EventType}" Foreground="#6B5E4A" Margin="5,0"/>
                                                         <TextBlock Grid.Column="2" Text="{Binding MedicineName}" Foreground="#6B5E4A" Margin="5,0" TextTrimming="CharacterEllipsis"/>
-                                                        <Button x:Name="btnDetails" Grid.Column="3" 
+
+                                                        <!-- Кнопка Редактировать -->
+                                                        <Button x:Name="btnEdit" Grid.Column="3" 
+                                                                Content="✎" 
+                                                                Style="{StaticResource TabEditButtonStyle}"
+                                                                Click="EditHealthEvent_Click" 
+                                                                Tag="{Binding Id}"
+                                                                ToolTip="Редактировать событие"
+                                                                Visibility="{Binding EditButtonVisibility}"/>
+
+                                                        <!-- Кнопка Подробнее -->
+                                                        <Button x:Name="btnDetails" Grid.Column="4" 
                                                                 Content="Подробнее" 
                                                                 Style="{StaticResource TabDetailsButtonStyle}"
                                                                 Click="HealthEventDetails_Click" 
                                                                 Tag="{Binding Id}"/>
-                                                        <Button x:Name="btnDelete" Grid.Column="4"
+
+                                                        <!-- Кнопка Удалить -->
+                                                        <Button x:Name="btnDelete" Grid.Column="5"
                                                                 Content="🗑" 
                                                                 Style="{StaticResource TabDeleteButtonStyle}"
                                                                 Click="HealthEventDelete_Click" 
-                                                                Tag="{Binding Id}"/>
+                                                                Tag="{Binding Id}"
+                                                                Visibility="{Binding DeleteButtonVisibility}"/>
                                                     </Grid>
                                                 </Border>
                                             </DataTemplate>

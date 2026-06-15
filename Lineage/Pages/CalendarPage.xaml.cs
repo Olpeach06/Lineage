@@ -1,6 +1,4 @@
-﻿using Lineage.AppData;
-using Lineage.Classes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,13 +10,17 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Lineage.AppData;
+using Lineage.Classes;
 
 namespace Lineage.Pages
 {
-    public partial class CalendarWindow : Window
+    public partial class CalendarPage : Page
     {
         private int treeId;
+        private string treeName;
 
         public class BirthdayItem
         {
@@ -32,24 +34,23 @@ namespace Lineage.Pages
             public bool IsAlive { get; set; }
         }
 
-        public CalendarWindow(int treeId, string treeName)
+        public CalendarPage(int treeId, string treeName)
         {
             InitializeComponent();
             this.treeId = treeId;
-            txtTreeInfo.Text = $"Проект: {treeName}";
-            Loaded += CalendarWindow_Loaded;
+            this.treeName = treeName;
         }
 
-        private void CalendarWindow_Loaded(object sender, RoutedEventArgs e)
+        private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             if (!Session.IsFamilyMode)
             {
-                MessageBox.Show("Календарь дней рождения доступен только в режиме семейного древа!", "Ошибка",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
-                Close();
+                NotificationWindow.ShowWarning("Календарь дней рождения доступен только в режиме семейного древа!");
+                NavigationService.GoBack();
                 return;
             }
 
+            txtTreeInfo.Text = $"Проект: {treeName}";
             LoadBirthdays();
         }
 
@@ -97,17 +98,11 @@ namespace Lineage.Pages
 
                         if (isAlive)
                         {
-                            if (isToday)
-                                bgColor = "#FFE4B5";
-                            else
-                                bgColor = "#FDF8F0";
+                            bgColor = isToday ? "#FFE4B5" : "#FDF8F0";
                         }
                         else
                         {
-                            if (isToday)
-                                bgColor = "#D3D3D3";
-                            else
-                                bgColor = "#E8E8E8";
+                            bgColor = isToday ? "#D3D3D3" : "#E8E8E8";
                         }
 
                         birthdays.Add(new BirthdayItem
@@ -133,13 +128,13 @@ namespace Lineage.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка загрузки: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                NotificationWindow.ShowError("Ошибка загрузки календаря", ex.Message);
             }
         }
 
-        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            Close();
+            NavigationService.GoBack();
         }
     }
 }

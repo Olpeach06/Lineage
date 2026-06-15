@@ -27,6 +27,7 @@ namespace Lineage.Pages
         private string selectedPhotoPath = null;
         private string originalPhotoPath = null;
         private List<AnimalComboItem> allAnimals = new List<AnimalComboItem>();
+        private List<ProductivityRecordItem> productivityRecords = new List<ProductivityRecordItem>();
 
         public class AnimalComboItem
         {
@@ -66,6 +67,17 @@ namespace Lineage.Pages
             public string Name { get; set; }
         }
 
+        public class ProductivityRecordItem
+        {
+            public int Id { get; set; }
+            public string RecordDate { get; set; }
+            public DateTime? RecordDateValue { get; set; }
+            public decimal? MilkYield { get; set; }
+            public decimal? FatContent { get; set; }
+            public decimal? ProteinContent { get; set; }
+            public string RecordType { get; set; }
+        }
+
         public EditAnimalPage()
         {
             InitializeComponent();
@@ -88,12 +100,15 @@ namespace Lineage.Pages
                 NavigationService.GoBack();
                 return;
             }
+
             currentTreeId = Session.CurrentTreeId;
 
             LoadSpecies();
             LoadGenders();
             LoadPedigreeClasses();
             LoadAnimalsForParents();
+
+            dpProductivityDate.SelectedDate = DateTime.Today;
 
             if (editAnimalId.HasValue)
                 LoadAnimalData(editAnimalId.Value);
@@ -288,7 +303,6 @@ namespace Lineage.Pages
                     txtChestGirth.Text = animal.ChestGirth?.ToString();
                     txtWeight.Text = animal.Weight?.ToString();
                     txtChipNumber.Text = animal.ChipNumber;
-                    //txtProductivityData.Text = animal.ProductivityData;
                     txtDescription.Text = animal.Description;
 
                     if (!string.IsNullOrEmpty(animal.ProfilePhotoPath))
@@ -307,11 +321,45 @@ namespace Lineage.Pages
                         if (pedigree.MotherId.HasValue)
                             cmbMother.SelectedValue = pedigree.MotherId.Value;
                     }
+
+                    // Загрузка продуктивности
+                    LoadProductivityRecords(animalId);
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка загрузки данных: {ex.Message}");
+            }
+        }
+
+        private void LoadProductivityRecords(int animalId)
+        {
+            try
+            {
+                using (var context = new GenealogyUnifiedDBEntities2())
+                {
+                    var records = context.ProductivityRecords
+                        .Where(p => p.AnimalId == animalId && p.RecordType == "lactation")
+                        .OrderByDescending(p => p.RecordDate)
+                        .ToList();
+
+                    productivityRecords = records.Select(r => new ProductivityRecordItem
+                    {
+                        Id = r.Id,
+                        RecordDate = r.RecordDate.ToString("dd.MM.yyyy"),
+                        RecordDateValue = r.RecordDate,
+                        MilkYield = r.MilkYield,
+                        FatContent = r.FatContent,
+                        ProteinContent = r.ProteinContent,
+                        RecordType = r.RecordType
+                    }).ToList();
+
+                    lvProductivity.ItemsSource = productivityRecords;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки продуктивности: {ex.Message}");
             }
         }
 
@@ -371,10 +419,143 @@ namespace Lineage.Pages
             btnRemovePhoto.IsEnabled = false;
         }
 
+        private async void AddProductivityRecord_Click(object sender, RoutedEventArgs e)
+        {
+            if (!dpProductivityDate.SelectedDate.HasValue)
+            {
+                MessageBox.Show("Укажите дату!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            decimal? milkYield = null;
+            if (!string.IsNullOrWhiteSpace(txtMilkYield.Text))
+            {
+                if (!decimal.TryParse(txtMilkYield.Text, out decimal milk))
+                {
+                    MessageBox.Show("Удой должен быть числом!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                milkYield = milk;
+            }
+
+            decimal? fatContent = null;
+            if (!string.IsNullOrWhiteSpace(txtFatContent.Text))
+            {
+                if (!decimal.TryParse(txtFatContent.Text, out decimal fat))
+                {
+                    MessageBox.Show("Жирность должна быть числом!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                fatContent = fat;
+            }
+
+            decimal? proteinContent = null;
+            if (!string.IsNullOrWhiteSpace(txtProteinContent.Text))
+            {
+                if (!decimal.TryParse(txtProteinContent.Text, out decimal protein))
+                {
+                    MessageBox.Show("Белок должен быть числом!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                proteinContent = protein;
+            }
+
+            try
+            {
+                int animalIdForRecord = editAnimalId ?? 0;
+
+                // Если это новое животное, сначала сохраняем его, чтобы получить ID
+                if (!editAnimalId.HasValue)
+                {
+                    using (var tempContext = new GenealogyUnifiedDBEntities2())
+                    {
+                        var tempAnimal = new Animals
+                        {
+                            TreeId = currentTreeId,
+                            Nickname = txtNickname.Text.Trim(),
+                            SpeciesId = 1,
+                            GenderId = 1,
+                            CreatedByUserId = Session.UserId,
+                            CreatedAt = DateTime.Now
+                        };
+                        tempContext.Animals.Add(tempAnimal);
+                        await tempContext.SaveChangesAsync();
+                        animalIdForRecord = tempAnimal.Id;
+                        editAnimalId = animalIdForRecord;
+                    }
+                }
+
+                using (var context = new GenealogyUnifiedDBEntities2())
+                {
+                    var record = new ProductivityRecords
+                    {
+                        AnimalId = animalIdForRecord,
+                        RecordDate = dpProductivityDate.SelectedDate.Value,
+                        MilkYield = milkYield,
+                        FatContent = fatContent,
+                        ProteinContent = proteinContent,
+                        RecordType = "lactation",
+                        CreatedByUserId = Session.UserId,
+                        CreatedAt = DateTime.Now
+                    };
+                    context.ProductivityRecords.Add(record);
+                    await context.SaveChangesAsync();
+                }
+
+                // Очищаем форму
+                dpProductivityDate.SelectedDate = DateTime.Today;
+                txtMilkYield.Text = "";
+                txtFatContent.Text = "";
+                txtProteinContent.Text = "";
+
+                // Перезагружаем список
+                LoadProductivityRecords(animalIdForRecord);
+
+                MessageBox.Show("Запись продуктивности добавлена!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка добавления: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private async void DeleteProductivityRecord_Click(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            if (button?.Tag == null) return;
+            int recordId = (int)button.Tag;
+
+            var result = MessageBox.Show("Вы уверены, что хотите удалить эту запись продуктивности?",
+                "Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    using (var context = new GenealogyUnifiedDBEntities2())
+                    {
+                        var record = context.ProductivityRecords.Find(recordId);
+                        if (record != null)
+                        {
+                            context.ProductivityRecords.Remove(record);
+                            await context.SaveChangesAsync();
+                            LoadProductivityRecords(editAnimalId ?? 0);
+                            MessageBox.Show("Запись удалена!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка удаления: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
+                // Проверка обязательных полей
                 if (string.IsNullOrWhiteSpace(txtNickname.Text))
                 {
                     MessageBox.Show("Введите кличку животного!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -382,10 +563,30 @@ namespace Lineage.Pages
                     return;
                 }
 
-                if (cmbSpecies.SelectedItem == null)
+                if (cmbSpecies.SelectedItem == null || (int)cmbSpecies.SelectedValue == 0)
                 {
                     MessageBox.Show("Выберите вид животного!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    cmbSpecies.Focus();
                     return;
+                }
+
+                if (cmbGender.SelectedItem == null || (int)cmbGender.SelectedValue == 0)
+                {
+                    MessageBox.Show("Выберите пол животного!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    cmbGender.Focus();
+                    return;
+                }
+
+                // Проверка корректности дат
+                if (dpBirthDate.SelectedDate.HasValue && dpDeathDate.SelectedDate.HasValue)
+                {
+                    if (dpDeathDate.SelectedDate.Value < dpBirthDate.SelectedDate.Value)
+                    {
+                        MessageBox.Show("Дата смерти не может быть раньше даты рождения!", "Ошибка",
+                            MessageBoxButton.OK, MessageBoxImage.Warning);
+                        dpDeathDate.Focus();
+                        return;
+                    }
                 }
 
                 using (var context = new GenealogyUnifiedDBEntities2())
@@ -424,6 +625,10 @@ namespace Lineage.Pages
                     animal.DeathDate = dpDeathDate.SelectedDate;
                     animal.DeathPlace = string.IsNullOrWhiteSpace(txtDeathPlace.Text) ? null : txtDeathPlace.Text.Trim();
                     animal.DeathReason = string.IsNullOrWhiteSpace(txtDeathReason.Text) ? null : txtDeathReason.Text.Trim();
+
+                    // Установка IsAlive в зависимости от даты смерти
+                    animal.IsAlive = !animal.DeathDate.HasValue;
+
                     animal.PedigreeClassId = cmbPedigreeClass.SelectedValue != null && (int)cmbPedigreeClass.SelectedValue > 0 ? (int?)cmbPedigreeClass.SelectedValue : null;
 
                     if (decimal.TryParse(txtBreedingValue.Text, out decimal breedingValue))
@@ -432,7 +637,6 @@ namespace Lineage.Pages
                         animal.BreedingValue = null;
 
                     animal.IsBreedingStock = chkIsBreedingStock.IsChecked;
-                    //animal.ProductivityData = string.IsNullOrWhiteSpace(txtProductivityData.Text) ? null : txtProductivityData.Text.Trim();
 
                     if (decimal.TryParse(txtHeight.Text, out decimal height))
                         animal.HeightAtWithers = height;

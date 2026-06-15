@@ -10,17 +10,20 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Lineage.AppData;
 using Lineage.Classes;
 using System.IO;
+using System.Diagnostics;
 
 namespace Lineage.Pages
 {
-    public partial class StoryDetailWindow : Window
+    public partial class StoryDetailPage : Page
     {
         private int storyId;
         private int personId;
+        private string personName;
 
         public class MediaItem
         {
@@ -32,26 +35,26 @@ namespace Lineage.Pages
             public string FullPath { get; set; }
         }
 
-        public StoryDetailWindow(int storyId, int personId, string personName)
+        public StoryDetailPage(int storyId, int personId, string personName)
         {
             InitializeComponent();
             this.storyId = storyId;
             this.personId = personId;
-            txtPersonInfo.Text = $"Персона: {personName}";
-            Loaded += StoryDetailWindow_Loaded;
+            this.personName = personName;
         }
 
-        private void StoryDetailWindow_Loaded(object sender, RoutedEventArgs e)
+        private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             // Истории доступны только в режиме семейного древа
             if (!Session.IsFamilyMode)
             {
                 MessageBox.Show("Истории доступны только в режиме семейного древа!", "Ошибка",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
-                Close();
+                NavigationService.GoBack();
                 return;
             }
 
+            txtPersonInfo.Text = $"Персона: {personName}";
             LoadStory();
         }
 
@@ -64,8 +67,9 @@ namespace Lineage.Pages
                     var story = context.Stories.FirstOrDefault(s => s.Id == storyId);
                     if (story == null)
                     {
-                        MessageBox.Show("История не найдена!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                        Close();
+                        MessageBox.Show("История не найдена!", "Ошибка",
+                            MessageBoxButton.OK, MessageBoxImage.Error);
+                        NavigationService.GoBack();
                         return;
                     }
 
@@ -117,7 +121,8 @@ namespace Lineage.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка загрузки истории: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка загрузки истории: {ex.Message}", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -127,8 +132,8 @@ namespace Lineage.Pages
             if (string.IsNullOrEmpty(fileNameOnly)) fileNameOnly = fileName;
 
             var possiblePaths = new List<string>();
-
             string currentDir = AppDomain.CurrentDomain.BaseDirectory;
+
             possiblePaths.Add(System.IO.Path.Combine(currentDir, fileNameOnly));
             possiblePaths.Add(System.IO.Path.Combine(currentDir, "Media", fileNameOnly));
             possiblePaths.Add(System.IO.Path.Combine(currentDir, "Media", fileName));
@@ -178,33 +183,35 @@ namespace Lineage.Pages
                 try
                 {
                     string filePath = media.FullPath;
-
                     if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
                         filePath = FindFile(media.FilePath, media.FileName);
 
                     if (File.Exists(filePath))
                     {
-                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                        ProcessStartInfo startInfo = new ProcessStartInfo
                         {
                             FileName = filePath,
                             UseShellExecute = true
-                        });
+                        };
+                        Process.Start(startInfo);
                     }
                     else
                     {
-                        MessageBox.Show($"Файл \"{media.FileName}\" не найден!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        MessageBox.Show($"Файл \"{media.FileName}\" не найден!", "Ошибка",
+                            MessageBoxButton.OK, MessageBoxImage.Warning);
                     }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Не удалось открыть файл: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Не удалось открыть файл: {ex.Message}", "Ошибка",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            Close();
+            NavigationService.GoBack();
         }
     }
 }

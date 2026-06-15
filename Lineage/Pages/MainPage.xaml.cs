@@ -1,5 +1,9 @@
-﻿using System;
+﻿using Lineage.AppData;
+using Lineage.Classes;
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,9 +16,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Lineage.AppData;
-using Lineage.Classes;
-using System.IO;
 
 namespace Lineage.Pages
 {
@@ -92,9 +93,38 @@ namespace Lineage.Pages
             currentTreeId = Session.CurrentTreeId;
             parentScrollViewer = FindVisualChild<ScrollViewer>(this);
 
+            if (!AppSettings.IsFamilyMode && isAdmin)
+            {
+                panelAdminButtons.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                panelAdminButtons.Visibility = Visibility.Collapsed;
+            }
+
             SetupFilter();
             LoadTree();
         }
+
+        private void TreeCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            // Адаптивная ширина канваса
+            if (treeCanvas != null && itemCards.Any())
+            {
+                double maxX = 0;
+                double maxY = 0;
+                foreach (var card in itemCards.Values)
+                {
+                    double right = Canvas.GetLeft(card) + card.Width;
+                    double bottom = Canvas.GetTop(card) + card.Height;
+                    if (right > maxX) maxX = right;
+                    if (bottom > maxY) maxY = bottom;
+                }
+                treeCanvas.Width = Math.Max(maxX + 100, parentScrollViewer?.ActualWidth ?? 800);
+                treeCanvas.Height = Math.Max(maxY + 100, parentScrollViewer?.ActualHeight ?? 600);
+            }
+        }
+
         private void LoadPublicTree()
         {
             try
@@ -103,7 +133,6 @@ namespace Lineage.Pages
                 {
                     int projectTypeId = Session.IsFamilyMode ? 1 : 2;
 
-                    // Ищем первое публичное дерево нужного типа
                     var publicTree = context.FamilyTrees
                         .FirstOrDefault(t => t.IsPublic == true && t.ProjectTypeId == projectTypeId);
 
@@ -151,6 +180,7 @@ namespace Lineage.Pages
             Canvas.SetTop(tb, 300);
             treeCanvas.Children.Add(tb);
         }
+
         private void SetupFilter()
         {
             cmbFilter.Items.Clear();
@@ -197,7 +227,6 @@ namespace Lineage.Pages
             familyTreeStructure.Clear();
             generations.Clear();
 
-            // Проверяем, выбран ли проект
             if (currentTreeId == 0)
             {
                 ShowNoProjectMessage();
@@ -218,6 +247,9 @@ namespace Lineage.Pages
                 ShowItemDetails(selectedItemId.Value);
             }
             SetCardsZIndex();
+
+            // Обновляем размер канваса
+            TreeCanvas_SizeChanged(null, null);
         }
 
         private void ShowNoProjectMessage()
@@ -256,18 +288,12 @@ namespace Lineage.Pages
                         return;
                     }
 
-                    // Получаем ID всех персон
                     var personIds = persons.Select(p => p.Id).ToList();
 
-                    // Загружаем связи - используем Contains с int, а не с объектами
                     personRelationships = context.PersonRelationships
                         .Where(r => personIds.Contains(r.Person1Id) && personIds.Contains(r.Person2Id))
                         .ToList();
 
-                    // Словарь для быстрого доступа
-                    var personDict = persons.ToDictionary(p => p.Id, p => p);
-
-                    // Строим иерархию: для каждого человека определяем детей
                     var childrenDict = new Dictionary<int, List<int>>();
                     foreach (var person in persons)
                     {
@@ -276,7 +302,7 @@ namespace Lineage.Pages
 
                     foreach (var rel in personRelationships)
                     {
-                        if (rel.RelationshipType == 1) // родитель-ребенок
+                        if (rel.RelationshipType == 1)
                         {
                             if (!childrenDict.ContainsKey(rel.Person1Id))
                                 childrenDict[rel.Person1Id] = new List<int>();
@@ -284,11 +310,9 @@ namespace Lineage.Pages
                         }
                     }
 
-                    // Определяем корневые элементы (те, у кого нет родителей)
                     var allChildren = childrenDict.Values.SelectMany(v => v).Distinct().ToHashSet();
                     var roots = persons.Where(p => !allChildren.Contains(p.Id)).ToList();
 
-                    // Если нет корневых, берем самых старших по дате рождения
                     if (!roots.Any() && persons.Any(p => p.BirthDate.HasValue))
                     {
                         var oldestBirthYear = persons.Where(p => p.BirthDate.HasValue).Min(p => p.BirthDate.Value.Year);
@@ -300,14 +324,12 @@ namespace Lineage.Pages
                         roots = persons.Take(1).ToList();
                     }
 
-                    // Вычисляем поколения рекурсивно
                     var generationMap = new Dictionary<int, int>();
                     foreach (var root in roots)
                     {
                         CalculateGenerations(root.Id, 0, childrenDict, generationMap);
                     }
 
-                    // Для оставшихся (если есть) присваиваем поколение по году рождения
                     foreach (var person in persons)
                     {
                         if (!generationMap.ContainsKey(person.Id))
@@ -330,13 +352,11 @@ namespace Lineage.Pages
 
                     generations = generationMap;
 
-                    // Группируем по поколениям
                     var personsByGeneration = persons
                         .GroupBy(p => generationMap[p.Id])
                         .OrderBy(g => g.Key)
                         .ToList();
 
-                    // Вычисляем позиции
                     int startX = 100;
                     int startY = 80;
                     int verticalSpacing = 140;
@@ -349,7 +369,6 @@ namespace Lineage.Pages
                         var personsInGen = genGroup.ToList();
                         int itemsCount = personsInGen.Count;
 
-                        // Центрируем поколение
                         int totalWidth = itemsCount * horizontalSpacing;
                         int xOffset = Math.Max(0, (maxInGeneration - itemsCount) * horizontalSpacing / 2);
                         int currentX = startX + xOffset;
@@ -373,7 +392,6 @@ namespace Lineage.Pages
                         }
                     }
 
-                    // Рисуем связи
                     DrawPersonRelationships();
                 }
             }
@@ -403,7 +421,6 @@ namespace Lineage.Pages
         {
             foreach (var rel in personRelationships)
             {
-                // Проверяем, что оба ID есть в itemCards
                 if (rel.RelationshipType == 1 && itemCards.ContainsKey(rel.Person1Id) && itemCards.ContainsKey(rel.Person2Id))
                 {
                     var parentCard = itemCards[rel.Person1Id];
@@ -490,14 +507,10 @@ namespace Lineage.Pages
 
                     var animalIds = animals.Select(a => a.Id).ToList();
 
-                    // Загружаем родословные связи - используем Contains с int
                     animalPedigrees = context.AnimalPedigree
                         .Where(p => animalIds.Contains(p.AnimalId))
                         .ToList();
 
-                    var animalDict = animals.ToDictionary(a => a.Id, a => a);
-
-                    // Строим иерархию по родословной
                     var childrenDict = new Dictionary<int, List<int>>();
                     foreach (var animal in animals)
                     {
@@ -512,11 +525,9 @@ namespace Lineage.Pages
                             childrenDict[pedigree.MotherId.Value].Add(pedigree.AnimalId);
                     }
 
-                    // Находим корневые элементы (те, у кого нет родителей)
                     var allChildren = childrenDict.Values.SelectMany(v => v).Distinct().ToHashSet();
                     var roots = animals.Where(a => !allChildren.Contains(a.Id)).ToList();
 
-                    // Если нет корневых, берем самых старших по дате рождения
                     if (!roots.Any() && animals.Any(a => a.BirthDate.HasValue))
                     {
                         var oldestBirthYear = animals.Where(a => a.BirthDate.HasValue).Min(a => a.BirthDate.Value.Year);
@@ -528,14 +539,12 @@ namespace Lineage.Pages
                         roots = animals.Take(1).ToList();
                     }
 
-                    // Вычисляем поколения
                     var generationMap = new Dictionary<int, int>();
                     foreach (var root in roots)
                     {
                         CalculateAnimalGenerations(root.Id, 0, childrenDict, generationMap);
                     }
 
-                    // Для оставшихся присваиваем поколение по году рождения
                     foreach (var animal in animals)
                     {
                         if (!generationMap.ContainsKey(animal.Id))
@@ -557,7 +566,6 @@ namespace Lineage.Pages
 
                     generations = generationMap;
 
-                    // Группируем по поколениям
                     var animalsByGeneration = animals
                         .GroupBy(a => generationMap[a.Id])
                         .OrderBy(g => g.Key)
@@ -597,7 +605,6 @@ namespace Lineage.Pages
                         }
                     }
 
-                    // Рисуем родословные связи
                     DrawAnimalPedigreeLines();
                 }
             }
@@ -702,7 +709,6 @@ namespace Lineage.Pages
                 DrawAnimalPedigreeLines();
             }
 
-            // После перерисовки линий обновляем их видимость и ZIndex
             UpdateLinesVisibility();
             SetCardsZIndex();
         }
@@ -713,7 +719,6 @@ namespace Lineage.Pages
             {
                 if (line != null)
                 {
-                    // Проверяем, связаны ли оба конца линии с видимыми карточками
                     string tag = line.Tag?.ToString() ?? "";
                     bool shouldBeVisible = false;
 
@@ -767,12 +772,11 @@ namespace Lineage.Pages
                     }
 
                     line.Visibility = shouldBeVisible ? Visibility.Visible : Visibility.Collapsed;
-
-                    // Устанавливаем низкий ZIndex, чтобы линия была под карточками
                     Canvas.SetZIndex(line, 0);
                 }
             }
         }
+
         private void SetCardsZIndex()
         {
             foreach (var card in itemCards.Values)
@@ -842,7 +846,7 @@ namespace Lineage.Pages
             var card = new Border
             {
                 Width = 200,
-                Height = 100,  // ← ТОЛЬКО ЭТО ИЗМЕНИЛ (было 80)
+                Height = 100,
                 Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FDF8F0")),
                 BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#B7A48B")),
                 BorderThickness = new Thickness(1),
@@ -883,13 +887,27 @@ namespace Lineage.Pages
                 }
                 catch
                 {
-                    var avatarText = new TextBlock { Text = "👤", FontSize = 24, Foreground = Brushes.White, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+                    var avatarText = new TextBlock
+                    {
+                        Text = "👤",
+                        FontSize = 24,
+                        Foreground = Brushes.White,
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        VerticalAlignment = VerticalAlignment.Center
+                    };
                     avatarBorder.Child = avatarText;
                 }
             }
             else
             {
-                var avatarText = new TextBlock { Text = "👤", FontSize = 24, Foreground = Brushes.White, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+                var avatarText = new TextBlock
+                {
+                    Text = "👤",
+                    FontSize = 24,
+                    Foreground = Brushes.White,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
                 avatarBorder.Child = avatarText;
             }
 
@@ -898,13 +916,22 @@ namespace Lineage.Pages
             grid.Children.Add(avatarBorder);
 
             var infoPanel = new StackPanel { Margin = new Thickness(5, 10, 5, 10), VerticalAlignment = VerticalAlignment.Center };
-            infoPanel.Children.Add(new TextBlock { Text = name, FontWeight = FontWeights.Bold, Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#5C4E3D")) });
-            infoPanel.Children.Add(new TextBlock { Text = info, FontSize = 11, Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#8B7E6B")) });
+            infoPanel.Children.Add(new TextBlock
+            {
+                Text = name,
+                FontWeight = FontWeights.Bold,
+                Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#5C4E3D"))
+            });
+            infoPanel.Children.Add(new TextBlock
+            {
+                Text = info,
+                FontSize = 11,
+                Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#8B7E6B"))
+            });
             Grid.SetRow(infoPanel, 0);
             Grid.SetColumn(infoPanel, 1);
             grid.Children.Add(infoPanel);
 
-            // ← НОВАЯ КНОПКА ВНИЗУ (раньше была справа)
             var selectButton = new Button
             {
                 Content = "Выбрать",
@@ -937,7 +964,7 @@ namespace Lineage.Pages
             var card = new Border
             {
                 Width = 200,
-                Height = 100,  // ← ТОЛЬКО ЭТО ИЗМЕНИЛ (было 80)
+                Height = 100,
                 Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FDF8F0")),
                 BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#B7A48B")),
                 BorderThickness = new Thickness(1),
@@ -978,13 +1005,27 @@ namespace Lineage.Pages
                 }
                 catch
                 {
-                    var avatarText = new TextBlock { Text = GetSpeciesIcon(GetSpeciesIdFromAnimal(id)), FontSize = 24, Foreground = Brushes.White, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+                    var avatarText = new TextBlock
+                    {
+                        Text = GetSpeciesIcon(GetSpeciesIdFromAnimal(id)),
+                        FontSize = 24,
+                        Foreground = Brushes.White,
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        VerticalAlignment = VerticalAlignment.Center
+                    };
                     avatarBorder.Child = avatarText;
                 }
             }
             else
             {
-                var avatarText = new TextBlock { Text = GetSpeciesIcon(GetSpeciesIdFromAnimal(id)), FontSize = 24, Foreground = Brushes.White, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+                var avatarText = new TextBlock
+                {
+                    Text = GetSpeciesIcon(GetSpeciesIdFromAnimal(id)),
+                    FontSize = 24,
+                    Foreground = Brushes.White,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
                 avatarBorder.Child = avatarText;
             }
 
@@ -993,13 +1034,22 @@ namespace Lineage.Pages
             grid.Children.Add(avatarBorder);
 
             var infoPanel = new StackPanel { Margin = new Thickness(5, 10, 5, 10), VerticalAlignment = VerticalAlignment.Center };
-            infoPanel.Children.Add(new TextBlock { Text = nickname, FontWeight = FontWeights.Bold, Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#5C4E3D")) });
-            infoPanel.Children.Add(new TextBlock { Text = info, FontSize = 11, Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#8B7E6B")) });
+            infoPanel.Children.Add(new TextBlock
+            {
+                Text = nickname,
+                FontWeight = FontWeights.Bold,
+                Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#5C4E3D"))
+            });
+            infoPanel.Children.Add(new TextBlock
+            {
+                Text = info,
+                FontSize = 11,
+                Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#8B7E6B"))
+            });
             Grid.SetRow(infoPanel, 0);
             Grid.SetColumn(infoPanel, 1);
             grid.Children.Add(infoPanel);
 
-            // ← НОВАЯ КНОПКА ВНИЗУ (раньше была справа)
             var selectButton = new Button
             {
                 Content = "Выбрать",
@@ -1494,7 +1544,6 @@ namespace Lineage.Pages
                 }
             }
 
-            // ← НОВОЕ: обновляем видимость линий после фильтрации
             UpdateLinesVisibility();
         }
 
@@ -1612,7 +1661,6 @@ namespace Lineage.Pages
                 {
                     if (AppSettings.IsFamilyMode)
                     {
-                        // ==================== УДАЛЕНИЕ ПЕРСОНЫ ====================
                         var person = context.Persons.FirstOrDefault(p => p.Id == selectedItemId.Value);
                         if (person == null)
                         {
@@ -1620,16 +1668,13 @@ namespace Lineage.Pages
                             return;
                         }
 
-                        // 1. Получаем все истории персоны
                         var stories = context.Stories.Where(s => s.PersonId == selectedItemId.Value).ToList();
                         var storyIds = stories.Select(s => s.Id).ToList();
 
-                        // 2. Получаем все медиафайлы, связанные с историями
                         var mediaLinks = context.MediaLinks.Where(ml => ml.StoryId.HasValue && storyIds.Contains(ml.StoryId.Value)).ToList();
                         var mediaFileIds = mediaLinks.Select(ml => ml.MediaFileId).ToList();
                         var mediaFiles = context.MediaFiles.Where(mf => mediaFileIds.Contains(mf.Id)).ToList();
 
-                        // 3. Удаляем физические файлы с диска
                         foreach (var file in mediaFiles)
                         {
                             string fullPath = PhotoHelper.GetProfilePhoto(file.FilePath);
@@ -1639,37 +1684,27 @@ namespace Lineage.Pages
                             }
                         }
 
-                        // 4. Удаляем связи медиафайлов
                         context.MediaLinks.RemoveRange(mediaLinks);
-
-                        // 5. Удаляем медиафайлы
                         context.MediaFiles.RemoveRange(mediaFiles);
-
-                        // 6. Удаляем истории
                         context.Stories.RemoveRange(stories);
 
-                        // 7. Удаляем родственные связи (где персона является Person1 или Person2)
                         var relationships = context.PersonRelationships
                             .Where(r => r.Person1Id == selectedItemId.Value || r.Person2Id == selectedItemId.Value)
                             .ToList();
                         context.PersonRelationships.RemoveRange(relationships);
 
-                        // 8. Если у пользователя есть ссылка на эту персону - обнуляем
                         var usersWithThisPerson = context.Users.Where(u => u.PersonId == selectedItemId.Value).ToList();
                         foreach (var user in usersWithThisPerson)
                         {
                             user.PersonId = null;
                         }
 
-                        // 9. Удаляем саму персону
                         context.Persons.Remove(person);
-
                         context.SaveChanges();
                         MessageBox.Show("Персона успешно удалена!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                     else
                     {
-                        // ==================== УДАЛЕНИЕ ЖИВОТНОГО ====================
                         var animal = context.Animals.FirstOrDefault(a => a.Id == selectedItemId.Value);
                         if (animal == null)
                         {
@@ -1677,29 +1712,23 @@ namespace Lineage.Pages
                             return;
                         }
 
-                        // 1. Удаляем ветеринарные события
                         var vetEvents = context.VeterinaryEvents.Where(v => v.AnimalId == selectedItemId.Value).ToList();
                         context.VeterinaryEvents.RemoveRange(vetEvents);
 
-                        // 2. Удаляем записи продуктивности
                         var productivityRecords = context.ProductivityRecords.Where(p => p.AnimalId == selectedItemId.Value).ToList();
                         context.ProductivityRecords.RemoveRange(productivityRecords);
 
-                        // 3. Удаляем записи о вязках (где животное участвует как самец или самка)
                         var breedings = context.Breedings
                             .Where(b => b.MaleId == selectedItemId.Value || b.FemaleId == selectedItemId.Value)
                             .ToList();
                         context.Breedings.RemoveRange(breedings);
 
-                        // 4. Удаляем записи о выставках
                         var exhibitions = context.Exhibitions.Where(ex => ex.AnimalId == selectedItemId.Value).ToList();
                         context.Exhibitions.RemoveRange(exhibitions);
 
-                        // 5. Удаляем племенные оценки
                         var assessments = context.AnimalAssessments.Where(a => a.AnimalId == selectedItemId.Value).ToList();
                         context.AnimalAssessments.RemoveRange(assessments);
 
-                        // 6. Удаляем записи родословной (где животное является родителем или потомком)
                         var pedigreeAsParent = context.AnimalPedigree
                             .Where(p => p.FatherId == selectedItemId.Value || p.MotherId == selectedItemId.Value)
                             .ToList();
@@ -1709,12 +1738,10 @@ namespace Lineage.Pages
                         context.AnimalPedigree.RemoveRange(pedigreeAsParent);
                         context.AnimalPedigree.RemoveRange(pedigreeAsChild);
 
-                        // 7. Удаляем медиафайлы, связанные с животным
                         var mediaLinks = context.MediaLinks.Where(ml => ml.AnimalId == selectedItemId.Value).ToList();
                         var mediaFileIds = mediaLinks.Select(ml => ml.MediaFileId).ToList();
                         var mediaFiles = context.MediaFiles.Where(mf => mediaFileIds.Contains(mf.Id)).ToList();
 
-                        // Удаляем физические файлы
                         foreach (var file in mediaFiles)
                         {
                             string fullPath = PhotoHelper.GetProfilePhoto(file.FilePath);
@@ -1726,15 +1753,11 @@ namespace Lineage.Pages
 
                         context.MediaLinks.RemoveRange(mediaLinks);
                         context.MediaFiles.RemoveRange(mediaFiles);
-
-                        // 8. Удаляем само животное
                         context.Animals.Remove(animal);
-
                         context.SaveChanges();
                         MessageBox.Show("Животное успешно удалено!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
 
-                    // Перезагружаем дерево
                     LoadTree();
                     selectedItemId = null;
                     txtPersonName.Text = "Выберите элемент";
@@ -1748,6 +1771,26 @@ namespace Lineage.Pages
                 MessageBox.Show($"Ошибка удаления: {ex.Message}\n\n{ex.InnerException?.Message}",
                     "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void BtnSpecies_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.Navigate(new DictionaryPage(DictionaryType.Species));
+        }
+
+        private void BtnBreeds_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.Navigate(new DictionaryPage(DictionaryType.Breeds));
+        }
+
+        private void BtnColors_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.Navigate(new DictionaryPage(DictionaryType.Colors));
+        }
+
+        private void BtnPedigreeClasses_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.Navigate(new DictionaryPage(DictionaryType.PedigreeClasses));
         }
 
         private void DetailsButton_Click(object sender, RoutedEventArgs e)
@@ -1799,16 +1842,13 @@ namespace Lineage.Pages
         {
             NavigationService.Navigate(new UsersPage());
         }
+
         private void SwitchModeButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                // Сохраняем последний использованный режим
                 Session.LastUsedMode = Session.CurrentMode;
-
-                // Для гостя используем userId = 0
                 int userId = Session.IsGuest ? 0 : Session.UserId;
-
                 NavigationService.Navigate(new SelectionPage(userId, Session.LastUsedMode));
             }
             catch (Exception ex)

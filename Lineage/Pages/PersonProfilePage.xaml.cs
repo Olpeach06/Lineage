@@ -22,6 +22,9 @@ namespace Lineage.Pages
     public partial class PersonProfilePage : Page
     {
         private int personId;
+        private int currentTreeId;
+        private bool canEdit; // Может ли пользователь редактировать
+        private bool isAdmin; // Является ли администратором
         private List<StoryItem> stories = new List<StoryItem>();
 
         public class StoryItem
@@ -32,6 +35,8 @@ namespace Lineage.Pages
             public DateTime? EventDate { get; set; }
             public string EventDateString { get; set; }
             public string ShortContent { get; set; }
+            public Visibility EditButtonVisibility { get; set; }  // Видимость кнопки редактирования
+            public Visibility DeleteButtonVisibility { get; set; } // Видимость кнопки удаления
         }
 
         public class PhotoItem
@@ -40,6 +45,8 @@ namespace Lineage.Pages
             public string FilePath { get; set; }
             public string ThumbPath { get; set; }
             public string FileName { get; set; }
+            public Visibility EditButtonVisibility { get; set; }
+            public Visibility DeleteButtonVisibility { get; set; }
         }
 
         public class VideoItem
@@ -47,6 +54,8 @@ namespace Lineage.Pages
             public int Id { get; set; }
             public string FileName { get; set; }
             public string FilePath { get; set; }
+            public Visibility EditButtonVisibility { get; set; }
+            public Visibility DeleteButtonVisibility { get; set; }
         }
 
         public class AudioItem
@@ -54,6 +63,8 @@ namespace Lineage.Pages
             public int Id { get; set; }
             public string FileName { get; set; }
             public string FilePath { get; set; }
+            public Visibility EditButtonVisibility { get; set; }
+            public Visibility DeleteButtonVisibility { get; set; }
         }
 
         public PersonProfilePage(int id)
@@ -73,18 +84,37 @@ namespace Lineage.Pages
                 return;
             }
 
+            // Определяем права пользователя
+            isAdmin = Session.IsAdmin;
+            canEdit = Session.IsAdmin || Session.IsEditor;
+
+            // Получаем TreeId персоны
+            using (var context = new GenealogyUnifiedDBEntities2())
+            {
+                var person = context.Persons.Find(personId);
+                if (person != null)
+                {
+                    currentTreeId = person.TreeId;
+                    var tree = context.FamilyTrees.Find(currentTreeId);
+                    // Право на редактирование: админ ИЛИ создатель дерева
+                    canEdit = Session.IsAdmin || (tree != null && tree.CreatedByUserId == Session.UserId);
+                }
+            }
+
             NavigationService.Navigated += NavigationService_Navigated;
 
             LoadAllData();
 
-            bool canEdit = Session.IsAdmin || Session.IsEditor;
-            bool isAdmin = Session.IsAdmin;
+            // Показываем кнопки добавления только если есть права на редактирование
+            bool canAdd = canEdit;
 
-            btnEdit.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
-            btnAddStory.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
-            btnAddStoryBottom.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
-            btnAddPhoto.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
-            btnAddMedia.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
+            btnEdit.Visibility = canAdd ? Visibility.Visible : Visibility.Collapsed;
+            btnAddStory.Visibility = canAdd ? Visibility.Visible : Visibility.Collapsed;
+            btnAddStoryBottom.Visibility = canAdd ? Visibility.Visible : Visibility.Collapsed;
+            btnAddPhoto.Visibility = canAdd ? Visibility.Visible : Visibility.Collapsed;
+            btnAddMedia.Visibility = canAdd ? Visibility.Visible : Visibility.Collapsed;
+
+            // Кнопки "Удалить все" только для администратора
             btnDeleteAllStories.Visibility = isAdmin ? Visibility.Visible : Visibility.Collapsed;
             btnDeleteAllMedia.Visibility = isAdmin ? Visibility.Visible : Visibility.Collapsed;
         }
@@ -147,7 +177,6 @@ namespace Lineage.Pages
                     txtDeathPlace.Text = string.IsNullOrEmpty(person.DeathPlace) ? "Место смерти: не указано" : $"Место смерти: {person.DeathPlace}";
                     txtBiography.Text = string.IsNullOrEmpty(person.Biography) ? "Биография не добавлена" : person.Biography;
 
-                    // Загрузка профессии
                     txtProfession.Text = string.IsNullOrEmpty(person.Profession) ? "Профессия не указана" : person.Profession;
 
                     var gender = context.Genders.FirstOrDefault(g => g.Id == person.GenderId);
@@ -321,6 +350,9 @@ namespace Lineage.Pages
                         .OrderByDescending(s => s.EventDate ?? DateTime.MinValue)
                         .ToList();
 
+                    // Определяем видимость кнопок для историй
+                    Visibility editDeleteVisibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
+
                     stories = storyList.Select(s => new StoryItem
                     {
                         Id = s.Id,
@@ -328,7 +360,9 @@ namespace Lineage.Pages
                         Content = s.Content,
                         EventDate = s.EventDate,
                         EventDateString = s.EventDate?.ToString("dd.MM.yyyy") ?? s.EventDateText ?? "Дата не указана",
-                        ShortContent = s.Content.Length > 100 ? s.Content.Substring(0, 100) + "..." : s.Content
+                        ShortContent = s.Content.Length > 100 ? s.Content.Substring(0, 100) + "..." : s.Content,
+                        EditButtonVisibility = editDeleteVisibility,
+                        DeleteButtonVisibility = editDeleteVisibility
                     }).ToList();
 
                     lvStories.ItemsSource = stories;
@@ -355,11 +389,13 @@ namespace Lineage.Pages
                     var videos = new List<VideoItem>();
                     var audios = new List<AudioItem>();
 
+                    // Определяем видимость кнопок для медиафайлов
+                    Visibility editDeleteVisibility = canEdit ? Visibility.Visible : Visibility.Collapsed;
+
                     foreach (var file in mediaFiles)
                     {
                         var mediaType = context.MediaTypes.FirstOrDefault(mt => mt.Id == file.MediaTypeId);
                         string typeName = mediaType?.Name ?? "";
-                        string fullPath = PhotoHelper.GetProfilePhoto(file.FilePath);
 
                         if (typeName.Contains("Изображение") || typeName.Contains("Image") || typeName.Contains("Фото"))
                         {
@@ -368,7 +404,9 @@ namespace Lineage.Pages
                                 Id = file.Id,
                                 FilePath = file.FilePath,
                                 FileName = file.FileName,
-                                ThumbPath = fullPath
+                                ThumbPath = PhotoHelper.GetProfilePhoto(file.FilePath),
+                                EditButtonVisibility = editDeleteVisibility,
+                                DeleteButtonVisibility = editDeleteVisibility
                             });
                         }
                         else if (typeName.Contains("Видео") || typeName.Contains("Video"))
@@ -377,7 +415,9 @@ namespace Lineage.Pages
                             {
                                 Id = file.Id,
                                 FileName = file.FileName,
-                                FilePath = file.FilePath
+                                FilePath = file.FilePath,
+                                EditButtonVisibility = editDeleteVisibility,
+                                DeleteButtonVisibility = editDeleteVisibility
                             });
                         }
                         else if (typeName.Contains("Аудио") || typeName.Contains("Audio"))
@@ -386,7 +426,9 @@ namespace Lineage.Pages
                             {
                                 Id = file.Id,
                                 FileName = file.FileName,
-                                FilePath = file.FilePath
+                                FilePath = file.FilePath,
+                                EditButtonVisibility = editDeleteVisibility,
+                                DeleteButtonVisibility = editDeleteVisibility
                             });
                         }
                     }
@@ -408,44 +450,28 @@ namespace Lineage.Pages
             var image = sender as Image;
             if (image?.Tag != null)
             {
-                string filePath = image.Tag.ToString();
-
-                // Ищем реальный путь к файлу через FindFile
-                string foundPath = FindFile(filePath, System.IO.Path.GetFileName(filePath));
-
-                if (File.Exists(foundPath))
+                int photoId = (int)image.Tag;
+                var photos = icPhotos.ItemsSource as List<PhotoItem>;
+                var photo = photos?.FirstOrDefault(p => p.Id == photoId);
+                if (photo != null)
                 {
-                    try
-                    {
-                        var bitmap = new BitmapImage();
-                        bitmap.BeginInit();
-                        bitmap.UriSource = new Uri(foundPath, UriKind.Absolute);
-                        bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                        bitmap.EndInit();
-                        image.Source = bitmap;
-                    }
-                    catch (Exception ex)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"Ошибка загрузки изображения: {ex.Message}");
-                        image.Source = null;
-                    }
-                }
-                else
-                {
-                    // Пробуем найти через PhotoHelper
-                    string photoHelperPath = PhotoHelper.GetProfilePhoto(filePath);
-                    if (File.Exists(photoHelperPath))
+                    string foundPath = FindFile(photo.FilePath, photo.FileName);
+                    if (File.Exists(foundPath))
                     {
                         try
                         {
                             var bitmap = new BitmapImage();
                             bitmap.BeginInit();
-                            bitmap.UriSource = new Uri(photoHelperPath, UriKind.Absolute);
+                            bitmap.UriSource = new Uri(foundPath, UriKind.Absolute);
                             bitmap.CacheOption = BitmapCacheOption.OnLoad;
                             bitmap.EndInit();
                             image.Source = bitmap;
                         }
-                        catch { }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"Ошибка загрузки изображения: {ex.Message}");
+                            image.Source = null;
+                        }
                     }
                     else
                     {
@@ -462,27 +488,30 @@ namespace Lineage.Pages
             tabAudios.Header = $"🎵 Аудио ({audioCount})";
         }
 
-        // ============================================
-        // МЕТОДЫ ДЛЯ ПОИСКА И ОТКРЫТИЯ ФАЙЛОВ
-        // ============================================
-
         private string FindFile(string storedPath, string fileName)
         {
             string fileNameOnly = System.IO.Path.GetFileName(storedPath);
             if (string.IsNullOrEmpty(fileNameOnly)) fileNameOnly = fileName;
 
             var possiblePaths = new List<string>();
-
             string currentDir = AppDomain.CurrentDomain.BaseDirectory;
+
+            possiblePaths.Add(storedPath);
             possiblePaths.Add(System.IO.Path.Combine(currentDir, fileNameOnly));
             possiblePaths.Add(System.IO.Path.Combine(currentDir, "Media", fileNameOnly));
             possiblePaths.Add(System.IO.Path.Combine(currentDir, "Media", fileName));
+            possiblePaths.Add(System.IO.Path.Combine(currentDir, "Photos", fileNameOnly));
+            possiblePaths.Add(System.IO.Path.Combine(currentDir, "Photos", fileName));
+            possiblePaths.Add(System.IO.Path.Combine(currentDir, "Images", fileNameOnly));
+            possiblePaths.Add(System.IO.Path.Combine(currentDir, "Images", fileName));
 
             string projectDir = System.IO.Path.GetDirectoryName(currentDir);
             if (!string.IsNullOrEmpty(projectDir))
             {
                 possiblePaths.Add(System.IO.Path.Combine(projectDir, "Media", fileNameOnly));
                 possiblePaths.Add(System.IO.Path.Combine(projectDir, "Media", fileName));
+                possiblePaths.Add(System.IO.Path.Combine(projectDir, "Photos", fileNameOnly));
+                possiblePaths.Add(System.IO.Path.Combine(projectDir, "Photos", fileName));
             }
 
             for (int i = 0; i < 5; i++)
@@ -553,10 +582,10 @@ namespace Lineage.Pages
 
         private void Photo_Click(object sender, MouseButtonEventArgs e)
         {
-            var border = sender as Border;
-            if (border?.Tag != null)
+            var image = sender as Image;
+            if (image?.Tag != null)
             {
-                int photoId = (int)border.Tag;
+                int photoId = (int)image.Tag;
                 var photos = icPhotos.ItemsSource as List<PhotoItem>;
                 var photo = photos?.FirstOrDefault(p => p.Id == photoId);
                 if (photo != null)
@@ -600,6 +629,273 @@ namespace Lineage.Pages
         }
 
         // ============================================
+        // РЕДАКТИРОВАНИЕ И УДАЛЕНИЕ ИСТОРИЙ
+        // ============================================
+
+        private void EditStory_Click(object sender, RoutedEventArgs e)
+        {
+            if (!canEdit)
+            {
+                MessageBox.Show("У вас нет прав на редактирование этой истории!", "Доступ запрещён",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var button = sender as Button;
+            if (button?.Tag == null) return;
+            int storyId = (int)button.Tag;
+            NavigationService.Navigate(new EditStoryPage(personId, storyId));
+        }
+
+        private async void DeleteStory_Click(object sender, RoutedEventArgs e)
+        {
+            if (!canEdit)
+            {
+                MessageBox.Show("У вас нет прав на удаление этой истории!", "Доступ запрещён",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var button = sender as Button;
+            if (button?.Tag == null) return;
+            int storyId = (int)button.Tag;
+
+            var result = MessageBox.Show("Вы уверены, что хотите удалить эту историю?",
+                "Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    using (var context = new GenealogyUnifiedDBEntities2())
+                    {
+                        var story = context.Stories.Find(storyId);
+                        if (story != null)
+                        {
+                            context.Stories.Remove(story);
+                            await context.SaveChangesAsync();
+                            LoadStories();
+                            MessageBox.Show("История удалена!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка удаления: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        // ============================================
+        // РЕДАКТИРОВАНИЕ МЕДИАФАЙЛОВ (открытие страницы редактирования истории)
+        // ============================================
+
+        private void EditPhoto_Click(object sender, RoutedEventArgs e)
+        {
+            if (!canEdit)
+            {
+                MessageBox.Show("У вас нет прав на редактирование этого файла!", "Доступ запрещён",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var button = sender as Button;
+            if (button?.Tag == null) return;
+            int mediaFileId = (int)button.Tag;
+
+            int storyId = GetStoryIdByMediaFileId(mediaFileId);
+            if (storyId > 0)
+            {
+                NavigationService.Navigate(new EditStoryPage(personId, storyId));
+            }
+            else
+            {
+                MessageBox.Show("Не удалось найти историю, связанную с этим файлом.", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void EditVideo_Click(object sender, RoutedEventArgs e)
+        {
+            if (!canEdit)
+            {
+                MessageBox.Show("У вас нет прав на редактирование этого файла!", "Доступ запрещён",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var button = sender as Button;
+            if (button?.Tag == null) return;
+            int mediaFileId = (int)button.Tag;
+
+            int storyId = GetStoryIdByMediaFileId(mediaFileId);
+            if (storyId > 0)
+            {
+                NavigationService.Navigate(new EditStoryPage(personId, storyId));
+            }
+            else
+            {
+                MessageBox.Show("Не удалось найти историю, связанную с этим файлом.", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void EditAudio_Click(object sender, RoutedEventArgs e)
+        {
+            if (!canEdit)
+            {
+                MessageBox.Show("У вас нет прав на редактирование этого файла!", "Доступ запрещён",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var button = sender as Button;
+            if (button?.Tag == null) return;
+            int mediaFileId = (int)button.Tag;
+
+            int storyId = GetStoryIdByMediaFileId(mediaFileId);
+            if (storyId > 0)
+            {
+                NavigationService.Navigate(new EditStoryPage(personId, storyId));
+            }
+            else
+            {
+                MessageBox.Show("Не удалось найти историю, связанную с этим файлом.", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        // ============================================
+        // УДАЛЕНИЕ МЕДИАФАЙЛОВ
+        // ============================================
+
+        private async void DeletePhoto_Click(object sender, RoutedEventArgs e)
+        {
+            if (!canEdit)
+            {
+                MessageBox.Show("У вас нет прав на удаление этого файла!", "Доступ запрещён",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var button = sender as Button;
+            if (button?.Tag == null) return;
+            int mediaFileId = (int)button.Tag;
+
+            var result = MessageBox.Show("Вы уверены, что хотите удалить это фото?",
+                "Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                await DeleteMediaFile(mediaFileId);
+                LoadMediaFiles();
+            }
+        }
+
+        private async void DeleteVideo_Click(object sender, RoutedEventArgs e)
+        {
+            if (!canEdit)
+            {
+                MessageBox.Show("У вас нет прав на удаление этого файла!", "Доступ запрещён",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var button = sender as Button;
+            if (button?.Tag == null) return;
+            int mediaFileId = (int)button.Tag;
+
+            var result = MessageBox.Show("Вы уверены, что хотите удалить это видео?",
+                "Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                await DeleteMediaFile(mediaFileId);
+                LoadMediaFiles();
+            }
+        }
+
+        private async void DeleteAudio_Click(object sender, RoutedEventArgs e)
+        {
+            if (!canEdit)
+            {
+                MessageBox.Show("У вас нет прав на удаление этого файла!", "Доступ запрещён",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var button = sender as Button;
+            if (button?.Tag == null) return;
+            int mediaFileId = (int)button.Tag;
+
+            var result = MessageBox.Show("Вы уверены, что хотите удалить этот аудиофайл?",
+                "Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                await DeleteMediaFile(mediaFileId);
+                LoadMediaFiles();
+            }
+        }
+
+        // ============================================
+        // ВСПОМОГАТЕЛЬНЫЙ МЕТОД ДЛЯ ПОЛУЧЕНИЯ ID ИСТОРИИ ПО ID МЕДИАФАЙЛА
+        // ============================================
+
+        private int GetStoryIdByMediaFileId(int mediaFileId)
+        {
+            try
+            {
+                using (var context = new GenealogyUnifiedDBEntities2())
+                {
+                    var mediaLink = context.MediaLinks
+                        .FirstOrDefault(ml => ml.MediaFileId == mediaFileId && ml.StoryId.HasValue);
+
+                    if (mediaLink != null && mediaLink.StoryId.HasValue)
+                    {
+                        return mediaLink.StoryId.Value;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Ошибка получения истории: {ex.Message}");
+            }
+            return 0;
+        }
+
+        private async Task DeleteMediaFile(int mediaFileId)
+        {
+            try
+            {
+                using (var context = new GenealogyUnifiedDBEntities2())
+                {
+                    var mediaLinks = context.MediaLinks.Where(ml => ml.MediaFileId == mediaFileId).ToList();
+                    context.MediaLinks.RemoveRange(mediaLinks);
+
+                    var mediaFile = context.MediaFiles.Find(mediaFileId);
+                    if (mediaFile != null)
+                    {
+                        string fullPath = PhotoHelper.GetProfilePhoto(mediaFile.FilePath);
+                        if (File.Exists(fullPath))
+                        {
+                            try { File.Delete(fullPath); } catch { }
+                        }
+
+                        context.MediaFiles.Remove(mediaFile);
+                    }
+
+                    await context.SaveChangesAsync();
+                    MessageBox.Show("Медиафайл удалён!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка удаления: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        // ============================================
         // ОСТАЛЬНЫЕ МЕТОДЫ
         // ============================================
 
@@ -609,38 +905,58 @@ namespace Lineage.Pages
             if (button?.Tag == null) return;
 
             int storyId = (int)button.Tag;
+
             using (var context = new GenealogyUnifiedDBEntities2())
             {
                 var story = context.Stories.FirstOrDefault(s => s.Id == storyId);
                 if (story != null)
                 {
-                    var storyWindow = new StoryDetailWindow(storyId, story.PersonId, txtFullName.Text)
-                    {
-                        Owner = Window.GetWindow(this)
-                    };
-                    storyWindow.ShowDialog();
-                    LoadAllData();
+                    NavigationService.Navigate(new StoryDetailPage(storyId, story.PersonId, txtFullName.Text));
                 }
             }
         }
 
         private void EditButton_Click(object sender, RoutedEventArgs e)
         {
+            if (!canEdit)
+            {
+                MessageBox.Show("У вас нет прав на редактирование этой персоны!", "Доступ запрещён",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
             NavigationService.Navigate(new EditPersonPage(personId));
         }
 
         private void AddStoryButton_Click(object sender, RoutedEventArgs e)
         {
+            if (!canEdit)
+            {
+                MessageBox.Show("У вас нет прав на добавление историй!", "Доступ запрещён",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
             NavigationService.Navigate(new EditStoryPage(personId));
         }
 
         private void AddPhotoButton_Click(object sender, RoutedEventArgs e)
         {
+            if (!canEdit)
+            {
+                MessageBox.Show("У вас нет прав на добавление фото!", "Доступ запрещён",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
             NavigationService.Navigate(new EditPersonPage(personId));
         }
 
         private void AddMediaButton_Click(object sender, RoutedEventArgs e)
         {
+            if (!canEdit)
+            {
+                MessageBox.Show("У вас нет прав на добавление медиафайлов!", "Доступ запрещён",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
             NavigationService.Navigate(new EditStoryPage(personId));
         }
 
@@ -649,8 +965,15 @@ namespace Lineage.Pages
             NavigationService.Navigate(new MainPage());
         }
 
-        private void DeleteAllStories_Click(object sender, RoutedEventArgs e)
+        private async void DeleteAllStories_Click(object sender, RoutedEventArgs e)
         {
+            if (!isAdmin)
+            {
+                MessageBox.Show("Только администратор может удалить все истории!", "Доступ запрещён",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             var result = MessageBox.Show("Вы уверены, что хотите удалить ВСЕ истории этой персоны?",
                 "Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (result == MessageBoxResult.Yes)
@@ -659,15 +982,22 @@ namespace Lineage.Pages
                 {
                     var storiesToDelete = context.Stories.Where(s => s.PersonId == personId).ToList();
                     context.Stories.RemoveRange(storiesToDelete);
-                    context.SaveChanges();
+                    await context.SaveChangesAsync();
                 }
                 MessageBox.Show("Все истории удалены!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 LoadAllData();
             }
         }
 
-        private void DeleteAllMedia_Click(object sender, RoutedEventArgs e)
+        private async void DeleteAllMedia_Click(object sender, RoutedEventArgs e)
         {
+            if (!isAdmin)
+            {
+                MessageBox.Show("Только администратор может удалить все медиафайлы!", "Доступ запрещён",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             var result = MessageBox.Show("Вы уверены, что хотите удалить ВСЕ медиафайлы этой персоны?",
                 "Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (result == MessageBoxResult.Yes)
@@ -690,7 +1020,7 @@ namespace Lineage.Pages
 
                     context.MediaLinks.RemoveRange(mediaLinks);
                     context.MediaFiles.RemoveRange(mediaFiles);
-                    context.SaveChanges();
+                    await context.SaveChangesAsync();
                 }
                 MessageBox.Show("Все медиафайлы удалены!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 LoadAllData();

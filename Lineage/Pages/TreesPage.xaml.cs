@@ -69,10 +69,8 @@ namespace Lineage.Pages
             {
                 using (var context = new GenealogyUnifiedDBEntities2())
                 {
-                    // Получаем тип текущего режима (1 - семейный, 2 - животноводство)
                     int currentProjectTypeId = Session.IsFamilyMode ? 1 : 2;
 
-                    // Получаем проекты, созданные пользователем, ТОЛЬКО текущего типа
                     var trees = context.FamilyTrees
                         .Where(t => t.CreatedByUserId == Session.UserId && t.ProjectTypeId == currentProjectTypeId)
                         .OrderByDescending(t => t.CreatedAt)
@@ -84,7 +82,6 @@ namespace Lineage.Pages
                         borderNoTrees.Visibility = Visibility.Visible;
                         lvTrees.Visibility = Visibility.Collapsed;
 
-                        // Показываем сообщение в зависимости от режима
                         string message = Session.IsFamilyMode
                             ? "У вас нет семейных деревьев. Создайте новое!"
                             : "У вас нет племенных книг. Создайте новую!";
@@ -99,14 +96,13 @@ namespace Lineage.Pages
 
                     foreach (var tree in trees)
                     {
-                        // Подсчитываем статистику в зависимости от типа проекта
                         string statsText = "";
                         int personsCount = 0;
                         int animalsCount = 0;
                         int storiesCount = 0;
                         int mediaCount = 0;
 
-                        if (tree.ProjectTypeId == 1) // Семейное древо
+                        if (tree.ProjectTypeId == 1)
                         {
                             personsCount = context.Persons.Count(p => p.TreeId == tree.Id);
                             var personIds = context.Persons
@@ -115,28 +111,22 @@ namespace Lineage.Pages
                                 .ToList();
                             storiesCount = context.Stories.Count(s => personIds.Contains(s.PersonId));
                             mediaCount = context.MediaLinks.Count(ml => personIds.Contains(ml.PersonId ?? 0));
-
                             statsText = $"👥 {personsCount} персон | 📖 {storiesCount} историй | 📷 {mediaCount} фото";
                         }
-                        else // Племенная книга (животные)
+                        else
                         {
                             animalsCount = context.Animals.Count(a => a.TreeId == tree.Id);
-                            // Для животных считаем количество вязок, выставок и оценок
                             var animalIds = context.Animals
                                 .Where(a => a.TreeId == tree.Id)
                                 .Select(a => a.Id)
                                 .ToList();
-
                             int breedingsCount = context.Breedings.Count(b => b.TreeId == tree.Id);
                             int exhibitionsCount = context.Exhibitions.Count(e => animalIds.Contains(e.AnimalId));
                             int assessmentsCount = context.AnimalAssessments.Count(a => animalIds.Contains(a.AnimalId));
-
                             statsText = $"🐄 {animalsCount} животных | 🔗 {breedingsCount} вязок | 🏆 {exhibitionsCount} выставок | ⭐ {assessmentsCount} оценок";
                         }
 
                         bool isCurrent = (tree.Id == Session.CurrentTreeId);
-
-                        // Право на удаление: только администратор ИЛИ создатель проекта
                         bool canDelete = Session.IsAdmin || tree.CreatedByUserId == Session.UserId;
 
                         allTrees.Add(new TreeItem
@@ -170,7 +160,6 @@ namespace Lineage.Pages
                         btnEditCurrent.Tag = currentTree.Id;
                         btnDeleteCurrent.Tag = currentTree.Id;
 
-                        // Право на удаление текущего дерева
                         bool canDeleteCurrent = Session.IsAdmin || currentTree.CreatedByUserId == Session.UserId;
                         btnDeleteCurrent.Visibility = canDeleteCurrent ? Visibility.Visible : Visibility.Collapsed;
                     }
@@ -184,49 +173,13 @@ namespace Lineage.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка загрузки проектов: {ex.Message}");
+                MessageBox.Show($"Ошибка загрузки проектов: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private void CreateTreeButton_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new TreeEditDialog();
-            if (dialog.ShowDialog() == true)
-            {
-                try
-                {
-                    using (var context = new GenealogyUnifiedDBEntities2())
-                    {
-                        int projectTypeId = Session.IsFamilyMode ? 1 : 2;
-
-                        var newTree = new FamilyTrees
-                        {
-                            Name = dialog.TreeName,
-                            Description = dialog.TreeDescription,
-                            ProjectTypeId = projectTypeId,
-                            CreatedByUserId = Session.UserId,
-                            CreatedAt = DateTime.Now,
-                            IsPublic = dialog.IsPublic
-                        };
-
-                        context.FamilyTrees.Add(newTree);
-                        context.SaveChanges();
-
-                        var treeCount = context.FamilyTrees.Count(t => t.CreatedByUserId == Session.UserId);
-                        if (treeCount == 1)
-                        {
-                            Session.CurrentTreeId = newTree.Id;
-                        }
-
-                        MessageBox.Show("Новый проект создан!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                        LoadTrees();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Ошибка создания проекта: {ex.Message}");
-                }
-            }
+            NavigationService.Navigate(new TreeEditPage());
         }
 
         private void SelectTreeButton_Click(object sender, RoutedEventArgs e)
@@ -236,17 +189,15 @@ namespace Lineage.Pages
 
             int treeId = (int)button.Tag;
 
-            // Проверяем, имеет ли пользователь доступ к этому дереву
             using (var context = new GenealogyUnifiedDBEntities2())
             {
                 var tree = context.FamilyTrees.Find(treeId);
                 if (tree == null) return;
 
-                // Дополнительная проверка: проект должен соответствовать текущему режиму
                 if ((Session.IsFamilyMode && tree.ProjectTypeId != 1) ||
                     (!Session.IsFamilyMode && tree.ProjectTypeId != 2))
                 {
-                    MessageBox.Show("Этот проект не соответствует текущему режиму работы.\n" +
+                    MessageBox.Show("Этот проект не соответствует текущему режиму работы.\n\n" +
                         "Для работы с этим проектом переключите режим на странице выбора.",
                         "Проект недоступен", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
@@ -255,11 +206,8 @@ namespace Lineage.Pages
                 if (tree.IsPublic || tree.CreatedByUserId == Session.UserId || Session.IsAdmin)
                 {
                     Session.CurrentTreeId = treeId;
-
-                    // Устанавливаем режим в соответствии с типом проекта
                     Session.CurrentMode = tree.ProjectTypeId;
                     AppSettings.CurrentMode = tree.ProjectTypeId;
-
                     System.Diagnostics.Debug.WriteLine($"Выбран проект: {tree.Name}, режим: {(tree.ProjectTypeId == 1 ? "Семейный" : "Животноводство")}");
                 }
             }
@@ -281,7 +229,6 @@ namespace Lineage.Pages
                     var tree = context.FamilyTrees.FirstOrDefault(t => t.Id == treeId);
                     if (tree == null) return;
 
-                    // Проверяем права на редактирование (только создатель или админ)
                     if (tree.CreatedByUserId != Session.UserId && !Session.IsAdmin)
                     {
                         MessageBox.Show("Вы можете редактировать только свои проекты!", "Доступ запрещён",
@@ -289,22 +236,12 @@ namespace Lineage.Pages
                         return;
                     }
 
-                    var dialog = new TreeEditDialog(tree);
-                    if (dialog.ShowDialog() == true)
-                    {
-                        tree.Name = dialog.TreeName;
-                        tree.Description = dialog.TreeDescription;
-                        tree.IsPublic = dialog.IsPublic;
-                        context.SaveChanges();
-
-                        MessageBox.Show("Проект обновлён!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                        LoadTrees();
-                    }
+                    NavigationService.Navigate(new TreeEditPage(tree));
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка редактирования проекта: {ex.Message}");
+                MessageBox.Show($"Ошибка редактирования проекта: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -315,13 +252,11 @@ namespace Lineage.Pages
 
             int treeId = (int)button.Tag;
 
-            // Проверяем права на удаление
             using (var checkContext = new GenealogyUnifiedDBEntities2())
             {
                 var tree = checkContext.FamilyTrees.Find(treeId);
                 if (tree == null) return;
 
-                // Только создатель или администратор может удалять
                 if (tree.CreatedByUserId != Session.UserId && !Session.IsAdmin)
                 {
                     MessageBox.Show("Вы можете удалять только свои проекты!", "Доступ запрещён",
@@ -330,7 +265,12 @@ namespace Lineage.Pages
                 }
             }
 
-            var result = MessageBox.Show("Вы уверены, что хотите удалить этот проект?\nВсе связанные данные будут также удалены!",
+            var result = MessageBox.Show("Вы уверены, что хотите удалить этот проект?\n\n" +
+                "Все связанные данные будут также удалены:\n" +
+                "• Все персоны/животные\n" +
+                "• Все истории\n" +
+                "• Все медиафайлы\n\n" +
+                "Это действие НЕОБРАТИМО!",
                 "Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
             if (result == MessageBoxResult.Yes)
@@ -342,7 +282,7 @@ namespace Lineage.Pages
                         var tree = context.FamilyTrees.FirstOrDefault(t => t.Id == treeId);
                         if (tree == null) return;
 
-                        if (tree.ProjectTypeId == 1) // Семейное древо
+                        if (tree.ProjectTypeId == 1)
                         {
                             var persons = context.Persons.Where(p => p.TreeId == treeId).ToList();
                             var personIds = persons.Select(p => p.Id).ToList();
@@ -360,7 +300,7 @@ namespace Lineage.Pages
 
                             context.Persons.RemoveRange(persons);
                         }
-                        else // Племенная книга (животные)
+                        else
                         {
                             var animals = context.Animals.Where(a => a.TreeId == treeId).ToList();
                             var animalIds = animals.Select(a => a.Id).ToList();
@@ -398,7 +338,6 @@ namespace Lineage.Pages
                                 .Where(t => t.CreatedByUserId == Session.UserId && t.ProjectTypeId == Session.CurrentMode)
                                 .FirstOrDefault();
                             Session.CurrentTreeId = anyTree?.Id ?? 0;
-
                             if (anyTree != null)
                             {
                                 AppSettings.CurrentMode = anyTree.ProjectTypeId;
@@ -412,7 +351,7 @@ namespace Lineage.Pages
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Ошибка удаления проекта: {ex.Message}");
+                    MessageBox.Show($"Ошибка удаления проекта: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }

@@ -1023,22 +1023,19 @@ namespace Lineage.Pages
             {
                 if (cmbFilterTree.SelectedItem == null)
                 {
-                    MessageBox.Show("Выберите проект!", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show("Выберите проект!", "Информация",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
                     return;
                 }
 
                 int treeId = (int)cmbFilterTree.SelectedValue;
                 string treeName = (cmbFilterTree.SelectedItem as TreeItem)?.Name ?? "Неизвестно";
-
-                var calendarWindow = new CalendarWindow(treeId, treeName)
-                {
-                    Owner = Window.GetWindow(this)
-                };
-                calendarWindow.ShowDialog();
+                NavigationService.Navigate(new CalendarPage(treeId, treeName));
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка открытия календаря: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка открытия календаря: {ex.Message}", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
